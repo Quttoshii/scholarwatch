@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@react-pdf/renderer": "^4.0.0",
+    "@tensorflow-models/posenet": "^2.2.2",
+    "@tensorflow/tfjs": "^4.22.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",

@@ -7,6 +7,7 @@ import Lectures from './components/Lectures';
 import Quizzes from './components/Quizzes';
 import LiveFeed from './components/LiveFeed';
 import Insights from './components/Insights';
+import PostureDetection from './components/PostureDetection';
 import './App.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <div className="sidebar">
             <Link to="/lectures"><button>Lectures</button></Link>
             <Link to="/liveFeed"><button>Emotion Detection</button></Link>
+            <Link to="/postureDetection"><button>Posture Detection</button></Link>
             <Link to="/quizzes"><button>Quizzes</button></Link>
             <Link to="/insights"><button>Insights</button></Link>
           </div>
@@ -42,6 +44,7 @@ function App() {
                 element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} 
               />
               <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
+              <Route path="/postureDetection" element={<PostureDetection/>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
