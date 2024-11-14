@@ -39,10 +39,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} />} />
               <Route path="/liveFeed" element={<LiveFeed setResults={setResults} />} />
-              <Route 
-                path="/quizzes" 
-                element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} 
-              />
+              <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} />
               <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
               <Route path="/postureDetection" element={<PostureDetection/>} />
               <Route path="*" element={<Navigate to="/" />} />

@@ -1,11 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Tooltip, Legend, PointElement } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Tooltip, Legend, PointElement);
 
 const Insights = ({ results, gazeResults, invalidationCount, totalStudents }) => {
+  const [data, setData] = useState({
+    totalStudents: 0,
+    totalLectures: 0,
+    invalidationCount: 0,
+    emotions: { awake_time: 0, drowsy_time: 0 },
+    attention: { focused_time: 0, unfocused_time: 0 },
+  });
   const [selectedCourse, setSelectedCourse] = useState('Course 1');
+
+  useEffect(() => {
+    fetch("http://localhost/scholarwatch/fetchInsights.php")
+        .then(response => response.json())
+        .then(data => {
+            setData({
+                totalStudents: data.total_students,
+                totalLectures: data.total_lectures,
+                invalidationCount: data.invalidation_count,
+                emotions: data.emotions,
+                attention: data.attention,
+            });
+        })
+        .catch(error => console.error("Error fetching data:", error));
+  }, []);
+
 
   // Sample slide data for two courses
   const slideData = {
@@ -152,12 +175,12 @@ const Insights = ({ results, gazeResults, invalidationCount, totalStudents }) =>
 
           <div className="dashboard-card compact-card">
             <h3>Total Enrolled Students</h3>
-            <p className='compact-card-font'>40</p>
+            <p className='compact-card-font'>{data.totalStudents}</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Total Uploaded Lectures:</h3>
-            <p className='compact-card-font'>5</p>
+            <p className='compact-card-font'>{data.totalLectures}</p>
           </div>
 
           <div className="dashboard-card compact-card">
