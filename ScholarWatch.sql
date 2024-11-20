@@ -17,8 +17,7 @@
  -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password
  -- BY 'root'; 
 
-SELECT * from quiz;
-
+-- CREATE SCHEMA `scholarwatch` ;
 
 use scholarwatch;
 SET NAMES utf8mb4;
@@ -300,16 +299,3 @@ COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-update quiz set is_invalid=1 where quizid = 1001;
-update quiz set is_invalid=1 where quizid = 1002;
-update quiz set is_invalid=0 where quizid = 1003;
-
-update attention set awake_time=30,drowsy_time=5 where moduleid=301; 
-update attention set awake_time=25,drowsy_time=15 where moduleid=302; 
-update attention set awake_time=15,drowsy_time=35 where moduleid=303;
-
-update attention set focused_time=35,unfocused_time=10 where moduleid=301; 
-update attention set focused_time=20,unfocused_time=10 where moduleid=302; 
-update attention set focused_time=20,unfocused_time=30 where moduleid=303;
-
-select * from attention;
