@@ -1,64 +1,75 @@
-// Login.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
 
-const Login = ({ setUserAuthenticated, setUserType }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+function Login({ setUserType }) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost/login.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+    const handleLogin = (e) => {
+        e.preventDefault();
+        
+        // Prepare login data
+        const loginData = {
+            email: email,
+            password: password,
+        };
 
-      const result = await response.json();
-      if (result.success) {
-        setUserAuthenticated(true);
-        setUserType(result.user_type); // Set the user type: "student" or "teacher"
-        navigate('/'); // Redirect to the appropriate page
-      } else {
-        setError(result.message || 'Invalid credentials');
-      }
-    } catch (error) {
-      setError('Failed to connect to the server');
-    }
-  };
+        // Send login request to PHP backend
+        fetch("http://localhost/scholarwatch/fetchlogin.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(loginData),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    // Handle error response
+                    setError(data.error === "invalid_email" ? "Invalid email" : "Invalid password");
+                } else if (data.userType) {
+                    // Set user type on successful login
+                    setUserType(data.userType);
+                }
+            })
+            .catch((error) => {
+                setError("An error occurred. Please try again.");
+                console.error("Error during login:", error);
+            });
+    };
 
-  return (
-    <div className="login-container">
-      <h2>Login</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleLogin}>
-        <label>
-          Username:
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  );
-};
+    return (
+        <div className="login-container">
+            <form className="login-form" onSubmit={handleLogin}>
+                <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
+                    />
+                </div>
+                {error && <p className="error">{error}</p>}
+                <button type="submit" className="login-button">
+                    Login
+                </button>
+            </form>
+        </div>
+    );
+}
 
 export default Login;

@@ -8,9 +8,11 @@ import Quizzes from './components/Quizzes';
 import LiveFeed from './components/LiveFeed';
 import Insights from './components/Insights';
 import PostureDetection from './components/PostureDetection';
+import Login from './components/Login';
 import './App.css';
 
 function App() {
+  const [userType, setUserType] = useState('');
   const [results, setResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
   const [isCalibrated, setIsCalibrated] = useState(false); // Track calibration globally
@@ -26,26 +28,43 @@ function App() {
     <Router>
       <div className="App">
         <Header />
-        <div className="main-container">
-          <div className="sidebar">
-            <Link to="/lectures"><button>Lectures</button></Link>
-            <Link to="/liveFeed"><button>Emotion Detection</button></Link>
-            <Link to="/postureDetection"><button>Posture Detection</button></Link>
-            <Link to="/quizzes"><button>Quizzes</button></Link>
-            <Link to="/insights"><button>Insights</button></Link>
+        {userType === "Teacher" ? (
+          <div className="main-container">
+            <div className="sidebar">
+              <Link to="/insights"><button>Insights</button></Link>
+            </div>
+            <div className="content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </div>
           </div>
-          <div className="content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} />} />
-              <Route path="/liveFeed" element={<LiveFeed setResults={setResults} />} />
-              <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} />
-              <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
-              <Route path="/postureDetection" element={<PostureDetection/>} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+        ) : (userType === "Student") ? (
+          <div className="main-container">
+            <div className="sidebar">
+              <Link to="/lectures"><button>Lectures</button></Link>
+              <Link to="/liveFeed"><button>Emotion Detection</button></Link>
+              <Link to="/postureDetection"><button>Posture Detection</button></Link>
+              <Link to="/quizzes"><button>Quizzes</button></Link>
+            </div>
+            <div className="content">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} />} />
+                <Route path="/liveFeed" element={<LiveFeed setResults={setResults} />} />
+                <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} />
+                <Route path="/postureDetection" element={<PostureDetection/>} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </div>
           </div>
-        </div>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Login setUserType={setUserType}/>}/>
+          </Routes>
+        )}
       </div>
     </Router>
   );
