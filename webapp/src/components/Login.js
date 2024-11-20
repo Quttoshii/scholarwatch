@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function Login({ setUserType }) {
+function Login({ setUserType, setUserID }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -30,6 +30,7 @@ function Login({ setUserType }) {
                 } else if (data.userType) {
                     // Set user type on successful login
                     setUserType(data.userType);
+                    setUserID(data.userID)
                 }
             })
             .catch((error) => {
