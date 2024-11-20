@@ -14,11 +14,7 @@
  Date: 13/11/2024 23:28:43
 */
 
- -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password
- -- BY 'root'; 
-
-SELECT * from quiz;
-
+ -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'V@lorant1'; 
 
 use scholarwatch;
 SET NAMES utf8mb4;
@@ -456,6 +452,15 @@ COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
+ALTER TABLE `scholarwatch`.`quiz` 
+ADD COLUMN `is_invalid` TINYINT NULL AFTER `ContentID`;
+
+ALTER TABLE `scholarwatch`.`attention` 
+ADD COLUMN `awake_time` DECIMAL(2) NULL AFTER `ModuleID`,
+ADD COLUMN `drowsy_time` DECIMAL(2) NULL AFTER `awake_time`,
+ADD COLUMN `focused_time` DECIMAL(2) NULL AFTER `drowsy_time`,
+ADD COLUMN `unfocused_time` DECIMAL(2) NULL AFTER `focused_time`;
+
 update quiz set is_invalid=1 where quizid = 1001;
 update quiz set is_invalid=1 where quizid = 1002;
 update quiz set is_invalid=0 where quizid = 1003;
@@ -468,4 +473,3 @@ update attention set focused_time=35,unfocused_time=10 where moduleid=301;
 update attention set focused_time=20,unfocused_time=10 where moduleid=302; 
 update attention set focused_time=20,unfocused_time=30 where moduleid=303;
 
-select * from attention;
