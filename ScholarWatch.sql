@@ -11,7 +11,7 @@
  Target Server Version : 110502 (11.5.2-MariaDB)
  File Encoding         : 65001
 
- Date: 13/11/2024 23:28:43
+ Date: 17/11/2024 16:39:01
 */
 
  -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'V@lorant1'; 
@@ -21,22 +21,40 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for ActivityMonitoring
+-- Table structure for Activity
 -- ----------------------------
-DROP TABLE IF EXISTS `ActivityMonitoring`;
-CREATE TABLE `ActivityMonitoring` (
-  `ModuleID` int(11) NOT NULL,
-  PRIMARY KEY (`ModuleID`),
-  CONSTRAINT `activitymonitoring_ibfk_1` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `Activity`;
+CREATE TABLE `Activity` (
+  `ActivityID` int(11) NOT NULL AUTO_INCREMENT,
+  `UserID` int(11) NOT NULL,
+  `SessionID` int(11) NOT NULL,
+  `SlideID` int(11) NOT NULL,
+  `FocusTime` float NOT NULL,
+  `UnfocusTime` float NOT NULL,
+  `SlouchingTime` float NOT NULL,
+  `AttentiveTime` float NOT NULL,
+  `LookingLeftTime` float NOT NULL,
+  `LookingRightTime` float NOT NULL,
+  `PhoneUsageTime` float NOT NULL,
+  `DrowsyTime` float NOT NULL,
+  `AwakeTime` float NOT NULL,
+  `Timestamp` datetime NOT NULL,
+  PRIMARY KEY (`ActivityID`),
+  KEY `UserID` (`UserID`),
+  KEY `SessionID` (`SessionID`),
+  KEY `SlideID` (`SlideID`),
+  CONSTRAINT `activity_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
+  CONSTRAINT `activity_ibfk_2` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`),
+  CONSTRAINT `activity_ibfk_3` FOREIGN KEY (`SlideID`) REFERENCES `Slide` (`SlideID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
--- Records of ActivityMonitoring
+-- Records of Activity
 -- ----------------------------
 BEGIN;
-INSERT INTO `ActivityMonitoring` (`ModuleID`) VALUES (301);
-INSERT INTO `ActivityMonitoring` (`ModuleID`) VALUES (302);
-INSERT INTO `ActivityMonitoring` (`ModuleID`) VALUES (303);
+INSERT INTO `Activity` (`ActivityID`, `UserID`, `SessionID`, `SlideID`, `FocusTime`, `UnfocusTime`, `SlouchingTime`, `AttentiveTime`, `LookingLeftTime`, `LookingRightTime`, `PhoneUsageTime`, `DrowsyTime`, `AwakeTime`, `Timestamp`) VALUES (1, 3, 1, 1, 300, 50, 20, 280, 10, 15, 5, 30, 270, '2024-01-15 09:15:00');
+INSERT INTO `Activity` (`ActivityID`, `UserID`, `SessionID`, `SlideID`, `FocusTime`, `UnfocusTime`, `SlouchingTime`, `AttentiveTime`, `LookingLeftTime`, `LookingRightTime`, `PhoneUsageTime`, `DrowsyTime`, `AwakeTime`, `Timestamp`) VALUES (2, 4, 1, 2, 250, 60, 30, 220, 15, 10, 10, 40, 210, '2024-01-15 09:30:00');
+INSERT INTO `Activity` (`ActivityID`, `UserID`, `SessionID`, `SlideID`, `FocusTime`, `UnfocusTime`, `SlouchingTime`, `AttentiveTime`, `LookingLeftTime`, `LookingRightTime`, `PhoneUsageTime`, `DrowsyTime`, `AwakeTime`, `Timestamp`) VALUES (3, 5, 2, 3, 180, 30, 10, 160, 5, 10, 0, 10, 170, '2024-01-16 10:15:00');
 COMMIT;
 
 -- ----------------------------
@@ -44,221 +62,102 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `Analytics`;
 CREATE TABLE `Analytics` (
-  `AnalyticID` int(11) NOT NULL,
-  `PerformanceMetrics` text DEFAULT NULL,
-  `AttentionMetrics` text DEFAULT NULL,
-  `AttendanceRecord` text DEFAULT NULL,
-  `Grade` float DEFAULT NULL,
-  `Marks` float DEFAULT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  `ModuleID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`AnalyticID`),
+  `AnalyticsID` int(11) NOT NULL AUTO_INCREMENT,
+  `UserID` int(11) NOT NULL,
+  `SessionID` int(11) NOT NULL,
+  `WeakTopics` text NOT NULL,
+  `AverageFocus` float NOT NULL,
+  `PerformanceScore` float NOT NULL,
+  `ImprovementSuggestions` text NOT NULL,
+  PRIMARY KEY (`AnalyticsID`),
   KEY `UserID` (`UserID`),
-  KEY `ModuleID` (`ModuleID`),
+  KEY `SessionID` (`SessionID`),
   CONSTRAINT `analytics_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
-  CONSTRAINT `analytics_ibfk_2` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `analytics_ibfk_2` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of Analytics
 -- ----------------------------
 BEGIN;
-INSERT INTO `Analytics` (`AnalyticID`, `PerformanceMetrics`, `AttentionMetrics`, `AttendanceRecord`, `Grade`, `Marks`, `UserID`, `ModuleID`) VALUES (601, 'High', '85%', 'Present', 3.7, 85, 101, 301);
-INSERT INTO `Analytics` (`AnalyticID`, `PerformanceMetrics`, `AttentionMetrics`, `AttendanceRecord`, `Grade`, `Marks`, `UserID`, `ModuleID`) VALUES (602, 'Moderate', '75%', 'Present', 3, 70, 103, 302);
-INSERT INTO `Analytics` (`AnalyticID`, `PerformanceMetrics`, `AttentionMetrics`, `AttendanceRecord`, `Grade`, `Marks`, `UserID`, `ModuleID`) VALUES (603, 'High', '90%', 'Present', 3.9, 88, 104, 303);
+INSERT INTO `Analytics` (`AnalyticsID`, `UserID`, `SessionID`, `WeakTopics`, `AverageFocus`, `PerformanceScore`, `ImprovementSuggestions`) VALUES (1, 3, 1, 'Loops, Functions', 250.5, 78, 'Practice more on loops and try solving function problems.');
+INSERT INTO `Analytics` (`AnalyticsID`, `UserID`, `SessionID`, `WeakTopics`, `AverageFocus`, `PerformanceScore`, `ImprovementSuggestions`) VALUES (2, 4, 1, 'Algebra Basics', 220, 85, 'Improve algebraic equation solving speed.');
+INSERT INTO `Analytics` (`AnalyticsID`, `UserID`, `SessionID`, `WeakTopics`, `AverageFocus`, `PerformanceScore`, `ImprovementSuggestions`) VALUES (3, 5, 2, 'Fractions', 180, 72.5, 'Focus on understanding fractions deeply.');
 COMMIT;
 
 -- ----------------------------
--- Table structure for AttendanceMonitoring
+-- Table structure for Attendance
 -- ----------------------------
-DROP TABLE IF EXISTS `AttendanceMonitoring`;
-CREATE TABLE `AttendanceMonitoring` (
-  `ModuleID` int(11) NOT NULL,
-  `AttendanceThreshold` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ModuleID`),
-  CONSTRAINT `attendancemonitoring_ibfk_1` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of AttendanceMonitoring
--- ----------------------------
-BEGIN;
-INSERT INTO `AttendanceMonitoring` (`ModuleID`, `AttendanceThreshold`) VALUES (301, 75);
-INSERT INTO `AttendanceMonitoring` (`ModuleID`, `AttendanceThreshold`) VALUES (302, 80);
-INSERT INTO `AttendanceMonitoring` (`ModuleID`, `AttendanceThreshold`) VALUES (303, 70);
-COMMIT;
-
--- ----------------------------
--- Table structure for Attention
--- ----------------------------
-DROP TABLE IF EXISTS `Attention`;
-CREATE TABLE `Attention` (
-  `ModuleID` int(11) NOT NULL,
-  PRIMARY KEY (`ModuleID`),
-  CONSTRAINT `attention_ibfk_1` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of Attention
--- ----------------------------
-BEGIN;
-INSERT INTO `Attention` (`ModuleID`) VALUES (301);
-INSERT INTO `Attention` (`ModuleID`) VALUES (302);
-INSERT INTO `Attention` (`ModuleID`) VALUES (303);
-COMMIT;
-
--- ----------------------------
--- Table structure for Content
--- ----------------------------
-DROP TABLE IF EXISTS `Content`;
-CREATE TABLE `Content` (
-  `ContentID` int(11) NOT NULL,
-  `SourceFile` text DEFAULT NULL,
-  PRIMARY KEY (`ContentID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of Content
--- ----------------------------
-BEGIN;
-INSERT INTO `Content` (`ContentID`, `SourceFile`) VALUES (401, 'intro_to_cs.pdf');
-INSERT INTO `Content` (`ContentID`, `SourceFile`) VALUES (402, 'math_for_computing.pdf');
-INSERT INTO `Content` (`ContentID`, `SourceFile`) VALUES (403, 'ethics_in_tech.pdf');
-COMMIT;
-
--- ----------------------------
--- Table structure for ExpressionRecognition
--- ----------------------------
-DROP TABLE IF EXISTS `ExpressionRecognition`;
-CREATE TABLE `ExpressionRecognition` (
-  `anmID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  `SessionID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`anmID`),
+DROP TABLE IF EXISTS `Attendance`;
+CREATE TABLE `Attendance` (
+  `AttendanceID` int(11) NOT NULL AUTO_INCREMENT,
+  `UserID` int(11) NOT NULL,
+  `SessionID` int(11) NOT NULL,
+  `Date` date NOT NULL,
+  `IsPresent` tinyint(1) NOT NULL,
+  PRIMARY KEY (`AttendanceID`),
   KEY `UserID` (`UserID`),
   KEY `SessionID` (`SessionID`),
-  CONSTRAINT `expressionrecognition_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
-  CONSTRAINT `expressionrecognition_ibfk_2` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
+  CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
--- Records of ExpressionRecognition
+-- Records of Attendance
 -- ----------------------------
 BEGIN;
-INSERT INTO `ExpressionRecognition` (`anmID`, `UserID`, `SessionID`) VALUES (901, 101, 501);
-INSERT INTO `ExpressionRecognition` (`anmID`, `UserID`, `SessionID`) VALUES (902, 103, 502);
-INSERT INTO `ExpressionRecognition` (`anmID`, `UserID`, `SessionID`) VALUES (903, 104, 503);
+INSERT INTO `Attendance` (`AttendanceID`, `UserID`, `SessionID`, `Date`, `IsPresent`) VALUES (1, 3, 1, '2024-01-15', 1);
+INSERT INTO `Attendance` (`AttendanceID`, `UserID`, `SessionID`, `Date`, `IsPresent`) VALUES (2, 4, 1, '2024-01-15', 1);
+INSERT INTO `Attendance` (`AttendanceID`, `UserID`, `SessionID`, `Date`, `IsPresent`) VALUES (3, 5, 2, '2024-01-16', 1);
 COMMIT;
 
 -- ----------------------------
--- Table structure for GazeTracking
+-- Table structure for Course
 -- ----------------------------
-DROP TABLE IF EXISTS `GazeTracking`;
-CREATE TABLE `GazeTracking` (
-  `anmID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  `SessionID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`anmID`),
-  KEY `UserID` (`UserID`),
+DROP TABLE IF EXISTS `Course`;
+CREATE TABLE `Course` (
+  `CourseID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) NOT NULL,
+  `TeacherID` int(11) NOT NULL,
+  PRIMARY KEY (`CourseID`),
+  KEY `TeacherID` (`TeacherID`),
+  CONSTRAINT `course_ibfk_1` FOREIGN KEY (`TeacherID`) REFERENCES `User` (`UserID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+-- Records of Course
+-- ----------------------------
+BEGIN;
+INSERT INTO `Course` (`CourseID`, `Name`, `TeacherID`) VALUES (1, 'Computer Science', 1);
+INSERT INTO `Course` (`CourseID`, `Name`, `TeacherID`) VALUES (2, 'Mathematics', 2);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for Lecture
+-- ----------------------------
+DROP TABLE IF EXISTS `Lecture`;
+CREATE TABLE `Lecture` (
+  `LectureID` int(11) NOT NULL AUTO_INCREMENT,
+  `SessionID` int(11) NOT NULL,
+  `CourseID` int(11) NOT NULL,
+  `LectureName` varchar(255) NOT NULL,
+  `DirectoryPath` varchar(255) NOT NULL,
+  `SlideCount` int(11) NOT NULL,
+  `StartTimestamp` datetime NOT NULL,
+  `EndTimestamp` datetime NOT NULL,
+  PRIMARY KEY (`LectureID`),
   KEY `SessionID` (`SessionID`),
-  CONSTRAINT `gazetracking_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
-  CONSTRAINT `gazetracking_ibfk_2` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `CourseID` (`CourseID`),
+  CONSTRAINT `lecture_ibfk_1` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`),
+  CONSTRAINT `lecture_ibfk_2` FOREIGN KEY (`CourseID`) REFERENCES `Course` (`CourseID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
--- Records of GazeTracking
+-- Records of Lecture
 -- ----------------------------
 BEGIN;
-INSERT INTO `GazeTracking` (`anmID`, `UserID`, `SessionID`) VALUES (701, 101, 501);
-INSERT INTO `GazeTracking` (`anmID`, `UserID`, `SessionID`) VALUES (702, 103, 502);
-INSERT INTO `GazeTracking` (`anmID`, `UserID`, `SessionID`) VALUES (703, 104, 503);
-COMMIT;
-
--- ----------------------------
--- Table structure for LMS_Module
--- ----------------------------
-DROP TABLE IF EXISTS `LMS_Module`;
-CREATE TABLE `LMS_Module` (
-  `lmsID` int(11) NOT NULL,
-  `ModuleID` int(11) NOT NULL,
-  PRIMARY KEY (`lmsID`,`ModuleID`),
-  KEY `ModuleID` (`ModuleID`),
-  CONSTRAINT `lms_module_ibfk_1` FOREIGN KEY (`lmsID`) REFERENCES `ScholarWatchLMS` (`lmsID`),
-  CONSTRAINT `lms_module_ibfk_2` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of LMS_Module
--- ----------------------------
-BEGIN;
-INSERT INTO `LMS_Module` (`lmsID`, `ModuleID`) VALUES (201, 301);
-INSERT INTO `LMS_Module` (`lmsID`, `ModuleID`) VALUES (201, 302);
-INSERT INTO `LMS_Module` (`lmsID`, `ModuleID`) VALUES (202, 303);
-COMMIT;
-
--- ----------------------------
--- Table structure for Module
--- ----------------------------
-DROP TABLE IF EXISTS `Module`;
-CREATE TABLE `Module` (
-  `ModuleID` int(11) NOT NULL,
-  `Title` varchar(255) DEFAULT NULL,
-  `Description` text DEFAULT NULL,
-  PRIMARY KEY (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of Module
--- ----------------------------
-BEGIN;
-INSERT INTO `Module` (`ModuleID`, `Title`, `Description`) VALUES (301, 'Computer Science Basics', 'Introduction to Computer Science fundamentals');
-INSERT INTO `Module` (`ModuleID`, `Title`, `Description`) VALUES (302, 'Mathematics for Computing', 'Mathematics concepts applied in computing');
-INSERT INTO `Module` (`ModuleID`, `Title`, `Description`) VALUES (303, 'Ethics in Technology', 'Exploring ethical concerns in modern tech usage');
-COMMIT;
-
--- ----------------------------
--- Table structure for Plugin
--- ----------------------------
-DROP TABLE IF EXISTS `Plugin`;
-CREATE TABLE `Plugin` (
-  `PluginID` int(11) NOT NULL,
-  `Name` varchar(50) DEFAULT NULL,
-  `Version` varchar(20) DEFAULT NULL,
-  `ModerationIntegration` text DEFAULT NULL,
-  PRIMARY KEY (`PluginID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of Plugin
--- ----------------------------
-BEGIN;
-INSERT INTO `Plugin` (`PluginID`, `Name`, `Version`, `ModerationIntegration`) VALUES (1301, 'Zoom Integration', '1.0', 'Video moderation tool');
-INSERT INTO `Plugin` (`PluginID`, `Name`, `Version`, `ModerationIntegration`) VALUES (1302, 'Attendance Tracker', '2.1', 'Automated attendance system');
-INSERT INTO `Plugin` (`PluginID`, `Name`, `Version`, `ModerationIntegration`) VALUES (1303, 'Gaze Tracker', '1.5', 'Monitors student gaze during sessions');
-COMMIT;
-
--- ----------------------------
--- Table structure for PostureDetection
--- ----------------------------
-DROP TABLE IF EXISTS `PostureDetection`;
-CREATE TABLE `PostureDetection` (
-  `anmID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  `SessionID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`anmID`),
-  KEY `UserID` (`UserID`),
-  KEY `SessionID` (`SessionID`),
-  CONSTRAINT `posturedetection_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
-  CONSTRAINT `posturedetection_ibfk_2` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of PostureDetection
--- ----------------------------
-BEGIN;
-INSERT INTO `PostureDetection` (`anmID`, `UserID`, `SessionID`) VALUES (801, 101, 501);
-INSERT INTO `PostureDetection` (`anmID`, `UserID`, `SessionID`) VALUES (802, 103, 502);
-INSERT INTO `PostureDetection` (`anmID`, `UserID`, `SessionID`) VALUES (803, 104, 503);
+INSERT INTO `Lecture` (`LectureID`, `SessionID`, `CourseID`, `LectureName`, `DirectoryPath`, `SlideCount`, `StartTimestamp`, `EndTimestamp`) VALUES (1, 1, 1, 'Introduction to Programming', '/lectures/programming_intro.pdf', 10, '2024-01-15 09:00:00', '2024-01-15 10:30:00');
+INSERT INTO `Lecture` (`LectureID`, `SessionID`, `CourseID`, `LectureName`, `DirectoryPath`, `SlideCount`, `StartTimestamp`, `EndTimestamp`) VALUES (2, 2, 2, 'Algebra Basics', '/lectures/algebra_basics.pdf', 8, '2024-01-16 10:00:00', '2024-01-16 11:00:00');
 COMMIT;
 
 -- ----------------------------
@@ -266,59 +165,56 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `Quiz`;
 CREATE TABLE `Quiz` (
-  `QuizID` int(11) NOT NULL,
-  `Question` text DEFAULT NULL,
-  `CorrectAnswers` text DEFAULT NULL,
-  `UserResponses` text DEFAULT NULL,
-  `ContentID` int(11) DEFAULT NULL,
+  `QuizID` int(11) NOT NULL AUTO_INCREMENT,
+  `SessionID` int(11) NOT NULL,
+  `LectureID` int(11) NOT NULL,
+  `UserID` int(11) NOT NULL,
+  `GeneratedDate` datetime NOT NULL,
+  `AttemptCount` int(11) NOT NULL,
+  `InvalidationCount` int(11) NOT NULL,
+  `InvalidationReason` varchar(255) DEFAULT NULL,
+  `AllotedTime` int(11) NOT NULL,
   PRIMARY KEY (`QuizID`),
-  KEY `ContentID` (`ContentID`),
-  CONSTRAINT `quiz_ibfk_1` FOREIGN KEY (`ContentID`) REFERENCES `Content` (`ContentID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `SessionID` (`SessionID`),
+  KEY `LectureID` (`LectureID`),
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `quiz_ibfk_1` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`),
+  CONSTRAINT `quiz_ibfk_2` FOREIGN KEY (`LectureID`) REFERENCES `Lecture` (`LectureID`),
+  CONSTRAINT `quiz_ibfk_3` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of Quiz
 -- ----------------------------
 BEGIN;
-INSERT INTO `Quiz` (`QuizID`, `Question`, `CorrectAnswers`, `UserResponses`, `ContentID`) VALUES (1001, 'What is an algorithm?', 'A process or set of rules', 'A step-by-step process', 401);
-INSERT INTO `Quiz` (`QuizID`, `Question`, `CorrectAnswers`, `UserResponses`, `ContentID`) VALUES (1002, 'What is the derivative of x^2?', '2x', 'x', 402);
-INSERT INTO `Quiz` (`QuizID`, `Question`, `CorrectAnswers`, `UserResponses`, `ContentID`) VALUES (1003, 'What is digital ethics?', 'Ethics related to digital world', 'Ethics in tech', 403);
+INSERT INTO `Quiz` (`QuizID`, `SessionID`, `LectureID`, `UserID`, `GeneratedDate`, `AttemptCount`, `InvalidationCount`, `InvalidationReason`, `AllotedTime`) VALUES (1, 3, 1, 3, '2024-01-17 11:00:00', 1, 0, NULL, 30);
+INSERT INTO `Quiz` (`QuizID`, `SessionID`, `LectureID`, `UserID`, `GeneratedDate`, `AttemptCount`, `InvalidationCount`, `InvalidationReason`, `AllotedTime`) VALUES (2, 3, 1, 4, '2024-01-17 11:05:00', 2, 1, 'Tab Switch', 30);
+INSERT INTO `Quiz` (`QuizID`, `SessionID`, `LectureID`, `UserID`, `GeneratedDate`, `AttemptCount`, `InvalidationCount`, `InvalidationReason`, `AllotedTime`) VALUES (3, 3, 1, 5, '2024-01-17 11:10:00', 1, 0, NULL, 30);
 COMMIT;
 
 -- ----------------------------
--- Table structure for QuizGeneration
+-- Table structure for QuizQuestion
 -- ----------------------------
-DROP TABLE IF EXISTS `QuizGeneration`;
-CREATE TABLE `QuizGeneration` (
-  `ModuleID` int(11) NOT NULL,
-  PRIMARY KEY (`ModuleID`),
-  CONSTRAINT `quizgeneration_ibfk_1` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `QuizQuestion`;
+CREATE TABLE `QuizQuestion` (
+  `QuestionID` int(11) NOT NULL AUTO_INCREMENT,
+  `QuizID` int(11) NOT NULL,
+  `QuestionText` text NOT NULL,
+  `CorrectAnswer` varchar(255) NOT NULL,
+  `StudentAnswer` varchar(255) DEFAULT NULL,
+  `IsCorrect` tinyint(1) NOT NULL,
+  PRIMARY KEY (`QuestionID`),
+  KEY `QuizID` (`QuizID`),
+  CONSTRAINT `quizquestion_ibfk_1` FOREIGN KEY (`QuizID`) REFERENCES `Quiz` (`QuizID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
--- Records of QuizGeneration
+-- Records of QuizQuestion
 -- ----------------------------
 BEGIN;
-INSERT INTO `QuizGeneration` (`ModuleID`) VALUES (301);
-INSERT INTO `QuizGeneration` (`ModuleID`) VALUES (302);
-INSERT INTO `QuizGeneration` (`ModuleID`) VALUES (303);
-COMMIT;
-
--- ----------------------------
--- Table structure for ScholarWatchLMS
--- ----------------------------
-DROP TABLE IF EXISTS `ScholarWatchLMS`;
-CREATE TABLE `ScholarWatchLMS` (
-  `lmsID` int(11) NOT NULL,
-  PRIMARY KEY (`lmsID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of ScholarWatchLMS
--- ----------------------------
-BEGIN;
-INSERT INTO `ScholarWatchLMS` (`lmsID`) VALUES (201);
-INSERT INTO `ScholarWatchLMS` (`lmsID`) VALUES (202);
+INSERT INTO `QuizQuestion` (`QuestionID`, `QuizID`, `QuestionText`, `CorrectAnswer`, `StudentAnswer`, `IsCorrect`) VALUES (1, 1, 'What is a variable in programming?', 'Storage of data', 'Storage of data', 1);
+INSERT INTO `QuizQuestion` (`QuestionID`, `QuizID`, `QuestionText`, `CorrectAnswer`, `StudentAnswer`, `IsCorrect`) VALUES (2, 2, 'Simplify x + x = ?', '2x', '2x', 1);
+INSERT INTO `QuizQuestion` (`QuestionID`, `QuizID`, `QuestionText`, `CorrectAnswer`, `StudentAnswer`, `IsCorrect`) VALUES (3, 3, 'What is 2 + 2?', '4', '3', 0);
 COMMIT;
 
 -- ----------------------------
@@ -326,82 +222,51 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `Session`;
 CREATE TABLE `Session` (
-  `SessionID` int(11) NOT NULL,
-  `Type` varchar(50) DEFAULT NULL,
-  `ContentID` int(11) DEFAULT NULL,
+  `SessionID` int(11) NOT NULL AUTO_INCREMENT,
+  `SessionType` enum('Lecture','Quiz') NOT NULL,
+  `CourseID` int(11) NOT NULL,
+  `UserID` int(11) NOT NULL,
+  `SessionDate` datetime NOT NULL,
+  `StartTimestamp` datetime NOT NULL,
+  `EndTimestamp` datetime NOT NULL,
   PRIMARY KEY (`SessionID`),
-  KEY `ContentID` (`ContentID`),
-  CONSTRAINT `session_ibfk_1` FOREIGN KEY (`ContentID`) REFERENCES `Content` (`ContentID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `CourseID` (`CourseID`),
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `session_ibfk_1` FOREIGN KEY (`CourseID`) REFERENCES `Course` (`CourseID`),
+  CONSTRAINT `session_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of Session
 -- ----------------------------
 BEGIN;
-INSERT INTO `Session` (`SessionID`, `Type`, `ContentID`) VALUES (501, 'Lecture', 401);
-INSERT INTO `Session` (`SessionID`, `Type`, `ContentID`) VALUES (502, 'Tutorial', 402);
-INSERT INTO `Session` (`SessionID`, `Type`, `ContentID`) VALUES (503, 'Seminar', 403);
+INSERT INTO `Session` (`SessionID`, `SessionType`, `CourseID`, `UserID`, `SessionDate`, `StartTimestamp`, `EndTimestamp`) VALUES (1, 'Lecture', 1, 1, '2024-01-15 00:00:00', '2024-01-15 09:00:00', '2024-01-15 10:30:00');
+INSERT INTO `Session` (`SessionID`, `SessionType`, `CourseID`, `UserID`, `SessionDate`, `StartTimestamp`, `EndTimestamp`) VALUES (2, 'Lecture', 2, 2, '2024-01-16 00:00:00', '2024-01-16 10:00:00', '2024-01-16 11:00:00');
+INSERT INTO `Session` (`SessionID`, `SessionType`, `CourseID`, `UserID`, `SessionDate`, `StartTimestamp`, `EndTimestamp`) VALUES (3, 'Quiz', 1, 1, '2024-01-17 00:00:00', '2024-01-17 11:00:00', '2024-01-17 11:30:00');
 COMMIT;
 
 -- ----------------------------
--- Table structure for SlideGeneration
+-- Table structure for Slide
 -- ----------------------------
-DROP TABLE IF EXISTS `SlideGeneration`;
-CREATE TABLE `SlideGeneration` (
-  `ModuleID` int(11) NOT NULL,
-  PRIMARY KEY (`ModuleID`),
-  CONSTRAINT `slidegeneration_ibfk_1` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `Slide`;
+CREATE TABLE `Slide` (
+  `SlideID` int(11) NOT NULL AUTO_INCREMENT,
+  `LectureID` int(11) NOT NULL,
+  `SlideNumber` int(11) NOT NULL,
+  `FocusDuration` float NOT NULL,
+  PRIMARY KEY (`SlideID`),
+  KEY `LectureID` (`LectureID`),
+  CONSTRAINT `slide_ibfk_1` FOREIGN KEY (`LectureID`) REFERENCES `Lecture` (`LectureID`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
--- Records of SlideGeneration
+-- Records of Slide
 -- ----------------------------
 BEGIN;
-INSERT INTO `SlideGeneration` (`ModuleID`) VALUES (301);
-INSERT INTO `SlideGeneration` (`ModuleID`) VALUES (302);
-INSERT INTO `SlideGeneration` (`ModuleID`) VALUES (303);
-COMMIT;
-
--- ----------------------------
--- Table structure for SplitScreen
--- ----------------------------
-DROP TABLE IF EXISTS `SplitScreen`;
-CREATE TABLE `SplitScreen` (
-  `anmID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`anmID`),
-  KEY `UserID` (`UserID`),
-  CONSTRAINT `splitscreen_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of SplitScreen
--- ----------------------------
-BEGIN;
-INSERT INTO `SplitScreen` (`anmID`, `UserID`) VALUES (1101, 101);
-INSERT INTO `SplitScreen` (`anmID`, `UserID`) VALUES (1102, 103);
-INSERT INTO `SplitScreen` (`anmID`, `UserID`) VALUES (1103, 104);
-COMMIT;
-
--- ----------------------------
--- Table structure for TabSwitching
--- ----------------------------
-DROP TABLE IF EXISTS `TabSwitching`;
-CREATE TABLE `TabSwitching` (
-  `anmID` int(11) NOT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  PRIMARY KEY (`anmID`),
-  KEY `UserID` (`UserID`),
-  CONSTRAINT `tabswitching_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of TabSwitching
--- ----------------------------
-BEGIN;
-INSERT INTO `TabSwitching` (`anmID`, `UserID`) VALUES (1201, 101);
-INSERT INTO `TabSwitching` (`anmID`, `UserID`) VALUES (1202, 103);
-INSERT INTO `TabSwitching` (`anmID`, `UserID`) VALUES (1203, 104);
+INSERT INTO `Slide` (`SlideID`, `LectureID`, `SlideNumber`, `FocusDuration`) VALUES (1, 1, 1, 150.5);
+INSERT INTO `Slide` (`SlideID`, `LectureID`, `SlideNumber`, `FocusDuration`) VALUES (2, 1, 2, 200.8);
+INSERT INTO `Slide` (`SlideID`, `LectureID`, `SlideNumber`, `FocusDuration`) VALUES (3, 2, 1, 180.3);
+INSERT INTO `Slide` (`SlideID`, `LectureID`, `SlideNumber`, `FocusDuration`) VALUES (4, 2, 2, 140.2);
 COMMIT;
 
 -- ----------------------------
@@ -409,45 +274,24 @@ COMMIT;
 -- ----------------------------
 DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
-  `UserID` int(11) NOT NULL,
-  `Name` varchar(100) DEFAULT NULL,
-  `Email` varchar(100) DEFAULT NULL,
-  `UserType` varchar(50) DEFAULT NULL,
+  `UserID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `UserType` enum('Student','Teacher') NOT NULL,
+  `Threshold` float DEFAULT NULL,
   PRIMARY KEY (`UserID`),
   UNIQUE KEY `Email` (`Email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of User
 -- ----------------------------
 BEGIN;
-INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`) VALUES (101, 'Ali Khan', 'ali.khan@example.pk', 'Student');
-INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`) VALUES (102, 'Sara Ali', 'sara.ali@example.pk', 'Teacher');
-INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`) VALUES (103, 'Usman Raza', 'usman.raza@example.pk', 'Student');
-INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`) VALUES (104, 'Ayesha Malik', 'ayesha.malik@example.pk', 'Student');
-COMMIT;
-
--- ----------------------------
--- Table structure for User_LMS
--- ----------------------------
-DROP TABLE IF EXISTS `User_LMS`;
-CREATE TABLE `User_LMS` (
-  `UserID` int(11) NOT NULL,
-  `lmsID` int(11) NOT NULL,
-  PRIMARY KEY (`UserID`,`lmsID`),
-  KEY `lmsID` (`lmsID`),
-  CONSTRAINT `user_lms_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
-  CONSTRAINT `user_lms_ibfk_2` FOREIGN KEY (`lmsID`) REFERENCES `ScholarWatchLMS` (`lmsID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ----------------------------
--- Records of User_LMS
--- ----------------------------
-BEGIN;
-INSERT INTO `User_LMS` (`UserID`, `lmsID`) VALUES (101, 201);
-INSERT INTO `User_LMS` (`UserID`, `lmsID`) VALUES (102, 201);
-INSERT INTO `User_LMS` (`UserID`, `lmsID`) VALUES (104, 201);
-INSERT INTO `User_LMS` (`UserID`, `lmsID`) VALUES (103, 202);
+INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (1, 'Ahmed Ali', 'ahmed.ali@gmail.com', 'Teacher', 0.75);
+INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (2, 'Fatima Khan', 'fatima.khan@gmail.com', 'Teacher', 0.8);
+INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (3, 'Hassan Raza', 'hassan.raza@gmail.com', 'Student', NULL);
+INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (4, 'Ayesha Malik', 'ayesha.malik@gmail.com', 'Student', NULL);
+INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (5, 'Zainab Tariq', 'zainab.tariq@gmail.com', 'Student', NULL);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
