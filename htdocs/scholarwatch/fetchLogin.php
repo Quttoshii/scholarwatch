@@ -16,11 +16,11 @@ try {
 
         $response = [];
 
-        // Prepare and execute query to fetch the password
-        $stmt = $pdo->prepare("SELECT password FROM user WHERE Email = :email");
+        // Prepare and execute query to fetch user details
+        $stmt = $pdo->prepare("SELECT userType, userID, password FROM user WHERE Email = :email");
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
-        
+
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
@@ -28,24 +28,20 @@ try {
 
             // Verify password
             if ($db_password == $password) {
-                // Fetch user type if password is correct
-                $stmt = $pdo->prepare("SELECT userType FROM user WHERE Email = :email");
-                $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-                $stmt->execute();
-
-                $userType = $stmt->fetch(PDO::FETCH_ASSOC)['userType'];
-                $response['userType'] = $userType;
+                // Password correct, return user details
+                $response['userType'] = $user['userType'];
+                $response['userID'] = $user['userID'];
             } else {
-                $response['error'] = "invalid_password";
+                $response['error'] = "invalid_password"; // Incorrect password
             }
         } else {
-            $response['error'] = "invalid_email";
+            $response['error'] = "invalid_email"; // Invalid email
         }
 
         echo json_encode($response);
     } else {
-        echo json_encode(["success" => false, "message" => "Invalid input"]);
+        echo json_encode(["error" => "Invalid input"]); // Missing email or password
     }
 } catch (PDOException $e) {
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(["error" => $e->getMessage()]); // Database error
 }
