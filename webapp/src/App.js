@@ -9,10 +9,13 @@ import LiveFeed from './components/LiveFeed';
 import Insights from './components/Insights';
 import PostureDetection from './components/PostureDetection';
 import Login from './components/Login';
+import CreateQuiz from './components/CreateQuiz';
+import CreateLecture from './components/CreateLecture';
 import './App.css';
 
 function App() {
   const [userType, setUserType] = useState('');
+  const [userID, setUserID] = useState('');
   const [results, setResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
   const [isCalibrated, setIsCalibrated] = useState(false); // Track calibration globally
@@ -27,15 +30,19 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header />
+        <Header userType={userType}/>
         {userType === "Teacher" ? (
           <div className="main-container">
             <div className="sidebar">
+              <Link to="/createLecture"><button>Lectures</button></Link>
+              <Link to="/createQuiz"><button>Quizzes</button></Link>
               <Link to="/insights"><button>Insights</button></Link>
             </div>
             <div className="content">
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/createLecture" element={<CreateLecture userID={userID}/>}/>
+                <Route path="/createQuiz" element={<CreateQuiz/>}/>
                 <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
@@ -62,7 +69,7 @@ function App() {
           </div>
         ) : (
           <Routes>
-            <Route path="/" element={<Login setUserType={setUserType}/>}/>
+            <Route path="/" element={<Login setUserType={setUserType} setUserID={setUserID}/>}/>
           </Routes>
         )}
       </div>

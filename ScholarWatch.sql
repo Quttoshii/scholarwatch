@@ -14,7 +14,7 @@
  Date: 17/11/2024 16:39:01
 */
 
- -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'V@lorant1'; 
+ -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root'; 
 
 -- CREATE SCHEMA `scholarwatch` ;
 
@@ -285,6 +285,22 @@ CREATE TABLE `User` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Creating password column in user table --
+SET SQL_SAFE_UPDATES = 0;
+ALTER TABLE `scholarwatch`.`user` 
+ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
+UPDATE `scholarwatch`.`user` 
+SET `password` = CONCAT('default_', `UserId`);
+ALTER TABLE `scholarwatch`.`user` 
+ADD UNIQUE INDEX `password_UNIQUE` (`password`);
+SET SQL_SAFE_UPDATES = 1;
+-- ----------------------------------------
+
+-- Removing NOT NULL from lecture.startTimeStamp and endTimestamp
+ALTER TABLE `scholarwatch`.`lecture` 
+CHANGE COLUMN `StartTimestamp` `StartTimestamp` DATETIME NULL ,
+CHANGE COLUMN `EndTimestamp` `EndTimestamp` DATETIME NULL ;
+
 -- ----------------------------
 -- Records of User
 -- ----------------------------
@@ -306,27 +322,3 @@ ADD COLUMN `awake_time` DECIMAL(2) NULL AFTER `ModuleID`,
 ADD COLUMN `drowsy_time` DECIMAL(2) NULL AFTER `awake_time`,
 ADD COLUMN `focused_time` DECIMAL(2) NULL AFTER `drowsy_time`,
 ADD COLUMN `unfocused_time` DECIMAL(2) NULL AFTER `focused_time`;
-
--- Creating password column in user table --
-SET SQL_SAFE_UPDATES = 0;
-ALTER TABLE `scholarwatch`.`user` 
-ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
-UPDATE `scholarwatch`.`user` 
-SET `password` = CONCAT('default_', `UserId`);
-ALTER TABLE `scholarwatch`.`user` 
-ADD UNIQUE INDEX `password_UNIQUE` (`password`);
-SET SQL_SAFE_UPDATES = 1;
--- ----------------------------------------
-
-update quiz set is_invalid=1 where quizid = 1001;
-update quiz set is_invalid=1 where quizid = 1002;
-update quiz set is_invalid=0 where quizid = 1003;
-
-update attention set awake_time=30,drowsy_time=5 where moduleid=301; 
-update attention set awake_time=25,drowsy_time=15 where moduleid=302; 
-update attention set awake_time=15,drowsy_time=35 where moduleid=303;
-
-update attention set focused_time=35,unfocused_time=10 where moduleid=301; 
-update attention set focused_time=20,unfocused_time=10 where moduleid=302; 
-update attention set focused_time=20,unfocused_time=30 where moduleid=303;
-
