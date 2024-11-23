@@ -14,7 +14,8 @@
  Date: 17/11/2024 16:39:01
 */
 
- -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root'; 
+--  ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+ 
 
 -- CREATE SCHEMA `scholarwatch` ;
 
@@ -285,16 +286,7 @@ CREATE TABLE `User` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Creating password column in user table --
-SET SQL_SAFE_UPDATES = 0;
-ALTER TABLE `scholarwatch`.`user` 
-ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
-UPDATE `scholarwatch`.`user` 
-SET `password` = CONCAT('default_', `UserId`);
-ALTER TABLE `scholarwatch`.`user` 
-ADD UNIQUE INDEX `password_UNIQUE` (`password`);
-SET SQL_SAFE_UPDATES = 1;
--- ----------------------------------------
+
 
 -- Removing NOT NULL from lecture.startTimeStamp and endTimestamp
 ALTER TABLE `scholarwatch`.`lecture` 
@@ -312,13 +304,63 @@ INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (
 INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (5, 'Zainab Tariq', 'zainab.tariq@gmail.com', 'Student', NULL);
 COMMIT;
 
+-- Creating password column in user table --
+
+SET SQL_SAFE_UPDATES = 0;
+ALTER TABLE `scholarwatch`.`user` 
+ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
+
+
+SET SQL_SAFE_UPDATES = 0;
+
+-- Ensure passwords are updated first
+UPDATE scholarwatch.user
+SET password = CONCAT('default_', UserId)
+WHERE password = '' OR password IS NULL;
+
+SELECT UserID, password FROM scholarwatch.user WHERE password = '' OR password IS NULL;
+
+-- Check for duplicate passwords
+SELECT password, COUNT(*) 
+FROM scholarwatch.user
+GROUP BY password
+HAVING COUNT(*) > 1;
+
+-- Add the unique constraint (ensure no duplicates)
+ALTER TABLE scholarwatch.user 
+ADD UNIQUE INDEX password_UNIQUE (password);
+
+SET SQL_SAFE_UPDATES = 1;
+
 SET FOREIGN_KEY_CHECKS = 1;
+-- ----------------------------------------
+ALTER TABLE `scholarwatch`.`quiz` 
+ADD COLUMN `ContentID` INT(11) NULL;
 
 ALTER TABLE `scholarwatch`.`quiz` 
 ADD COLUMN `is_invalid` TINYINT NULL AFTER `ContentID`;
+
+-- table for attention
+CREATE TABLE `scholarwatch`.`attention` (
+  `AttentionID` INT(11) NOT NULL AUTO_INCREMENT,
+  `ModuleID` INT(11) NOT NULL,
+  PRIMARY KEY (`AttentionID`),
+  KEY `ModuleID` (`ModuleID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 ALTER TABLE `scholarwatch`.`attention` 
 ADD COLUMN `awake_time` DECIMAL(2) NULL AFTER `ModuleID`,
 ADD COLUMN `drowsy_time` DECIMAL(2) NULL AFTER `awake_time`,
 ADD COLUMN `focused_time` DECIMAL(2) NULL AFTER `drowsy_time`,
 ADD COLUMN `unfocused_time` DECIMAL(2) NULL AFTER `focused_time`;
+
+-- dummy values for attention table
+
+INSERT INTO `scholarwatch`.`attention` (`ModuleID`, `awake_time`, `drowsy_time`, `focused_time`, `unfocused_time`) 
+VALUES 
+(1, 1.5, 0.5, 2.0, 0.5), 
+(2, 2.0, 0.4, 1.5, 0.3), 
+(3, 1.2, 0.8, 1.8, 0.7), 
+(4, 2.5, 0.3, 2.1, 0.6), 
+(5, 1.8, 0.6, 2.3, 0.4);
