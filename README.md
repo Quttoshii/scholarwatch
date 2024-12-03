@@ -11,5 +11,5 @@
 
 - To run the backend:
     - install xampp
-    - replace '/xampp/htdocs' with '/scholarwatch/htdocs'
+    - replace '/xampp/htdocs' folder with '/scholarwatch/htdocs' folder
     - update your database credentials in '/htdocs/include/db.php'

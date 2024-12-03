@@ -18,6 +18,8 @@ const CreateLecture = ({ userID }) => {
     const [lectureName, setLectureName] = useState(""); // State for lecture name
     const [lectures, setLectures] = useState([]); // State to store fetched lectures
 
+    const [fetchTrigger, setFetchTrigger] = useState(0); // Trigger state
+
     // Fetch lecture data from the backend
     useEffect(() => {
         const fetchLectures = async () => {
@@ -44,7 +46,7 @@ const CreateLecture = ({ userID }) => {
         };
     
         fetchLectures();
-    }, [userID]); // Dependency on userID
+    }, [userID, fetchTrigger]); // Dependency on userID
     
 
     const onFileLoad = (event) => {
@@ -74,54 +76,56 @@ const CreateLecture = ({ userID }) => {
     }
 
     try {
-        // Step 1: Upload the PDF file
-        const formData = new FormData();
-        formData.append("lecture_file", selectedFile);
-
-        const uploadResponse = await axios.post("http://localhost/scholarwatch/uploadPDF.php", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
+        // Log the state of the file before upload
+        console.log("Selected File:", {
+            name: selectedFile.name,
+            type: selectedFile.type,
+            size: selectedFile.size
         });
 
-        if (!uploadResponse.data.success) {
-            alert(`Error uploading PDF: ${uploadResponse.data.message}`);
-            return;
+        const formData = new FormData();
+        formData.append("lecture_file", selectedFile);
+        formData.append("lecture_name", lectureName.trim());
+        formData.append("num_pages", numPages);
+
+        // Log formData contents
+        for (let [key, value] of formData.entries()) {
+            console.log(`FormData - ${key}:`, value);
         }
 
-        // Step 2: Send metadata
-        const metadata = {
-            lecture_name: lectureName.trim(),
-            num_pages: numPages,
-            file_path: uploadResponse.data.file_path, // File path returned by the server
-        };
-
-        const metadataResponse = await axios.post(
-            "http://localhost/scholarwatch/insertMetadata.php",
-            metadata,
+        const response = await axios.post(
+            "http://localhost/scholarwatch/insertLecture.php", 
+            formData, 
             {
                 headers: {
-                    "Content-Type": "application/json",
-                },
+                    'Content-Type': 'multipart/form-data',
+                }
             }
         );
 
-        if (metadataResponse.data.success) {
+        if (response.data.success) {
             alert("Lecture uploaded successfully!");
-            setLectureName(""); // Clear lecture name input
-            setSelectedFile(null); // Clear selected file
-            setPdfData(null); // Clear PDF viewer
-            setNumPages(null); // Reset number of pages
-            setPageNumber(1); // Reset page number
+            // Reset states
+            setLectureName("");
+            setSelectedFile(null);
+            setPdfData(null);
+            setNumPages(null);
+            setPageNumber(1);
+
+            setFetchTrigger((prev) => prev + 1);
         } else {
-            alert(`Error uploading metadata: ${metadataResponse.data.message}`);
+            alert(`Error uploading lecture: ${response.data.message || 'Unknown error'}`);
         }
+
+        console.log("Full response:", response);
+
+        // Rest of the code remains the same
     } catch (error) {
-        console.error("Upload error:", error);
-        alert("An error occurred while uploading the lecture.");
+        console.error("Full error object:", error);
+        console.error("Error response:", error.response);
+        alert(`Error uploading lecture: ${error.response?.data?.message || error.message || 'Unknown error'}`);
     }
 };
-
 
     return (
         <div>
@@ -131,7 +135,6 @@ const CreateLecture = ({ userID }) => {
                     <thead>
                         <tr>
                             <th>Lecture Name</th>
-                            <th>File Path</th>
                             <th>Number of Pages</th>
                             <th>Uploaded At</th>
                         </tr>
@@ -140,10 +143,9 @@ const CreateLecture = ({ userID }) => {
                         {lectures.length > 0 ? (
                             lectures.map((lecture) => (
                                 <tr key={lecture.lectureID}>
-                                    <td>{lecture.lectureName}</td>
                                     <td>
                                         <a href={`http://localhost/scholarwatch/${lecture.DirectoryPath}`} target="_blank" rel="noopener noreferrer">
-                                            {lecture.DirectoryPath}
+                                        {lecture.lectureName}
                                         </a>
                                     </td>
                                     <td>{lecture.slideCount}</td>
