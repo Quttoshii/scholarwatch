@@ -7,6 +7,7 @@ import Lectures from './components/Lectures';
 import Quizzes from './components/Quizzes';
 import LiveFeed from './components/LiveFeed';
 import Insights from './components/Insights';
+import StudentInsights from './components/StudentsInsights.js';
 import PostureDetection from './components/PostureDetection';
 import Login from './components/Login';
 import CreateQuiz from './components/CreateQuiz';
@@ -55,6 +56,7 @@ function App() {
               <Link to="/liveFeed"><button>Emotion Detection</button></Link>
               <Link to="/postureDetection"><button>Posture Detection</button></Link>
               <Link to="/quizzes"><button>Quizzes</button></Link>
+              <Link to="/StudentInsights"><button>Insights</button></Link>
             </div>
             <div className="content">
               <Routes>
@@ -63,6 +65,10 @@ function App() {
                 <Route path="/liveFeed" element={<LiveFeed setResults={setResults} />} />
                 <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} />
                 <Route path="/postureDetection" element={<PostureDetection/>} />
+                <Route
+                  path="/StudentInsights"
+                  element={<StudentInsights results={results} gazeResults={gazeResults} />} // Correct component
+                />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
