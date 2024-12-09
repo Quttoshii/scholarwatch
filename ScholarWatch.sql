@@ -285,16 +285,7 @@ CREATE TABLE `User` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Creating password column in user table --
-SET SQL_SAFE_UPDATES = 0;
-ALTER TABLE `scholarwatch`.`user` 
-ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
-UPDATE `scholarwatch`.`user` 
-SET `password` = CONCAT('default_', `UserId`);
-ALTER TABLE `scholarwatch`.`user` 
-ADD UNIQUE INDEX `password_UNIQUE` (`password`);
-SET SQL_SAFE_UPDATES = 1;
--- ----------------------------------------
+
 
 -- Removing NOT NULL from lecture.startTimeStamp and endTimestamp
 ALTER TABLE `scholarwatch`.`lecture` 
@@ -313,6 +304,17 @@ INSERT INTO `User` (`UserID`, `Name`, `Email`, `UserType`, `Threshold`) VALUES (
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Creating password column in user table --
+SET SQL_SAFE_UPDATES = 0;
+ALTER TABLE `scholarwatch`.`user` 
+ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
+UPDATE `scholarwatch`.`user` 
+SET `password` = CONCAT('default_', `UserId`);
+ALTER TABLE `scholarwatch`.`user` 
+ADD UNIQUE INDEX `password_UNIQUE` (`password`);
+SET SQL_SAFE_UPDATES = 1;
+-- ----------------------------------------
 
 ALTER TABLE `scholarwatch`.`quiz` 
 ADD COLUMN `is_invalid` TINYINT NULL AFTER `ContentID`;
