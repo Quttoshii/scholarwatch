@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css'; // Separate CSS for the header
 
-function Header() {
+function Header( {userType} ) {
   return (
     <header className="header">
       <div className="header-content">
@@ -10,7 +10,13 @@ function Header() {
           alt="Moodle Logo" 
           className="logo" 
         />
-        <h1>ScholarWatch</h1>
+        {userType === "Teacher" ? (
+          <h1>ScholarWatch Teacher</h1>
+        ) : (userType === "Student") ? (
+          <h1>ScholarWatch Student</h1>
+        ) : (
+          <h1>ScholarWatch</h1>
+        )}
       </div>
     </header>
   );
