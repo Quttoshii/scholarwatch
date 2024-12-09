@@ -1,18 +1,18 @@
 
 
 (One time only)
-<!-- - To create the database:
+ - To create the database:
     - You can use either mysql Workbench or use vscode extension ( Create a connection, export sql, give the connections name and its password in db.php)
     - uncomment the following lines in 'ScholarWatch.sql' to execute once, then recomment them:
         - ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password'; 
-        - CREATE SCHEMA `scholarwatch` ; -->
+        - CREATE SCHEMA `scholarwatch` ; 
 
 (One time Only)
-<!-- - To set the environment for backend:
+ - To set the environment for backend:
     - install xampp
     - Go to the directory where you have xampp installed.
     - replace '/xampp/htdocs' folder with '/scholarwatch/htdocs' folder.
-    - update your database credentials in '/htdocs/scholarwatch/include/db.php' -->
+    - update your database credentials in '/htdocs/scholarwatch/include/db.php' 
 
 - To run the backend: 
     - Run xampp (Apache and MYSQl)
