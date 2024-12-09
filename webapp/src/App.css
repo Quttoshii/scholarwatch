@@ -25,11 +25,12 @@ body {
   margin: 0;
 }
 
-.main-container {
+.main-container{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin: 20px;
+  height: var(--dynamic-height, ); /* Default height if not set */
 }
 
 .sidebar a {
@@ -274,4 +275,17 @@ body {
     margin: 20px;
     padding: 15px;
   }
+}
+
+#posture-detection-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+iframe {
+  width: 100%; /* Make iframe fill the width of its container */
+  height: calc(100% - 50px); /* Adjust height minus space for header/buttons */
+  border: none; /* Remove iframe border */
 }
