@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost:3306';
 $db = 'scholarwatch';  // Database name
-$user = 'root';     // Database username
+$user = 'new';     // Database username
 $pass = 'root';     // Database password
 
 try {
