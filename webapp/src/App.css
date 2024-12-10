@@ -158,22 +158,6 @@ body {
   border-radius: 5px; /* Optional: add border-radius */
 }
 
-.mirrored-video {
-  transform: scaleX(-1); /* Flip the video horizontally */
-}
-
-/* New styles for the smaller button */
-.smaller-button {
-  padding: 5px 10px; /* Smaller padding */
-  font-size: 14px; /* Smaller font size */
-  border-radius: 5px; /* Keep the same border radius */
-}
-
-.home-container {
-  text-align: center;
-  padding: 50px;
-}
-
 #webgazerVideoFeed,
 #webgazerFaceOverlay,
 #webgazerFaceFeedbackBox {
@@ -189,6 +173,22 @@ body {
   border: 2px solid red; /* Red border for feedback box */
   z-index: 1001; /* Make sure it stays above the video */
   pointer-events: none; /* Prevent interactions with the box */
+}
+
+.mirrored-video {
+  transform: scaleX(-1); /* Flip the video horizontally */
+}
+
+/* New styles for the smaller button */
+.smaller-button {
+  padding: 5px 10px; /* Smaller padding */
+  font-size: 14px; /* Smaller font size */
+  border-radius: 5px; /* Keep the same border radius */
+}
+
+.home-container {
+  text-align: center;
+  padding: 50px;
 }
 
 .login-container {

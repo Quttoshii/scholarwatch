@@ -25,15 +25,6 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
   useEffect(() => {
     
     const initializeWebGazer = () => {
-      // function loadScript(url, callback) { 
-      //   var script = document.createElement('script'); 
-      //   script.type = 'text/javascript'; script.src = url; 
-      //   script.onload = callback; 
-      //   document.head.appendChild(script); 
-      // } 
-      // loadScript('https://cdn.jsdelivr.net/npm/webgazer/dist/webgazer.min.js', function() { 
-      //   console.log('WebGazer loaded'); 
-      // });
 
       if (window.webgazer) {
         window.webgazer.showVideo(true);
@@ -44,11 +35,17 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
 
         // Apply styles to WebGazer elements inside the `lectures-content` container
         const styleWebGazerElements = () => {
+          const videoContainer = document.getElementById('webgazerVideoContainer');
           const videoElement = document.getElementById('webgazerVideoFeed');
           const faceOverlay = document.getElementById('webgazerFaceOverlay');
           const faceFeedbackBox = document.getElementById('webgazerFaceFeedbackBox'); // Bounding box
           const lecturesContent = document.querySelector('.lectures-content'); // Get the lectures content container
-          const videoContainer = document.getElementById('webgazerVideoContainer');
+          
+          console.log("videoContainer", videoContainer);
+          console.log("videoElement", videoElement);
+          console.log("faceOverlay", faceOverlay);
+          console.log("faceFeedbackBox", faceFeedbackBox);
+          console.log("lecturesContent", lecturesContent);
 
           if (videoContainer && lecturesContent) {
             videoContainer.style.position = 'absolute';
@@ -132,18 +129,33 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
 
     return () => {
       if (window.webgazer) {
-        const videoElement = document.getElementById('webgazerVideoFeed');
-        const faceOverlay = document.getElementById('webgazerFaceOverlay');
-        const faceFeedbackBox = document.getElementById('webgazerFaceFeedbackBox');
-  
-        if (videoElement) videoElement.remove(); // Remove video
-        if (faceOverlay) faceOverlay.remove(); // Remove face overlay
-        if (faceFeedbackBox) faceFeedbackBox.remove(); // Remove feedback box
+        try {
+          const videoElement = document.getElementById('webgazerVideoFeed');
+          const faceOverlay = document.getElementById('webgazerFaceOverlay');
+          const faceFeedbackBox = document.getElementById('webgazerFaceFeedbackBox');
+          const videoContainer = document.getElementById('webgazerVideoContainer');
+          
+          if (videoElement && videoElement.srcObject) {
+            const tracks = videoElement.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+          }
 
-        window.webgazer.clearGazeListener();
-        window.webgazer.showPredictionPoints(false);
-        window.webgazer.pause();
-        
+          if (videoElement) videoElement.remove(); // Remove video
+          if (faceOverlay) faceOverlay.remove(); // Remove face overlay
+          if (faceFeedbackBox) faceFeedbackBox.remove(); // Remove feedback box
+          if (videoContainer) videoContainer.remove();
+
+          window.webgazer.clearGazeListener();
+          window.webgazer.showPredictionPoints(false);
+          window.webgazer.pause();
+
+          // window.webgazer.end();
+          // window.webgazer.stopVideo();
+        } catch (error) {
+          console.log('Stopping WebGazer', error);
+        }
+
+
         // // Send data when component unmounts
         // fetch("http://localhost/scholarwatch/insertGazeTracking.php", {
         //   method: "POST",
@@ -167,8 +179,10 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
       if (!isCalibrating) {
         window.webgazer.showPredictionPoints(true); // Show the tracker dot
         window.webgazer.resume(); // Resume gaze tracking
+        // console.log("calibration completed: ", isCalibrating)
       } else {
         startCalibration();
+        // console.log("calibration in process: ", isCalibrating)
       }
     }
   }, [isWebGazerReady, isCalibrating]);

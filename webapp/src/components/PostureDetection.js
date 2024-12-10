@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 function PostureDetection() {
-  const iframeRef = useRef(null);
+  const postureDetectionRef = useRef(null);
 
   useEffect(() => {
     const container = document.querySelector('.main-container');
@@ -13,8 +13,7 @@ function PostureDetection() {
       if (event.data.postureData) {
         console.log('Posture Data:', event.data.postureData);
 
-        // Handle the posture data as needed
-        // Example: Display it or store it in state
+        // Posture data 
         const {
           totalSessionTime,
           goodPostureTime,
@@ -44,8 +43,8 @@ function PostureDetection() {
     <div id="posture-detection-container" className="postureDetection">
       <h2>Posture Detection</h2>
       <iframe
-        ref={iframeRef}
-        src="/iframe.html"
+        ref={postureDetectionRef}
+        src="/postureDetection.html"
         title="Posture Detection"
       />
     </div>
