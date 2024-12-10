@@ -20,6 +20,10 @@ import './App.css';
 function App() {
   const [userType, setUserType] = useState('');
   const [userID, setUserID] = useState('');
+  const [userName, setUserName] = useState('');
+  const [email, setEmail] = useState("");
+  
+  
   const [results, setResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
   const [isCalibrated, setIsCalibrated] = useState(false); // Track calibration globally
@@ -49,7 +53,7 @@ function App() {
             </div>
             <div className="content">
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home userType={userType} userID={userID} userName={userName}  email={email} />} />
                 <Route path="/createLecture" element={<CreateLecture userID={userID}/>} />
                 <Route path="/createQuiz" element={<CreateQuiz/>} />
                 <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
@@ -61,6 +65,7 @@ function App() {
         ) : (userType === "Student") ? (
           <div className="main-container">
             <div className="sidebar">
+
               <Link to="/lectures"><button>Lectures</button></Link>
               <Link to="/liveFeed"><button>Emotion Detection</button></Link>
               <Link to="/postureDetection"><button>Posture Detection</button></Link>
@@ -70,7 +75,8 @@ function App() {
             </div>
             <div className="content">
               <Routes>
-                <Route path="/" element={<Home />} />
+
+                <Route path="/" element={<Home userType={userType} userID={userID} userName={userName} email={email} />} />
                 <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} />} />
                 <Route path="/liveFeed" element={<LiveFeed setResults={setResults} />} />
                 <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} />
@@ -83,7 +89,7 @@ function App() {
           </div>
         ) : (
           <Routes>
-            <Route path="/" element={<Login setUserType={setUserType} setUserID={setUserID}/>}/>
+            <Route path="/" element={<Login setUserType={setUserType} setUserID={setUserID} setUserName={setUserName} email={email} setEmail={setEmail} />} />
           </Routes>
         )}
       </div>

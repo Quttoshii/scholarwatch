@@ -6,7 +6,7 @@ function PostureDetection() {
   useEffect(() => {
     const container = document.querySelector('.main-container');
     const isWideScreen = window.innerWidth > 768;
-    document.documentElement.style.setProperty('--dynamic-height', isWideScreen ? '75vh' : '75vh');
+    document.documentElement.style.setProperty('--dynamic-height', isWideScreen ? '85vh' : '85vh');
 
 
     const handlePostMessage = (event) => {
