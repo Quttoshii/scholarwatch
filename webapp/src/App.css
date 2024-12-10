@@ -40,11 +40,12 @@ body {
   margin: 0;
 }
 
-.main-container {
+.main-container{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin: 20px;
+  height: var(--dynamic-height, ); /* Default height if not set */
 }
 
 .sidebar a {
@@ -176,22 +177,6 @@ body {
   border-radius: 5px; /* Optional: add border-radius */
 }
 
-.mirrored-video {
-  transform: scaleX(-1); /* Flip the video horizontally */
-}
-
-/* New styles for the smaller button */
-.smaller-button {
-  padding: 5px 10px; /* Smaller padding */
-  font-size: 14px; /* Smaller font size */
-  border-radius: 5px; /* Keep the same border radius */
-}
-
-.home-container {
-  text-align: center;
-  padding: 50px;
-}
-
 #webgazerVideoFeed,
 #webgazerFaceOverlay,
 #webgazerFaceFeedbackBox {
@@ -207,6 +192,22 @@ body {
   border: 2px solid red; /* Red border for feedback box */
   z-index: 1001; /* Make sure it stays above the video */
   pointer-events: none; /* Prevent interactions with the box */
+}
+
+.mirrored-video {
+  transform: scaleX(-1); /* Flip the video horizontally */
+}
+
+/* New styles for the smaller button */
+.smaller-button {
+  padding: 5px 10px; /* Smaller padding */
+  font-size: 14px; /* Smaller font size */
+  border-radius: 5px; /* Keep the same border radius */
+}
+
+.home-container {
+  text-align: center;
+  padding: 50px;
 }
 
 .login-container {
@@ -293,4 +294,103 @@ body {
     margin: 20px;
     padding: 15px;
   }
+}
+
+.login-container {
+  text-align: center;
+  max-width: 400px;
+  margin: 50px auto; /* Center on the page */
+  padding: 20px;
+  background-color: #fff; /* White background for the form */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border: 1px solid #ddd; /* Light border */
+}
+
+.login-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.login-container p {
+  font-size: 16px;
+  color: #666; /* Lighter gray for the description */
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Stretch input fields to full width */
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left; /* Align labels to the left */
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+  display: block; /* Ensure labels are on their own line */
+}
+
+.form-group input {
+  width: 100%; /* Full width of the container */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #f6a623; /* Moodle orange */
+  outline: none;
+  box-shadow: 0 0 5px rgba(246, 166, 35, 0.5); /* Add glow effect */
+}
+
+.login-button {
+  background-color: #f6a623; /* Moodle orange */
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #d48f20; /* Darker orange for hover */
+}
+
+.login-button:active {
+  background-color: #bf7e1a; /* Even darker orange for active state */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-container {
+    margin: 20px;
+    padding: 15px;
+  }
+}
+
+#posture-detection-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+iframe {
+  width: 100%; /* Make iframe fill the width of its container */
+  height: calc(100% - 50px); /* Adjust height minus space for header/buttons */
+  border: none; /* Remove iframe border */
 }

@@ -23,7 +23,7 @@ const LiveFeed = ({ setResults }) => {
       const response = await axios.post('http://localhost:8000/stop_detection/');
       console.log("Stop Detection Response:", response.data);
       setResults(response.data.results); // Update results here
-      navigate('/insights'); // Redirect to Insights page
+      navigate('/liveFeed'); // Redirect to Insights page
     } catch (error) {
       console.error("Error stopping detection:", error);
     } finally {

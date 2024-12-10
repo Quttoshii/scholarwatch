@@ -14,10 +14,10 @@
  Date: 17/11/2024 16:39:01
 */
 
-  ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abg6951.';
+--  ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
  
 
- CREATE SCHEMA `scholarwatch` ;
+-- CREATE SCHEMA `scholarwatch` ;
 
 use scholarwatch;
 SET NAMES utf8mb4;
@@ -336,6 +336,17 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ----------------------------------------
 ALTER TABLE `scholarwatch`.`quiz` 
 ADD COLUMN `ContentID` INT(11) NULL;
+
+-- Creating password column in user table --
+SET SQL_SAFE_UPDATES = 0;
+ALTER TABLE `scholarwatch`.`user` 
+ADD COLUMN `password` VARCHAR(45) NOT NULL AFTER `Email`;
+UPDATE `scholarwatch`.`user` 
+SET `password` = CONCAT('default_', `UserId`);
+ALTER TABLE `scholarwatch`.`user` 
+ADD UNIQUE INDEX `password_UNIQUE` (`password`);
+SET SQL_SAFE_UPDATES = 1;
+-- ----------------------------------------
 
 ALTER TABLE `scholarwatch`.`quiz` 
 ADD COLUMN `is_invalid` TINYINT NULL AFTER `ContentID`;
