@@ -2,14 +2,29 @@
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  color: #333; /* Dark gray for general text */
+  color: #333;
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5; /* Light gray background for the app */
+  background-color: #f5f5f5;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: 5% 10%, 50% 50%, 90% 80%;
+  background-size: 8%, 12%, 10%;
+  opacity: 0.9;
 }
+   
+
 
 .App {
   text-align: center;
+}
+
+.login-container {
+  background-color: #fff; /* Ensures the background is white */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  max-width: 400px; /* Optional: Restricts the form size */
+  margin: auto; /* Centers the container */
 }
 
 .header {
@@ -37,6 +52,8 @@ body {
   width: 100%; /* Make the links full width */
   text-decoration: none; /* Remove underline on links */
 }
+
+
 
 .sidebar button {
   width: 100%; /* Full width of the sidebar */
@@ -87,6 +104,8 @@ body {
     margin-left: 0;
   }
 }
+
+/* Lectures.css and other styles are unchanged */
 
 /* Quizzes */
 .take-quiz-btn {

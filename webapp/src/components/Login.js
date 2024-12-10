@@ -40,7 +40,7 @@ function Login({ setUserType, setUserID }) {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-container" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.9)' }}>
             <form className="login-form" onSubmit={handleLogin}>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>

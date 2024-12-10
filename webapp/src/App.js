@@ -12,7 +12,8 @@ import PostureDetection from './components/PostureDetection';
 import Login from './components/Login';
 import CreateQuiz from './components/CreateQuiz';
 import CreateLecture from './components/CreateLecture';
-import AttendanceMonitoring from './components/AttendanceMonitoring'; 
+import AttendanceMonitoring from './components/AttendanceMonitoring';
+import BackgroundIcons from './components/BackgroundIcons'; 
 
 import './App.css';
 
@@ -35,6 +36,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+      <BackgroundIcons />
         <Header userType={userType}/>
         {userType === "Teacher" ? (
           <div className="main-container">
