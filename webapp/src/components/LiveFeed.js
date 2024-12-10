@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const LiveFeed = ({ setResults }) => {
+const LiveFeed = ({ setEmotionResults }) => {
   const navigate = useNavigate();
   const [isDetecting, setIsDetecting] = useState(false);
 
@@ -22,8 +22,9 @@ const LiveFeed = ({ setResults }) => {
     try {
       const response = await axios.post('http://localhost:8000/stop_detection/');
       console.log("Stop Detection Response:", response.data);
-      setResults(response.data.results); // Update results here
-      navigate('/liveFeed'); // Redirect to Insights page
+      setEmotionResults(response.data.results); // Update results here
+      // console.log(response.data.results);
+      navigate('/results');
     } catch (error) {
       console.error("Error stopping detection:", error);
     } finally {

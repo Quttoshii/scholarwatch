@@ -13,18 +13,18 @@ import Login from './components/Login';
 import CreateQuiz from './components/CreateQuiz';
 import CreateLecture from './components/CreateLecture';
 import AttendanceMonitoring from './components/AttendanceMonitoring'; 
+import Results from './components/Results.js';
 
 import './App.css';
 
 function App() {
   const [userType, setUserType] = useState('');
   const [userID, setUserID] = useState('');
-  const [results, setResults] = useState({ awake_time: 0, drowsy_time: 0 });
+  const [emotionResults, setEmotionResults] = useState({ awake_time: 0, drowsy_time: 0 });
+  const [postureResults, setPostureResults] = useState({ total_time:0, good_posture_time: 0, phone_use_time: 0 , no_person_time: 0, looking_right_time: 0, looking_left_time: 0, slouching_time: 0});
   const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
   const [isCalibrated, setIsCalibrated] = useState(false); // Track calibration globally
   const [invalidationCount, setInvalidationCount] = useState([]); // New state for invalidation count
-  const thresholdUnfocused = 30; 
-  const thresholdDrowsy = 10; 
 
   
   const incrementInvalidationCount = () => {
@@ -43,15 +43,13 @@ function App() {
               <Link to="/createLecture"><button>Lectures</button></Link>
               <Link to="/createQuiz"><button>Quizzes</button></Link>
               <Link to="/insights"><button>Insights</button></Link>
-              
             </div>
             <div className="content">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/createLecture" element={<CreateLecture userID={userID}/>} />
                 <Route path="/createQuiz" element={<CreateQuiz/>} />
-                <Route path="/insights" element={<Insights results={results} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
-              
+                <Route path="/insights" element={<Insights results={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
@@ -70,11 +68,12 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} />} />
-                <Route path="/liveFeed" element={<LiveFeed setResults={setResults} />} />
+                <Route path="/liveFeed" element={<LiveFeed setEmotionResults={setEmotionResults} />} />
                 <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} />} />
-                <Route path="/postureDetection" element={<PostureDetection/>} />
-                <Route path="/StudentInsights" element={<StudentInsights results={results} gazeResults={gazeResults} />} />
-                <Route path="/attendanceMonitoring" element={<AttendanceMonitoring results={results} gazeResults={gazeResults} thresholdUnfocused={thresholdUnfocused} thresholdDrowsy={thresholdDrowsy} />} /> 
+                <Route path="/postureDetection" element={<PostureDetection setPostureResults={setPostureResults}/>} />
+                <Route path="/StudentInsights" element={<StudentInsights results={emotionResults} gazeResults={gazeResults} />} />
+                <Route path="/results" element={<Results emotionResults={emotionResults}/>} />
+                <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults}/>} /> 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>

@@ -26,6 +26,12 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
     
     const initializeWebGazer = () => {
       if (window.webgazer) {
+        // console.log(isCalibrated);
+        // if (isCalibrated) {
+
+        //   window.webgazer = window.webgazer.resume();
+        // }
+
         window.webgazer.showVideo(true);
         window.webgazer.showFaceOverlay(false);
         window.webgazer.showPredictionPoints(true);
@@ -42,7 +48,7 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
           if (videoContainer && lecturesContent) {
             videoContainer.style.position = 'absolute';
             videoContainer.style.top = '20px'; // Align with top padding of lectures-content
-            videoContainer.style.left = '85%'; // Align with left padding of lectures-content
+            videoContainer.style.left = '80%'; // Align with left padding of lectures-content
             videoContainer.style.width = '200px'; // Slightly increased width
             videoContainer.style.height = '150px'; // Slightly increased height
             videoContainer.style.borderRadius = '8px';
@@ -146,27 +152,6 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
   useEffect(() => {
     setGazeResults({ focused_time: focusTime, unfocused_time: unfocusTime });
   }, [focusTime, unfocusTime, setGazeResults]);
-
-  // Focus detection logic
-  const startFocusTracking = () => {
-    window.webgazer.setGazeListener((data) => {
-      if (data == null) {
-        setIsFocused(false);
-        return;
-      }
-
-      const { x, y } = data;
-      if (lecturesRef.current) {
-        const boundingBox = lecturesRef.current.getBoundingClientRect();
-        const isInBoundingBox =
-          x >= boundingBox.left &&
-          x <= boundingBox.right &&
-          y >= boundingBox.top &&
-          y <= boundingBox.bottom;
-        setIsFocused(isInBoundingBox);
-      }
-    }).begin();
-  };
 
   const startCalibration = () => {
     window.webgazer.setGazeListener((data) => {

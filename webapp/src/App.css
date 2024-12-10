@@ -375,3 +375,61 @@ iframe {
   height: calc(100% - 50px); /* Adjust height minus space for header/buttons */
   border: none; /* Remove iframe border */
 }
+
+.attendance-container {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+}
+
+.weights-section,
+.threshold-section,
+.centered-section {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+.monitoring-label {
+  display: block;
+  margin: 10px 0;
+}
+
+input[type="number"] {
+  margin-left: 10px;
+  padding: 5px;
+  width: 60px;
+}
+
+.centered-section {
+  text-align: center;
+}
+
+.centered-section p {
+  margin: 5px 0;
+}
+
+.threshold-section p {
+  margin: 10px 0 5px;
+}
+
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+}

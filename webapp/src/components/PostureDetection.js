@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-function PostureDetection() {
+function PostureDetection({setPostureResults}) {
   const postureDetectionRef = useRef(null);
 
   useEffect(() => {
@@ -20,13 +20,22 @@ function PostureDetection() {
           durations: { noPerson, phoneUse, lookingRight, lookingLeft, slouching },
         } = event.data.postureData;
 
-        console.log(`Total Time: ${totalSessionTime}s`);
-        console.log(`Good Posture Time: ${goodPostureTime}s`);
-        console.log(`No Person Time: ${noPerson}s`);
-        console.log(`Phone Use Time: ${phoneUse}s`);
-        console.log(`Looking Right Time: ${lookingRight}s`);
-        console.log(`Looking Left Time: ${lookingLeft}s`);
-        console.log(`Slouching Time: ${slouching}s`);
+        setPostureResults({
+          total_time: totalSessionTime,
+          good_posture_time: goodPostureTime,
+          phone_use_time: phoneUse,
+          no_person_time: noPerson,
+          looking_right_time: lookingRight,
+          looking_left_time: lookingLeft,
+          slouching_time: slouching
+        });
+        // console.log(`Total Time: ${totalSessionTime}s`);
+        // console.log(`Good Posture Time: ${goodPostureTime}s`);
+        // console.log(`No Person Time: ${noPerson}s`);
+        // console.log(`Phone Use Time: ${phoneUse}s`);
+        // console.log(`Looking Right Time: ${lookingRight}s`);
+        // console.log(`Looking Left Time: ${lookingLeft}s`);
+        // console.log(`Slouching Time: ${slouching}s`);
       }
     };
 
