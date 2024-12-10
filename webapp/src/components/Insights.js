@@ -343,7 +343,7 @@ const Insights = ({
                   y: selectedQuizData,
                   type: 'box',
                   name: `Quiz ${selectedQuiz}`,
-                  boxpoints: 'all',
+                  // boxpoints: 'all',
                   jitter: 0.5,
                   marker: { color: '#0671B7' },
                   line: { width: 2 },

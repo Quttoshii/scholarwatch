@@ -25,151 +25,93 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
   useEffect(() => {
     
     const initializeWebGazer = () => {
-
       if (window.webgazer) {
         window.webgazer.showVideo(true);
         window.webgazer.showFaceOverlay(false);
         window.webgazer.showPredictionPoints(true);
         window.webgazer.showFaceFeedbackBox(false);
         setIsWebGazerReady(true);
-
-        // Apply styles to WebGazer elements inside the `lectures-content` container
+    
         const styleWebGazerElements = () => {
           const videoContainer = document.getElementById('webgazerVideoContainer');
           const videoElement = document.getElementById('webgazerVideoFeed');
-          const faceOverlay = document.getElementById('webgazerFaceOverlay');
-          const faceFeedbackBox = document.getElementById('webgazerFaceFeedbackBox'); // Bounding box
-          const lecturesContent = document.querySelector('.lectures-content'); // Get the lectures content container
+          const videoCanvas = document.getElementById('webgazerVideoCanvas');
           
-          console.log("videoContainer", videoContainer);
-          console.log("videoElement", videoElement);
-          console.log("faceOverlay", faceOverlay);
-          console.log("faceFeedbackBox", faceFeedbackBox);
-          console.log("lecturesContent", lecturesContent);
-
+          const lecturesContent = document.querySelector('.lectures-content'); // Get the lectures content container
+    
           if (videoContainer && lecturesContent) {
             videoContainer.style.position = 'absolute';
-            videoContainer.style.top = '10px'; // Adjust as necessary
-            videoContainer.style.right = '10px'; // Adjust as necessary
-            videoContainer.style.width = '150px';
-            videoContainer.style.height = '100px';
-            // videoContainer.style.border = '2px solid rgba(0, 255, 0, 0.5)';
-            videoContainer.style.borderRadius = '5px';
+            videoContainer.style.top = '20px'; // Align with top padding of lectures-content
+            videoContainer.style.left = '85%'; // Align with left padding of lectures-content
+            videoContainer.style.width = '200px'; // Slightly increased width
+            videoContainer.style.height = '150px'; // Slightly increased height
+            videoContainer.style.borderRadius = '8px';
             videoContainer.style.transform = 'scaleX(-1)'; // Mirror the video feed
-            videoContainer.style.zIndex = '999'; // Ensure it is below the buttons
+            videoContainer.style.zIndex = '10';
             videoContainer.style.pointerEvents = 'none'; // Prevent interaction with the video
-
-            // Append WebGazer's video container inside the lectures content container
+            videoContainer.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)'; // Optional: add a subtle shadow
+            
             lecturesContent.appendChild(videoContainer);
           }
-
-          if (videoElement && lecturesContent) {
-            // Position the WebGazer video inside the lectures-content container
-            videoElement.style.position = 'absolute';
-            videoElement.style.top = '10px'; // Adjust as necessary
-            videoElement.style.right = '10px'; // Adjust as necessary
-            videoElement.style.width = '150px';
-            videoElement.style.height = '100px';
-            // videoElement.style.border = '2px solid rgba(0, 255, 0, 0.5)';
-            videoElement.style.borderRadius = '5px';
-            videoElement.style.transform = 'scaleX(-1)'; // Mirror the video feed
-            videoElement.style.zIndex = '999'; // Ensure it is below the buttons
-            videoElement.style.pointerEvents = 'none'; // Prevent interaction with the video
-
-            // Append WebGazer's video feed inside the lectures content container
-            lecturesContent.appendChild(videoElement);
+          
+          if (videoElement && videoContainer) {
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'cover'; // Ensures video fills container while maintaining aspect ratio
+            videoElement.style.borderRadius = '8px';
+            videoElement.style.transform = 'scaleX(-1)';
+            
+            videoContainer.appendChild(videoElement);
           }
-
-          if (faceOverlay && lecturesContent) {
-            // Adjust the bounding box (face overlay) inside the container
-            faceOverlay.style.position = 'absolute';
-            faceOverlay.style.top = '10px'; // Adjust as necessary
-            faceOverlay.style.right = '10px'; // Adjust as necessary
-            faceOverlay.style.width = '150px';
-            faceOverlay.style.height = '100px';
-            faceOverlay.style.pointerEvents = 'none'; // Prevent interaction with the overlay
-            faceOverlay.style.zIndex = '1000'; // Ensure it is below the buttons
-            faceOverlay.style.pointerEvents = 'none'; // Prevent interaction with the box
-
-            // Append the face overlay inside the lectures content container
-            lecturesContent.appendChild(faceOverlay);
-          }
-
-          if (faceFeedbackBox && lecturesContent) {
-            // Move the face feedback box (bounding box) to match the video feed position
-            const videoRect = videoElement.getBoundingClientRect();
-            const lecturesRect = lecturesContent.getBoundingClientRect();
-
-            // Calculate the offset and size to center the feedback box
-            const boundingBoxWidth = videoRect.width * 0.6;
-            const boundingBoxHeight = videoRect.height * 0.6;
-            const boundingBoxTop = videoRect.top - lecturesRect.top + (videoRect.height - boundingBoxHeight) / 2;
-            const boundingBoxLeft = videoRect.left - lecturesRect.left + (videoRect.width - boundingBoxWidth) / 2;
-
-            faceFeedbackBox.style.position = 'absolute';
-            faceFeedbackBox.style.top = `${boundingBoxTop}px`;
-            faceFeedbackBox.style.left = `${boundingBoxLeft}px`;
-            faceFeedbackBox.style.width = `${boundingBoxWidth}px`;
-            faceFeedbackBox.style.height = `${boundingBoxHeight}px`;
-            faceFeedbackBox.style.border = '2px solid red';
-            faceFeedbackBox.style.zIndex = '1001'; // Ensure it is below the buttons
-            faceFeedbackBox.style.pointerEvents = 'none'; // Prevent interaction with the box
-
-            // Append the face feedback box inside the lectures content container
-            lecturesContent.appendChild(faceFeedbackBox);
+          
+          if (videoCanvas && videoContainer) {
+            videoCanvas.style.width = '100%';
+            videoCanvas.style.height = '100%';
+            videoCanvas.style.objectFit = 'cover';
+            videoCanvas.style.borderRadius = '8px';
+            videoCanvas.style.transform = 'scaleX(-1)';
+            
+            videoContainer.appendChild(videoCanvas);
           }
         };
-
-        // Delay to ensure WebGazer elements are loaded into the DOM
-        setTimeout(styleWebGazerElements, 1000); // Adjust the delay if necessary
+    
+        const waitForElements = () => {
+          const videoContainer = document.getElementById('webgazerVideoContainer');
+          const videoElement = document.getElementById('webgazerVideoFeed');
+          const lecturesContent = document.querySelector('.lectures-content');
+          const videoCanvas = document.getElementById('webgazerVideoCanvas');
+    
+          if (videoContainer && videoElement && lecturesContent && videoCanvas) {
+            styleWebGazerElements();
+          } else {
+            requestAnimationFrame(waitForElements); // Check again on the next animation frame
+          }
+        };
+    
+        requestAnimationFrame(waitForElements); // Start checking for elements
       }
     };
+    
 
     initializeWebGazer();
 
     return () => {
       if (window.webgazer) {
         try {
-          const videoElement = document.getElementById('webgazerVideoFeed');
-          const faceOverlay = document.getElementById('webgazerFaceOverlay');
-          const faceFeedbackBox = document.getElementById('webgazerFaceFeedbackBox');
-          const videoContainer = document.getElementById('webgazerVideoContainer');
-          
-          if (videoElement && videoElement.srcObject) {
-            const tracks = videoElement.srcObject.getTracks();
-            tracks.forEach(track => track.stop());
-          }
+          const webgazerGazeDot = document.getElementById('webgazerGazeDot');
 
-          if (videoElement) videoElement.remove(); // Remove video
-          if (faceOverlay) faceOverlay.remove(); // Remove face overlay
-          if (faceFeedbackBox) faceFeedbackBox.remove(); // Remove feedback box
-          if (videoContainer) videoContainer.remove();
+          if (webgazerGazeDot) webgazerGazeDot.remove();
 
           window.webgazer.clearGazeListener();
           window.webgazer.showPredictionPoints(false);
           window.webgazer.pause();
 
           // window.webgazer.end();
-          // window.webgazer.stopVideo();
+          window.webgazer.stopVideo();
         } catch (error) {
           console.log('Stopping WebGazer', error);
         }
 
-
-        // // Send data when component unmounts
-        // fetch("http://localhost/scholarwatch/insertGazeTracking.php", {
-        //   method: "POST",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify({ 
-        //     title: "Sample Lecture", 
-        //     description: "Lecture description",
-        //     focusTime: focusTime,
-        //     unfocusTime: unfocusTime
-        //   }),
-        // })
-        // .then(response => response.json())
-        // .then(data => console.log("Lecture inserted:", data))
-        // .catch(error => console.error("Error inserting lecture:", error));
       }
     };
   }, []);
