@@ -23,7 +23,18 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
   ];
 
   useEffect(() => {
+    
     const initializeWebGazer = () => {
+      // function loadScript(url, callback) { 
+      //   var script = document.createElement('script'); 
+      //   script.type = 'text/javascript'; script.src = url; 
+      //   script.onload = callback; 
+      //   document.head.appendChild(script); 
+      // } 
+      // loadScript('https://cdn.jsdelivr.net/npm/webgazer/dist/webgazer.min.js', function() { 
+      //   console.log('WebGazer loaded'); 
+      // });
+
       if (window.webgazer) {
         window.webgazer.showVideo(true);
         window.webgazer.showFaceOverlay(false);
@@ -132,6 +143,21 @@ function GazeTracking({ isCalibrated, setIsCalibrated, lecturesRef, setGazeResul
         window.webgazer.clearGazeListener();
         window.webgazer.showPredictionPoints(false);
         window.webgazer.pause();
+        
+        // // Send data when component unmounts
+        // fetch("http://localhost/scholarwatch/insertGazeTracking.php", {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify({ 
+        //     title: "Sample Lecture", 
+        //     description: "Lecture description",
+        //     focusTime: focusTime,
+        //     unfocusTime: unfocusTime
+        //   }),
+        // })
+        // .then(response => response.json())
+        // .then(data => console.log("Lecture inserted:", data))
+        // .catch(error => console.error("Error inserting lecture:", error));
       }
     };
   }, []);
