@@ -1,8 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Bar, Pie, Line, Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Tooltip, Legend, PointElement } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+  PointElement
+} from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Tooltip, Legend, PointElement);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+  PointElement
+);
 
 const StudentsInsights = () => {
   const [data, setData] = useState({
@@ -73,22 +92,25 @@ const StudentsInsights = () => {
     labels: ["Viewed Lectures", "Not Viewed"],
     datasets: [
       {
-        data: [data.viewedLectures, data.notViewedLectures],
-        backgroundColor: ['#FF7F0E', '#993333'], // Autumn orange and peach tones
+        data: [viewedLectures, notViewedLectures],
+        backgroundColor: ['#FF7F0E', '#993333'],
         borderColor: ['#FF7F0E', '#FDBF6F'],
         borderWidth: 1,
       },
     ],
   };
 
+  // If no quiz scores, provide a dummy array to avoid errors
+  const quizLabelCount = quizScores.length > 0 ? quizScores.length : 5;
+  const quizLabels = Array.from({ length: quizLabelCount }, (_, i) => `Quiz ${i + 1}`);
+
   const quizScoreData = {
-    labels: ["Quiz 1", "Quiz 2", "Quiz 3", "Quiz 4", "Quiz 5"],
+    labels: quizLabels,
     datasets: [
       {
         label: "Quiz Scores",
-        data: data.quizScores,
-        backgroundColor: "#F3C44D", // Orange
-        //borderColor: "#FFD700", // Yellow
+        data: quizScores.length > 0 ? quizScores : [0, 0, 0, 0, 0],
+        backgroundColor: "#F3C44D",
         borderWidth: 1,
       },
     ],
@@ -98,30 +120,26 @@ const attentionData = {
     labels: ["Focused", "Unfocused"],
     datasets: [
       {
-        data: [data.attention.focused_time, data.attention.unfocused_time],
-        backgroundColor: ['#FF6700', '#FDD1A6'], // Autumn peach and yellow
+        data: [attention.focused_time, attention.unfocused_time],
+        backgroundColor: ['#FF6700', '#FDD1A6'],
         borderWidth: 0,
       },
     ],
   };
 
+  // In the original code, averageTimeData was static dummy data.
+  // If needed, fetch from DB and format similarly. For now, we keep it static or remove it.
+  // Let's keep it static since no instructions were given on how to fetch it:
   const averageTimeData = {
     labels: ["January", "February", "March", "April", "June"],
     datasets: [
       {
-        label: "English",
+        label: selectedCourse,
         data: [15, 20, 25, 18, 22],
-        borderColor: "#FF4500", // Orange-red
-        backgroundColor: "rgba(255, 69, 0, 0.3)", // Transparent Orange-red
+        borderColor: "#FF4500",
+        backgroundColor: "rgba(255, 69, 0, 0.3)",
         fill: true,
-      },
-      {
-        label: "History",
-        data: [10, 18, 20, 15, 17],
-        borderColor: "#FFD700", // Yellow
-        backgroundColor: "rgba(255, 215, 0, 0.3)", // Transparent Yellow
-        fill: true,
-      },
+      }
     ],
   };
 
@@ -131,9 +149,11 @@ const attentionData = {
       <div className="dropdown-container">
         <label>Course: </label>
         <select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
-          <option>English</option>
-          <option>Math</option>
-          <option>History</option>
+          {coursesData.map((course) => (
+            <option key={course.CourseID} value={course.Name}>
+              {course.Name}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -163,15 +183,20 @@ const attentionData = {
                   maintainAspectRatio: false,
                   plugins: { legend: { position: "top" } },
                   scales: {
-                    x: { grid: { display: false }, title: { display: true, text: "Quizzes" } },
-                    y: { grid: { display: false }, beginAtZero: true, title: { display: true, text: "Scores" } },
+                    x: {
+                      grid: { display: false },
+                      title: { display: true, text: "Quizzes" },
+                    },
+                    y: {
+                      grid: { display: false },
+                      beginAtZero: true,
+                      title: { display: true, text: "Scores" },
+                    },
                   },
                 }}
               />
             </div>
           </div>
-
-          
 
           <div className="dashboard-card">
             <h3>Attention</h3>
@@ -206,19 +231,19 @@ const attentionData = {
               </span>{" "}
               Student Name
             </h3>
-            <p className="compact-card-font">John Doe</p>
+            <p className="compact-card-font">{studentName}</p>
           </div>
           <div className="dashboard-card compact-card">
             <h3>Total Courses:</h3>
-            <p className="compact-card-font">3</p>
+            <p className="compact-card-font">{coursesData.length}</p>
           </div>
           <div className="dashboard-card compact-card">
             <h3>Class Strength</h3>
-            <p className="compact-card-font">{data.totalStudents}</p>
+            <p className="compact-card-font">{totalStudents}</p>
           </div>
           <div className="dashboard-card compact-card">
             <h3>Attendance</h3>
-            <p className="compact-card-font">{data.attendance}</p>
+            <p className="compact-card-font">{attendance}</p>
           </div>
         </div>
 
@@ -232,8 +257,15 @@ const attentionData = {
                 maintainAspectRatio: false,
                 plugins: { legend: { position: "top" } },
                 scales: {
-                  x: { grid: { display: false }, title: { display: true, text: "Months" } },
-                  y: { grid: { display: false }, beginAtZero: true, title: { display: true, text: "Minutes" } },
+                  x: {
+                    grid: { display: false },
+                    title: { display: true, text: "Months" },
+                  },
+                  y: {
+                    grid: { display: false },
+                    beginAtZero: true,
+                    title: { display: true, text: "Minutes" },
+                  },
                 },
               }}
             />
@@ -265,7 +297,7 @@ const attentionData = {
           padding: 10px;
           border: 1px solid #ddd;
           border-radius: 8px;
-          background-color: #FFF5EE; /* Peach background */
+          background-color: #FFF5EE;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           text-align: center;
           font-size: 14px;
@@ -287,7 +319,7 @@ const attentionData = {
         }
 
         .compact-card-font {
-          color: #FF8C00; /* Autumn Font Color */
+          color: #FF8C00;
         }
 
         h3 {
