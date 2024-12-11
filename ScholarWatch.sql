@@ -14,8 +14,9 @@
  Date: 17/11/2024 16:39:01
 */
 
---  ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
- 
+ -- ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
+ -- FLUSH PRIVILEGES;
+
 
 -- CREATE SCHEMA `scholarwatch` ;
 

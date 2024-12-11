@@ -1,15 +1,7 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
 
-const Logout = ({ setUserType }) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
+function Logout({ setUserType}) {
     setUserType('');
-    navigate('/');
-  }, [setUserType, navigate]);
-
-  return null; 
-};
+}
 
 export default Logout;

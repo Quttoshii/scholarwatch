@@ -1,17 +1,17 @@
 import React from 'react';
 import './BackgroundIcons.css';
 
-import icon1 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/icon_1.svg'; 
-import icon2 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/pencil.svg';
-import icon3 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/icon_3.svg';
-import icon4 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/lights.svg';
-import icon5 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/icon_5.svg';
-import icon6 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/QnA_f.svg';
-import icon7 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/arrow.svg';
-import icon8 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/alarm.svg';
-import icon9 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/study.svg';
-import icon10 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/page.svg';
-//import icon11 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/arrow.svg';
+import icon1 from '../icon_1.svg'; 
+import icon2 from '../pencil.svg';
+import icon3 from '../icon_3.svg';
+import icon4 from '../lights.svg';
+import icon5 from '../icon_5.svg';
+import icon6 from '../QnA_f.svg';
+import icon7 from '../alarm.svg';
+import icon8 from '../alarm.svg';
+import icon9 from '../study.svg';
+import icon10 from '../page.svg';
+//import icon11 from './arrow.svg';
 
 const BackgroundIcons = () => {
 
