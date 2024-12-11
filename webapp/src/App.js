@@ -14,6 +14,7 @@ import CreateQuiz from './components/CreateQuiz';
 import CreateLecture from './components/CreateLecture';
 import AttendanceMonitoring from './components/AttendanceMonitoring'; 
 import Results from './components/Results.js';
+import Logout from './components/Logout.js';
 
 import './App.css';
 
@@ -43,6 +44,8 @@ function App() {
               <Link to="/createLecture"><button>Lectures</button></Link>
               <Link to="/createQuiz"><button>Quizzes</button></Link>
               <Link to="/insights"><button>Insights</button></Link>
+              <Link to="/attendanceMonitoring"><button>Attendance Monitoring</button></Link> 
+              <Link to="/logout"><button>Log out</button></Link>
             </div>
             <div className="content">
               <Routes>
@@ -50,6 +53,8 @@ function App() {
                 <Route path="/createLecture" element={<CreateLecture userID={userID}/>} />
                 <Route path="/createQuiz" element={<CreateQuiz/>} />
                 <Route path="/insights" element={<Insights results={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
+                <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults}/>} /> 
+                <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
@@ -62,7 +67,7 @@ function App() {
               <Link to="/postureDetection"><button>Posture Detection</button></Link>
               <Link to="/quizzes"><button>Quizzes</button></Link>
               <Link to="/StudentInsights"><button>Insights</button></Link>
-              <Link to="/attendanceMonitoring"><button>Attendance Monitoring</button></Link> 
+              <Link to="/logout"><button>Log out</button></Link>
             </div>
             <div className="content">
               <Routes>
@@ -73,7 +78,7 @@ function App() {
                 <Route path="/postureDetection" element={<PostureDetection setPostureResults={setPostureResults}/>} />
                 <Route path="/StudentInsights" element={<StudentInsights results={emotionResults} gazeResults={gazeResults} />} />
                 <Route path="/results" element={<Results emotionResults={emotionResults}/>} />
-                <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults}/>} /> 
+                <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
