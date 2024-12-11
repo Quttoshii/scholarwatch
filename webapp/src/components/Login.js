@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-function Login({ setUserType, setUserID }) {
-    const [email, setEmail] = useState("");
+function Login({ setUserType, setUserID,setUserName ,email,setEmail}) {
+    
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
@@ -30,7 +30,9 @@ function Login({ setUserType, setUserID }) {
                 } else if (data.userType) {
                     // Set user type on successful login
                     setUserType(data.userType);
-                    setUserID(data.userID)
+                    setUserID(data.userID);
+                    setUserName(data.userName); 
+                    
                 }
             })
             .catch((error) => {
@@ -40,7 +42,7 @@ function Login({ setUserType, setUserID }) {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-container" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.9)' }}>
             <form className="login-form" onSubmit={handleLogin}>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>

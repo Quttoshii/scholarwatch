@@ -12,6 +12,7 @@ const StudentsInsights = () => {
     attendance: "90%",
   });
   const [selectedCourse, setSelectedCourse] = useState("English");
+  const [selectedLecture, setSelectedLecture] = useState("Lecture1"); 
 
   useEffect(() => {
     const fetchCourseData = (course) => {
@@ -51,6 +52,23 @@ const StudentsInsights = () => {
     setData(fetchedData);
   }, [selectedCourse]);
 
+  const fetchAttentionDataByLecture = (lecture) => {
+    
+    const attentionData = {
+      Lecture1: { focused_time: 70, unfocused_time: 30 },
+      Lecture2: { focused_time: 60, unfocused_time: 40 },
+    };
+    return attentionData[lecture];
+  };
+
+  useEffect(() => {
+    const newAttentionData = fetchAttentionDataByLecture(selectedLecture);
+    setData(prevData => ({
+      ...prevData,
+      attention: newAttentionData
+    }));
+  }, [selectedLecture]);
+
   const lectureViewData = {
     labels: ["Viewed Lectures", "Not Viewed"],
     datasets: [
@@ -76,7 +94,7 @@ const StudentsInsights = () => {
     ],
   };
 
-  const attentionData = {
+const attentionData = {
     labels: ["Focused", "Unfocused"],
     datasets: [
       {
@@ -157,6 +175,16 @@ const StudentsInsights = () => {
 
           <div className="dashboard-card">
             <h3>Attention</h3>
+
+            <div className="dropdown-container">
+          <label>Select Lecture:</label>
+          <select value={selectedLecture} onChange={(e) => setSelectedLecture(e.target.value)}>
+            <option value="Lecture1">Lecture 1</option>
+            <option value="Lecture2">Lecture 2</option>
+          </select>
+        </div>
+
+
             <div className="chart-container">
               <Doughnut
                 data={attentionData}
