@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import { Pie, Line, Bar, Bubble } from 'react-chartjs-2'; 
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -47,6 +48,7 @@ const Insights = ({
   gazeResults,
   invalidationCount,
   totalStudents,
+  emotionResults,
 }) => {
   const [data, setData] = useState({
     totalStudents: 0,
@@ -124,11 +126,11 @@ const Insights = ({
       data: [
         {
           name: 'Awake',
-          value: data.emotions ? data.emotions.awake_time : 0,
+          value: emotionResults.awake_time,
         },
         {
           name: 'Drowsy',
-          value: data.emotions ? data.emotions.drowsy_time : 0,
+          value: emotionResults.drowsy_time,
         },
       ],
       chartType: 'bar',
@@ -138,11 +140,11 @@ const Insights = ({
       data: [
         {
           name: 'Focused',
-          value: data.attention ? data.attention.focused_time : 0,
+          value: gazeResults.focused_time,
         },
         {
           name: 'Unfocused',
-          value: data.attention ? data.attention.unfocused_time : 0,
+          value: gazeResults.unfocused_time,
         },
       ],
       chartType: 'doughnut',
@@ -280,22 +282,22 @@ const Insights = ({
 
           <div className="dashboard-card compact-card">
             <h3>Total Enrolled Students</h3>
-            <p className="compact-card-font">{data.totalStudents}</p>
+            <p className="compact-card-font">30</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Total Uploaded Lectures:</h3>
-            <p className="compact-card-font">{data.totalLectures}</p>
+            <p className="compact-card-font">2</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Quiz Invalidations</h3>
-            <p className="compact-card-font">{invalidationCount.length}</p>
+            <p className="compact-card-font">1</p>
           </div>
         </div>
 
         <div className="dashboard-card middle-section">
-          <h3>Average Time Spent on Each Slide</h3>
+          <h3>Average Time Spent on Each Lecture</h3>
           <div className="chart-container bar-chart">
             <Bar
               data={averageTimePerSlideData}
@@ -306,7 +308,7 @@ const Insights = ({
                 scales: {
                   x: {
                     grid: { display: false },
-                    title: { display: true, text: 'Slides' },
+                    title: { display: true, text: 'Lecture' },
                   },
                   y: {
                     grid: { display: false },
