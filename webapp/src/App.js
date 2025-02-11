@@ -59,7 +59,7 @@ function App() {
                 <Route path="/" element={<Home userType={userType} userID={userID} userName={userName}  email={email} />} />
                 <Route path="/createLecture" element={<CreateLecture userID={userID}/>} />
                 <Route path="/createQuiz" element={<CreateQuiz/>} />
-                <Route path="/insights" element={<Insights results={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
+                <Route path="/insights" element={<Insights emotionResults={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
                 <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults}/>} /> 
                 <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
                 <Route path="*" element={<Navigate to="/" />} />

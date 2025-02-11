@@ -231,7 +231,7 @@ const attentionData = {
               </span>{" "}
               Student Name
             </h3>
-            <p className="compact-card-font">{studentName}</p>
+            <p className="compact-card-font">Hassan Raza</p>
           </div>
           <div className="dashboard-card compact-card">
             <h3>Total Courses:</h3>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Pie, Line, Bar, Bubble } from 'react-chartjs-2'; 
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,9 +25,39 @@ ChartJS.register(
   PointElement
 );
 
-const Insights = () => {
-  const [coursesData, setCoursesData] = useState([]);
-  const [selectedCourseID, setSelectedCourseID] = useState(null);
+// Updated attendance data structure to include courses
+const attendanceData = {
+  English: {
+    '2024-11-01': { present: 20, absent: 5 },
+    '2024-11-02': { present: 18, absent: 7 },
+    '2024-11-03': { present: 22, absent: 3 },
+    // Add more dates as needed
+  },
+  History: {
+    '2024-11-01': { present: 15, absent: 10 },
+    '2024-11-02': { present: 17, absent: 8 },
+    '2024-11-03': { present: 14, absent: 11 },
+    // Add more dates as needed
+  },
+  // Add more courses as needed
+};
+
+const Insights = ({
+  results,
+  gazeResults,
+  invalidationCount,
+  totalStudents,
+  emotionResults,
+}) => {
+  const [data, setData] = useState({
+    totalStudents: 0,
+    totalLectures: 0,
+    invalidationCount: 0,
+    emotions: { awake_time: 0, drowsy_time: 0 },
+    attention: { focused_time: 0, unfocused_time: 0 },
+  });
+  const [selectedCourse, setSelectedCourse] = useState('English');
+  const [selectedQuiz, setSelectedQuiz] = useState(1);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [attendance, setAttendance] = useState({ present: 0, absent: 0 });
   const [selectedQuiz, setSelectedQuiz] = useState(null); // moved hook to top-level
@@ -167,16 +198,28 @@ const Insights = () => {
     {
       title: 'Emotions',
       data: [
-        { name: 'Awake', value: emotions.awake_time },
-        { name: 'Drowsy', value: emotions.drowsy_time },
+        {
+          name: 'Awake',
+          value: emotionResults.awake_time,
+        },
+        {
+          name: 'Drowsy',
+          value: emotionResults.drowsy_time,
+        },
       ],
       chartType: 'bar',
     },
     {
       title: 'Attention',
       data: [
-        { name: 'Focused', value: attention.focused_time },
-        { name: 'Unfocused', value: attention.unfocused_time },
+        {
+          name: 'Focused',
+          value: gazeResults.focused_time,
+        },
+        {
+          name: 'Unfocused',
+          value: gazeResults.unfocused_time,
+        },
       ],
       chartType: 'doughnut',
     },
@@ -330,35 +373,23 @@ const Insights = () => {
 
           <div className="dashboard-card compact-card">
             <h3>Total Enrolled Students</h3>
-            <p className="compact-card-font">{total_students}</p>
+            <p className="compact-card-font">30</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Total Uploaded Lectures:</h3>
-            <p className="compact-card-font">{total_lectures}</p>
+            <p className="compact-card-font">2</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Quiz Invalidations</h3>
-            <p className="compact-card-font">{invalidation_count}</p>
+            <p className="compact-card-font">1</p>
           </div>
         </div>
 
 
         <div className="dashboard-card middle-section">
-          <h3>Average Time Spent on Each Slide</h3>
-          <label htmlFor="attentionLecture">Select Lecture: </label>
-          <select
-            id="attentionLecture"
-            value={selectedAttentionLecture}
-            onChange={handleLectureChange(setSelectedAttentionLecture)}
-          >
-            <option value="Lecture 1">Lecture 1</option>
-            <option value="Lecture 2">Lecture 2</option>
-            <option value="Lecture 3">Lecture 3</option>
-            <option value="Lecture 4">Lecture 4</option>
-            <option value="Lecture 5">Lecture 5</option>
-          </select>
+          <h3>Average Time Spent on Each Lecture</h3>
           <div className="chart-container bar-chart">
             <Bar
               data={averageTimePerSlideData}
@@ -369,7 +400,7 @@ const Insights = () => {
                 scales: {
                   x: {
                     grid: { display: false },
-                    title: { display: true, text: 'Slides' },
+                    title: { display: true, text: 'Lecture' },
                   },
                   y: {
                     grid: { display: false },
