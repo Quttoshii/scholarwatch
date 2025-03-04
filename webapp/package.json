@@ -2,6 +2,7 @@
   "name": "scholarwatch",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@react-pdf/renderer": "^4.0.0",
     "@sgratzl/chartjs-chart-boxplot": "^4.4.4",

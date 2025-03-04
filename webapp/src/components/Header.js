@@ -5,11 +5,9 @@ function Header( {userType} ) {
   return (
     <header className="header">
       <div className="header-content">
-        <img 
-          src="/assets/moodle-logo.png" 
-          alt="Moodle Logo" 
-          className="logo" 
-        />
+      < img src={`${process.env.PUBLIC_URL}/assets/moodle-logo.png`} 
+        alt="Moodle Logo" 
+        className="logo" />
         {userType === "Teacher" ? (
           <h1>ScholarWatch Teacher</h1>
         ) : (userType === "Student") ? (
