@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import { Pie, Line, Bar, Bubble } from 'react-chartjs-2'; 
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,9 +10,8 @@ import {
   ArcElement,
   Tooltip,
   Legend,
-  PointElement,
+  PointElement
 } from 'chart.js';
-// eslint-disable-next-line no-use-before-define
 import Plot from 'react-plotly.js';
 
 ChartJS.register(
@@ -47,6 +47,7 @@ const Insights = ({
   gazeResults,
   invalidationCount,
   totalStudents,
+  emotionResults,
 }) => {
   const [data, setData] = useState({
     totalStudents: 0,
@@ -59,63 +60,138 @@ const Insights = ({
   const [selectedQuiz, setSelectedQuiz] = useState(1);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [attendance, setAttendance] = useState({ present: 0, absent: 0 });
+  const [selectedQuiz, setSelectedQuiz] = useState(null); // moved hook to top-level
+  const [selectedAttentionLecture, setSelectedAttentionLecture] = useState('Lecture 1');
+  // const [selectedPostureLecture, setSelectedPostureLecture] = useState('Lecture 1');
+  // const [selectedSlideTimeLecture, setSelectedSlideTimeLecture] = useState('Lecture 1');
 
   useEffect(() => {
     fetch('http://localhost/scholarwatch/fetchTeacherInsights.php')
       .then((response) => response.json())
-      .then((data) => {
-        setData({
-          totalStudents: data.total_students,
-          totalLectures: data.total_lectures,
-          invalidationCount: data.invalidation_count,
-          emotions: data.emotions,
-          attention: data.attention,
-        });
+      .then((fetchedData) => {
+        const { courses } = fetchedData;
+        setCoursesData(courses || []);
+        if (courses && courses.length > 0) {
+          setSelectedCourseID(courses[0].CourseID);
+          // Set quiz after we know selected course
+          const defaultCourse = courses[0];
+          const quizIDs = defaultCourse.quiz_data ? Object.keys(defaultCourse.quiz_data) : [];
+          if (quizIDs.length > 0) {
+            setSelectedQuiz(quizIDs[0]);
+          }
+        }
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const slideData = {
-    English: [15, 25, 10, 15, 20],
-    History: [10, 18, 12, 20, 14],
-  };
+  // Get current selectedCourse after coursesData is set
+  const selectedCourse = coursesData.find(c => c.CourseID === selectedCourseID);
 
-  const averageTimeData = {
-    labels: ['January', 'February', 'March', 'April', 'June'],
-    datasets: [
-      {
-        label: 'English',
-        data: [15, 20, 25, 18, 22],
-        borderColor: '#0671B7',
-        backgroundColor: '#0671B7',
-        fill: false,
-      },
-      {
-        label: 'History',
-        data: [10, 18, 20, 15, 17],
-        borderColor: '#e64072',
-        backgroundColor: '#e64072',
-        fill: false,
-      },
-    ],
-  };
+  // Update attendance when selectedCourse or selectedDate changes
+  useEffect(() => {
+    if (selectedCourse) {
+      const dateString = selectedDate.toISOString().split('T')[0];
+      const att = selectedCourse.attendance[dateString] || { present: 0, absent: 0 };
+      setAttendance(att);
 
-  // Updated quiz data to be arrays of scores for box and whisker plot
-  const quizData = {
-    1: [60, 65, 75, 80, 90], // Example quiz scores
-    2: [70, 75, 80, 85, 92],
-  };
+      // Also update selectedQuiz if needed (e.g. if selectedCourse changes)
+      const quizIDs = selectedCourse.quiz_data ? Object.keys(selectedCourse.quiz_data) : [];
+      if (quizIDs.length > 0 && (!selectedQuiz || !quizIDs.includes(selectedQuiz))) {
+        setSelectedQuiz(quizIDs[0]);
+      }
+    }
+  }, [selectedCourse, selectedDate, selectedQuiz]);
 
+  // Now we can handle the loading state safely AFTER the hooks
+  if (!selectedCourse) {
+    return <div>Loading...</div>;
+  }
+
+  // Extract data
+  const {
+    total_students,
+    total_lectures,
+    invalidation_count,
+    emotions,
+    attention,
+    slides,
+    quiz_data,
+    lectureEngagement
+  } = selectedCourse;
+
+  const quizIDs = quiz_data ? Object.keys(quiz_data) : [];
+  const selectedQuizData = selectedQuiz && quiz_data[selectedQuiz] ? quiz_data[selectedQuiz] : [];
+
+  // Dummy lecture view data (modify if needed)
   const lectureViewData = {
     labels: ['Viewed Lectures', 'Not Viewed'],
     datasets: [
       {
-        data: [25, 15],
+        data: [30, 10],
         backgroundColor: ['#0671B7', '#e64072'],
         borderColor: ['#0671B7', '#e64072'],
         borderWidth: 1,
       },
     ],
+  };
+
+  const bubbleChartData = {
+    datasets: [
+      {
+        label: 'Good Posture',
+        data: [
+          { x: 10, y: 1, r: 20 },
+          { x: 20, y: 1, r: 15 },
+        ],
+        backgroundColor: '#b30c52',
+        hoverBackgroundColor: '#d94b78', // Two shades lighter
+      },
+      {
+        label: 'Slouching',
+        data: [
+          { x: 15, y: 2, r: 30 },
+          { x: 25, y: 2, r: 10 },
+        ],
+        backgroundColor: '#f048c6',
+        hoverBackgroundColor: '#f57fd1', // Two shades lighter
+      },
+      {
+        label: 'Looking Left',
+        data: [
+          { x: 20, y: 3, r: 25 },
+        ],
+        backgroundColor: '#0c97b3',
+        hoverBackgroundColor: '#3bb3c9', // Two shades lighter
+      },
+      {
+        label: 'Looking Right',
+        data: [
+          { x: 25, y: 4, r: 18 },
+        ],
+        backgroundColor: '#b538b5',
+        hoverBackgroundColor: '#cd65cd', // Two shades lighter
+      },
+      {
+        label: 'Phone Use',
+        data: [
+          { x: 30, y: 5, r: 12 },
+        ],
+        backgroundColor: '#1d39a1',
+        hoverBackgroundColor: '#4f69b7', // Two shades lighter
+      },
+    ],
+  };
+
+  const categoryLabels = [
+    'Good Posture',
+    'Slouching',
+    'Looking Left',
+    'Looking Right',
+    'Phone Use',
+  ];
+
+  const handleLectureChange = (setter) => (event) => {
+    setter(event.target.value);
   };
 
   const insights = [
@@ -124,11 +200,11 @@ const Insights = ({
       data: [
         {
           name: 'Awake',
-          value: data.emotions ? data.emotions.awake_time : 0,
+          value: emotionResults.awake_time,
         },
         {
           name: 'Drowsy',
-          value: data.emotions ? data.emotions.drowsy_time : 0,
+          value: emotionResults.drowsy_time,
         },
       ],
       chartType: 'bar',
@@ -138,23 +214,23 @@ const Insights = ({
       data: [
         {
           name: 'Focused',
-          value: data.attention ? data.attention.focused_time : 0,
+          value: gazeResults.focused_time,
         },
         {
           name: 'Unfocused',
-          value: data.attention ? data.attention.unfocused_time : 0,
+          value: gazeResults.unfocused_time,
         },
       ],
       chartType: 'doughnut',
     },
   ];
 
-  const createChartData = (data) => ({
-    labels: data.map((d) => d.name),
+  const createChartData = (chartData) => ({
+    labels: chartData.map((d) => d.name),
     datasets: [
       {
         label: 'Time (minutes)',
-        data: data.map((d) => d.value),
+        data: chartData.map((d) => d.value),
         backgroundColor: ['#0671B7', '#e64072'],
         borderColor: ['#0671B7', '#e64072'],
         borderWidth: 1,
@@ -163,11 +239,11 @@ const Insights = ({
   });
 
   const averageTimePerSlideData = {
-    labels: ['Slide 1', 'Slide 2', 'Slide 3', 'Slide 4', 'Slide 5'],
+    labels: slides.map((_, idx) => `Slide ${idx + 1}`),
     datasets: [
       {
         label: 'Average Time (minutes)',
-        data: slideData[selectedCourse],
+        data: slides,
         backgroundColor: '#0671B7',
         borderColor: '#0671B7',
         borderWidth: 1,
@@ -175,16 +251,18 @@ const Insights = ({
     ],
   };
 
-  // Update attendance when selectedCourse or selectedDate changes
-  useEffect(() => {
-    const dateString = selectedDate.toISOString().split('T')[0];
-    const courseAttendanceData = attendanceData[selectedCourse] || {};
-    const attendanceInfo =
-      courseAttendanceData[dateString] || { present: 0, absent: 0 };
-    setAttendance(attendanceInfo);
-  }, [selectedCourse, selectedDate]);
-
-  const selectedQuizData = quizData[selectedQuiz];
+  const averageTimeData = {
+    labels: lectureEngagement.map((e) => e.date),
+    datasets: [
+      {
+        label: 'Engagement (minutes)',
+        data: lectureEngagement.map((e) => e.time),
+        borderColor: '#0671B7',
+        backgroundColor: '#0671B7',
+        fill: false,
+      },
+    ],
+  };
 
   return (
     <div>
@@ -194,11 +272,14 @@ const Insights = ({
         <label htmlFor="courseSelect">Select Course: </label>
         <select
           id="courseSelect"
-          value={selectedCourse}
-          onChange={(e) => setSelectedCourse(e.target.value)}
+          value={selectedCourseID || ''}
+          onChange={(e) => setSelectedCourseID(parseInt(e.target.value))}
         >
-          <option value="English">English</option>
-          <option value="History">History</option>
+          {coursesData.map((course) => (
+            <option key={course.CourseID} value={course.CourseID}>
+              {course.Name}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -221,6 +302,18 @@ const Insights = ({
           {insights.map((insight, index) => (
             <div key={index} className="dashboard-card">
               <h3>{insight.title}</h3>
+              <label htmlFor="attentionLecture">Select Lecture: </label>
+          <select
+            id="attentionLecture"
+            value={selectedAttentionLecture}
+            onChange={handleLectureChange(setSelectedAttentionLecture)}
+          >
+            <option value="Lecture 1">Lecture 1</option>
+            <option value="Lecture 2">Lecture 2</option>
+            <option value="Lecture 3">Lecture 3</option>
+            <option value="Lecture 4">Lecture 4</option>
+            <option value="Lecture 5">Lecture 5</option>
+          </select>
               <div className="chart-container">
                 {insight.chartType === 'bar' ? (
                   <Bar
@@ -275,27 +368,28 @@ const Insights = ({
         <div className="right-section">
           <div className="dashboard-card compact-card">
             <h3>Total Courses:</h3>
-            <p className="compact-card-font">2</p>
+            <p className="compact-card-font">{coursesData.length}</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Total Enrolled Students</h3>
-            <p className="compact-card-font">{data.totalStudents}</p>
+            <p className="compact-card-font">30</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Total Uploaded Lectures:</h3>
-            <p className="compact-card-font">{data.totalLectures}</p>
+            <p className="compact-card-font">2</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Quiz Invalidations</h3>
-            <p className="compact-card-font">{invalidationCount.length}</p>
+            <p className="compact-card-font">1</p>
           </div>
         </div>
 
+
         <div className="dashboard-card middle-section">
-          <h3>Average Time Spent on Each Slide</h3>
+          <h3>Average Time Spent on Each Lecture</h3>
           <div className="chart-container bar-chart">
             <Bar
               data={averageTimePerSlideData}
@@ -306,7 +400,7 @@ const Insights = ({
                 scales: {
                   x: {
                     grid: { display: false },
-                    title: { display: true, text: 'Slides' },
+                    title: { display: true, text: 'Lecture' },
                   },
                   y: {
                     grid: { display: false },
@@ -319,17 +413,94 @@ const Insights = ({
           </div>
         </div>
 
-        {/* QUIZ STATISTICS SECTION (REPLACED WITH BOX AND WHISKER PLOT) */}
+        
+
+        <div className="dashboard-card wide-chart">
+  <h3>Posture Insights</h3>
+  <div className="chart-container">
+  <label htmlFor="attentionLecture">Select Lecture: </label>
+          <select
+            id="attentionLecture"
+            value={selectedAttentionLecture}
+            onChange={handleLectureChange(setSelectedAttentionLecture)}
+          >
+            <option value="Lecture 1">Lecture 1</option>
+            <option value="Lecture 2">Lecture 2</option>
+            <option value="Lecture 3">Lecture 3</option>
+            <option value="Lecture 4">Lecture 4</option>
+            <option value="Lecture 5">Lecture 5</option>
+          </select>
+    <Bubble
+      data={bubbleChartData}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 20,    // Padding above the chart
+            bottom: 10, // Padding below the chart
+            left: 10,   // Padding to the left of the chart
+            right: 10,  // Padding to the right of the chart
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const dataPoint = context.raw;
+                const category = categoryLabels[dataPoint.y - 1]; // Map y-value to category
+                return `Slide: ${dataPoint.x}, Category: ${category}, Count: ${dataPoint.r}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Slide Number',
+            },
+            ticks: {
+              stepSize: 5,
+              padding: 10,
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Posture Categories',
+            },
+            ticks: {
+              callback: function (value) {
+                return categoryLabels[value - 1]; // Map y-value to categories
+              },
+              stepSize: 1,
+              min: 1,
+              max: categoryLabels.length,
+            },
+          },
+        },
+      }}
+    />
+  </div>
+</div>
+
+
+        {/* QUIZ STATISTICS SECTION */}
         <div className="dashboard-card middle-section">
           <h3>Quiz Statistics</h3>
           <div className="top-section">
             <label htmlFor="quizSelect">Select Quiz: </label>
             <select
               id="quizSelect"
-              value={selectedQuiz}
-              onChange={(e) => setSelectedQuiz(Number(e.target.value))}
+              value={selectedQuiz || ''}
+              onChange={(e) => setSelectedQuiz(e.target.value)}
             >
-              {Object.keys(quizData).map((quiz) => (
+              {quizIDs.map((quiz) => (
                 <option key={quiz} value={quiz}>
                   Quiz {quiz}
                 </option>
@@ -337,30 +508,33 @@ const Insights = ({
             </select>
           </div>
           <div className="chart-container">
-            <Plot
-              data={[
-                {
-                  y: selectedQuizData,
-                  type: 'box',
-                  name: `Quiz ${selectedQuiz}`,
-                  // boxpoints: 'all',
-                  jitter: 0.5,
-                  marker: { color: '#0671B7' },
-                  line: { width: 2 },
-                },
-              ]}
-              layout={{
-                title: `Quiz ${selectedQuiz} Scores`,
-                yaxis: { title: 'Scores', zeroline: false },
-                xaxis: { title: 'Quiz', zeroline: false },
-                autosize: true,
-                showlegend: false,
-              }}
-              style={{ width: '100%', height: '100%' }}
-            />
+            {selectedQuizData && selectedQuizData.length > 0 ? (
+              <Plot
+                data={[
+                  {
+                    y: selectedQuizData,
+                    type: 'box',
+                    name: `Quiz ${selectedQuiz}`,
+                    //boxpoints: 'all',
+                    jitter: 0.5,
+                    marker: { color: '#0671B7' },
+                    line: { width: 2 },
+                  },
+                ]}
+                layout={{
+                  title: `Quiz ${selectedQuiz} Scores`,
+                  yaxis: { title: 'Scores', zeroline: false },
+                  xaxis: { title: 'Quiz', zeroline: false },
+                  autosize: true,
+                  showlegend: false,
+                }}
+                style={{ width: '100%', height: '100%' }}
+              />
+            ) : (
+              <p>No quiz data available</p>
+            )}
           </div>
         </div>
-        {/* END QUIZ STATISTICS SECTION */}
 
         <div className="dashboard-card bottom-section">
           <h3>Average Time Spent Reading Lectures</h3>
@@ -374,7 +548,7 @@ const Insights = ({
                 scales: {
                   x: {
                     grid: { display: false },
-                    title: { display: true, text: 'Days' },
+                    title: { display: true, text: 'Date' },
                   },
                   y: {
                     grid: { display: false },
@@ -389,11 +563,27 @@ const Insights = ({
       </div>
 
       <style jsx>{`
+
+            .dashboard-card.wide-chart {
+        grid-column: span 2; /* Adjusts the bubble chart width to span 2 columns */
+        width: 100%; /* Ensures it uses the full width of the container */
+      }
+
+      .chart-container {
+        width: 100%; /* Ensures the chart uses the full width of the container */
+        height: 400px; /* Adjust height as needed */
+      }
+
         .dashboard-grid {
           display: grid;
           grid-template-columns: 4fr 1fr;
           gap: 10px;
         }
+
+         .dashboard-card {
+          margin-bottom: 20px;
+        }
+
 
         .top-section {
           display: grid;
@@ -420,7 +610,7 @@ const Insights = ({
           border: 1px solid #ddd;
           border-radius: 8px;
           background-color: #f9f9f9;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
           text-align: center;
           font-size: 14px;
         }
