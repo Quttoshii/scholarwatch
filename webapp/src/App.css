@@ -2,14 +2,29 @@
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
-  color: #333; /* Dark gray for general text */
+  color: #333;
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5; /* Light gray background for the app */
+  background-color: #f5f5f5;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: 5% 10%, 50% 50%, 90% 80%;
+  background-size: 8%, 12%, 10%;
+  opacity: 0.9;
 }
+   
+
 
 .App {
   text-align: center;
+}
+
+.login-container {
+  background-color: #fff; 
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  max-width: 400px; 
+  margin: auto; 
 }
 
 .header {
@@ -25,11 +40,12 @@ body {
   margin: 0;
 }
 
-.main-container {
+.main-container{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin: 20px;
+  height: var(--dynamic-height, ); /* Default height if not set */
 }
 
 .sidebar a {
@@ -37,6 +53,8 @@ body {
   width: 100%; /* Make the links full width */
   text-decoration: none; /* Remove underline on links */
 }
+
+
 
 .sidebar button {
   width: 100%; /* Full width of the sidebar */
@@ -87,6 +105,8 @@ body {
     margin-left: 0;
   }
 }
+
+/* Lectures.css and other styles are unchanged */
 
 /* Quizzes */
 .take-quiz-btn {
@@ -157,6 +177,23 @@ body {
   border-radius: 5px; /* Optional: add border-radius */
 }
 
+#webgazerVideoFeed,
+#webgazerFaceOverlay,
+#webgazerFaceFeedbackBox {
+  pointer-events: none; /* Prevent interaction */
+}
+
+#webgazerFaceFeedbackBox {
+  position: absolute;
+  top: 10px; /* Same as the top of your WebGazer feed */
+  right: 10px; /* Same as the right of your WebGazer feed */
+  width: 150px; /* Same width as your WebGazer video */
+  height: 100px; /* Same height as your WebGazer video */
+  border: 2px solid red; /* Red border for feedback box */
+  z-index: 1001; /* Make sure it stays above the video */
+  pointer-events: none; /* Prevent interactions with the box */
+}
+
 .mirrored-video {
   transform: scaleX(-1); /* Flip the video horizontally */
 }
@@ -173,19 +210,245 @@ body {
   padding: 50px;
 }
 
-#webgazerVideoFeed,
-#webgazerFaceOverlay,
-#webgazerFaceFeedbackBox {
-  pointer-events: none; /* Prevent interaction */
+.login-container {
+  text-align: center;
+  max-width: 400px;
+  margin: 50px auto; /* Center on the page */
+  padding: 20px;
+  background-color: #fff; /* White background for the form */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border: 1px solid #ddd; /* Light border */
 }
 
-#webgazerFaceFeedbackBox {
-  position: absolute;
-  top: 10px; /* Same as the top of your WebGazer feed */
-  right: 10px; /* Same as the right of your WebGazer feed */
-  width: 150px; /* Same width as your WebGazer video */
-  height: 100px; /* Same height as your WebGazer video */
-  border: 2px solid red; /* Red border for feedback box */
-  z-index: 1001; /* Make sure it stays above the video */
-  pointer-events: none; /* Prevent interactions with the box */
+.login-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.login-container p {
+  font-size: 16px;
+  color: #666; /* Lighter gray for the description */
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Stretch input fields to full width */
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left; /* Align labels to the left */
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+  display: block; /* Ensure labels are on their own line */
+}
+
+.form-group input {
+  width: 100%; /* Full width of the container */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #f6a623; /* Moodle orange */
+  outline: none;
+  box-shadow: 0 0 5px rgba(246, 166, 35, 0.5); /* Add glow effect */
+}
+
+.login-button {
+  background-color: #f6a623; /* Moodle orange */
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #d48f20; /* Darker orange for hover */
+}
+
+.login-button:active {
+  background-color: #bf7e1a; /* Even darker orange for active state */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-container {
+    margin: 20px;
+    padding: 15px;
+  }
+}
+
+.login-container {
+  text-align: center;
+  max-width: 400px;
+  margin: 50px auto; /* Center on the page */
+  padding: 20px;
+  background-color: #fff; /* White background for the form */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border: 1px solid #ddd; /* Light border */
+}
+
+.login-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.login-container p {
+  font-size: 16px;
+  color: #666; /* Lighter gray for the description */
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Stretch input fields to full width */
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left; /* Align labels to the left */
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+  display: block; /* Ensure labels are on their own line */
+}
+
+.form-group input {
+  width: 100%; /* Full width of the container */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #f6a623; /* Moodle orange */
+  outline: none;
+  box-shadow: 0 0 5px rgba(246, 166, 35, 0.5); /* Add glow effect */
+}
+
+.login-button {
+  background-color: #f6a623; /* Moodle orange */
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #d48f20; /* Darker orange for hover */
+}
+
+.login-button:active {
+  background-color: #bf7e1a; /* Even darker orange for active state */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-container {
+    margin: 20px;
+    padding: 15px;
+  }
+}
+
+#posture-detection-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+iframe {
+  width: 100%; /* Make iframe fill the width of its container */
+  height: calc(100% - 50px); /* Adjust height minus space for header/buttons */
+  border: none; /* Remove iframe border */
+}
+
+.attendance-container {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+}
+
+.weights-section,
+.threshold-section,
+.centered-section {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+.monitoring-label {
+  display: block;
+  margin: 10px 0;
+}
+
+input[type="number"] {
+  margin-left: 10px;
+  padding: 5px;
+  width: 60px;
+}
+
+.centered-section {
+  text-align: center;
+}
+
+.centered-section p {
+  margin: 5px 0;
+}
+
+.threshold-section p {
+  margin: 10px 0 5px;
+}
+
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
 }

@@ -3,22 +3,18 @@ import GazeTracking from './GazeTracking';
 import PDFViewer from './PDFViewer';
 
 function Lectures({ isCalibrated, setIsCalibrated, setGazeResults }) {
-  const [cameraPermission, setCameraPermission] = useState(null);
+  const [cameraPermission, setCameraPermission] = useState(true);
   const [uploadedFile, setUploadFile] = useState(null);
   const lecturesRef = useRef(null); // Create a ref for the Lectures component
 
   useEffect(() => {
-    const checkCameraPermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setCameraPermission(true);
-        stream.getTracks().forEach(track => track.stop()); // Stop the stream to release the camera
-      } catch (error) {
+    const checkCameraSupport = () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         setCameraPermission(false);
       }
     };
 
-    checkCameraPermission();
+    checkCameraSupport();
   }, []);
 
   return (
