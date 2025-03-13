@@ -1,23 +1,47 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow requests from React app's origin
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Specify allowed request methods
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Specify allowed headers
+// Allow requests from any origin (or specify 'http://localhost:3000' for more security)
+header("Access-Control-Allow-Origin: *"); 
+header("Access-Control-Allow-Methods: POST, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); 
 header("Content-Type: application/json");
-include 'db.php';
 
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+include 'includes/db.php'; // Ensure this file is correct
+
+// Read and decode JSON data
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['focused_time']) && isset($data['unfocused_time'])) {
-    $focused_time = $data['focused_time'];
-    $unfocused_time = $data['unfocused_time'];
+// Debugging log
+file_put_contents("debug_log.txt", "Raw Input: " . file_get_contents("php://input") . "\nDecoded Data: " . print_r($data, true), FILE_APPEND);
 
-    try {
-        $stmt = $pdo->prepare("INSERT INTO attention (focused_time, unfocused_time) VALUES (:focused_time, :unfocused_time)");
-        $stmt->execute(['focused_time' => $focused_time, 'unfocused_time' => $unfocused_time]);
-        echo json_encode(["success" => true, "message" => "Values added successfully"]);
-    } catch (PDOException $e) {
-        echo json_encode(["success" => false, "error" => $e->getMessage()]);
-    }
-} else {
-    echo json_encode(["success" => false, "message" => "Invalid input"]);
+// Hardcoded session ID
+$sessionID = "12345"; // Change this value as needed
+
+// Validate required fields
+if (empty($data['FocusTime']) || empty($data['UnfocusTime'])) {
+    echo json_encode(["success" => false, "message" => "Missing required fields", "received_data" => $data]);
+    exit;
 }
+
+try {
+    $stmt = $pdo->prepare("
+        INSERT INTO GazeTracking (SessionID, FocusTime, UnfocusTime, CreatedAt) 
+        VALUES (?, ?, ?, NOW())
+    ");
+
+    $stmt->execute([
+        $sessionID, // Use hardcoded session ID
+        $data['FocusTime'],
+        $data['UnfocusTime']
+    ]);
+
+    echo json_encode(["success" => true, "message" => "Data inserted successfully"]);
+} catch (PDOException $e) {
+    echo json_encode(["success" => false, "error" => "Database error: " . $e->getMessage()]);
+}
+?>
