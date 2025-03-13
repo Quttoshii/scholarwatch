@@ -1,13 +1,22 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow requests from your React app
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Allow specific HTTP methods
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow specific headers
-header("Content-Type: application/json");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    header("Access-Control-Allow-Origin: http://localhost:3000"); 
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); 
+    header("Access-Control-Allow-Headers: Content-Type, Authorization"); 
+    http_response_code(200); 
+    exit; 
+}
 
 
-include 'includes/db.php'; // Ensure your db.php has the correct PDO setup
+header("Access-Control-Allow-Origin: http://localhost:3000"); 
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json"); 
 
-// Assume userID is passed via query string like ?userID=123
+include 'includes/db.php'; 
+
+
 $userID = isset($_GET['userID']) ? $_GET['userID'] : '';
 
 if (!$userID) {

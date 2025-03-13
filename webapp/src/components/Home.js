@@ -18,8 +18,10 @@ function Home({ userType, userID, userName, email }) {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost/fetchUserDetails.php?userID=${userID}`);
+        // Make sure the correct userID is passed to the PHP file
+        const response = await fetch(`http://localhost/scholarwatch/fetchUserDetails.php?userID=${userID}`);
         const data = await response.json();
+
         if (data.error) {
           setError(data.error);
           setLoading(false);
@@ -75,4 +77,4 @@ function Home({ userType, userID, userName, email }) {
   );
 }
 
-export default Home;
+export default Home; 
