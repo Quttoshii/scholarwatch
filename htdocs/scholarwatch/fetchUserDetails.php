@@ -1,22 +1,22 @@
 <?php
-
+// Handle preflight (OPTIONS) request for CORS
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    header("Access-Control-Allow-Origin: http://localhost:3000"); 
-    header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); 
-    header("Access-Control-Allow-Headers: Content-Type, Authorization"); 
-    http_response_code(200); 
-    exit; 
+    header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow requests from React app's origin
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Specify allowed request methods
+    header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Specify allowed headers
+    http_response_code(200); // Send a response with status code 200 (OK)
+    exit; // Exit the script after handling preflight request
 }
 
+// Allow requests from React app
+header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow requests from React app
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Allow specific HTTP methods
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow specific headers
+header("Content-Type: application/json"); // Set content type as JSON
 
-header("Access-Control-Allow-Origin: http://localhost:3000"); 
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); 
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Content-Type: application/json"); 
+include 'includes/db.php'; // Ensure your db.php has the correct PDO setup
 
-include 'includes/db.php'; 
-
-
+// Assume userID is passed via query string like ?userID=123
 $userID = isset($_GET['userID']) ? $_GET['userID'] : '';
 
 if (!$userID) {

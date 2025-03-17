@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
+import duckSvg from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/duck.svg'; 
 
 function Home({ userType, userID, userName, email }) {
   const [userInfo, setUserInfo] = useState({
@@ -56,6 +57,7 @@ function Home({ userType, userID, userName, email }) {
 
   return (
     <div className="home-container">
+      <img src={duckSvg} alt="Duck" className="peek-a-boo-duck" /> {/* New image tag for the duck */}
       <div className="profile-header">
         <h1>{welcomeMessage}</h1>
       </div>
@@ -77,4 +79,4 @@ function Home({ userType, userID, userName, email }) {
   );
 }
 
-export default Home; 
+export default Home;

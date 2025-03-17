@@ -1,8 +1,7 @@
-/* Base styles and typography improvements */
 body, html {
-    font-family: 'Helvetica Neue', Arial, sans-serif; /* Modern, clean font */
-    color: #333; /* Slightly darker to improve readability */
-    background-color: #FFF5EE; /* Light grey background to reduce strain */
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    background-color: #FFF5EE;
 }
 
 .home-container {
@@ -10,16 +9,20 @@ body, html {
     max-width: 800px;
     margin: 50px auto;
     padding: 20px;
-    background-color: #FFF5EE; 
+    background-color: #FFF5EE;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #ddd;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    transform: translateY(100px);
+    animation: stackUp 0.75s ease-out forwards;
+    animation-delay: 0s;
 }
 
 .home-container:hover {
-    transform: translateY(-5px); /* Slight lift on hover */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 .profile-header {
@@ -33,17 +36,17 @@ body, html {
 }
 
 .profile-picture {
-    width: 120px; /* Increased size */
+    width: 120px;
     height: 120px;
     border-radius: 50%;
-    margin: -60px auto 20px; /* Lifted above the header */
-    border: 4px solid white; /* White border to blend with header */
+    margin: -60px auto 20px;
+    border: 4px solid white;
     object-fit: cover;
-    transition: transform 0.3s ease; /* Smooth scale transition */
+    transition: transform 0.3s ease;
 }
 
 .profile-picture:hover {
-    transform: scale(1.1); /* Enlarge on hover */
+    transform: scale(1.1);
 }
 
 .user-details p {
@@ -52,15 +55,41 @@ body, html {
     margin: 10px 0;
     padding: 8px;
     border-bottom: 1px solid #eee;
-    transition: background-color 0.3s ease; /* Transition for hover effect */
+    opacity: 0;
+    transform: translateY(100px);
+    animation: stackUp 0.75s ease-out forwards;
+    animation-delay: calc(var(--animation-order) * 0.2s);
 }
 
 .user-details p:hover {
-    background-color: #fafafa; /* Light background on hover for each detail */
+    background-color: #fafafa;
+    text-shadow: 0 0 8px rgba(246, 166, 35, 0.5);
 }
 
 .user-details p:last-child {
     border-bottom: none;
+}
+
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes stackUp {
+    0% {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
@@ -69,8 +98,9 @@ body, html {
         margin: 20px;
     }
 }
+
 .details-toggle {
-  background-color: #f6a623; /* Moodle orange */
+  background-color: #f6a623;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -83,10 +113,19 @@ body, html {
 }
 
 .details-toggle:hover {
-  background-color: #d48f20; /* Darker shade for hover */
+  background-color: #d48f20;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .details-toggle:focus {
-  box-shadow: 0 0 0 3px rgba(246, 166, 35, 0.5); /* Focus ring */
+  box-shadow: 0 0 0 3px rgba(246, 166, 35, 0.5);
+}
+
+.peek-a-boo-duck {
+    position: absolute;
+    top: 10%; 
+    right: -4%; 
+    transform: translateX(50%) translateY(-50%);
+    width: 550px; 
+    z-index: 2; 
 }

@@ -1,9 +1,10 @@
 <?php
-// Allow requests from any origin (or specify 'http://localhost:3000' for more security)
-header("Access-Control-Allow-Origin: *"); 
-header("Access-Control-Allow-Methods: POST, OPTIONS"); 
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); 
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
+
+include 'includes/db.php';
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -11,19 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-include 'includes/db.php'; // Ensure this file is correct
-
 // Read and decode JSON data
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Debugging log
 file_put_contents("debug_log.txt", "Raw Input: " . file_get_contents("php://input") . "\nDecoded Data: " . print_r($data, true), FILE_APPEND);
 
-// Hardcoded session ID
-$sessionID = "12345"; // Change this value as needed
+// Hardcoded Session ID
+$sessionID = "HARDCODED_SESSION_123";
 
 // Validate required fields
-if (empty($data['FocusTime']) || empty($data['UnfocusTime'])) {
+if (!isset($data['FocusTime']) || !isset($data['UnfocusTime'])) {
     echo json_encode(["success" => false, "message" => "Missing required fields", "received_data" => $data]);
     exit;
 }
@@ -35,7 +34,7 @@ try {
     ");
 
     $stmt->execute([
-        $sessionID, // Use hardcoded session ID
+        $sessionID,  // Always use the hardcoded session ID
         $data['FocusTime'],
         $data['UnfocusTime']
     ]);
