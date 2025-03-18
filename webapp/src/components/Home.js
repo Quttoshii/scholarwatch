@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
-import duckSvg from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/duck.svg'; 
+import duckSvg from '../duck.svg'; 
 
 function Home({ userType, userID, userName, email }) {
   const [userInfo, setUserInfo] = useState({
