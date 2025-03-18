@@ -17,7 +17,7 @@ try {
         $response = [];
 
         // Prepare and execute query to fetch user details
-        $stmt = $pdo->prepare("SELECT userType, userID, password FROM user WHERE Email = :email");
+        $stmt = $pdo->prepare("SELECT userType, userID,name, password FROM user WHERE Email = :email");
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
@@ -31,6 +31,7 @@ try {
                 // Password correct, return user details
                 $response['userType'] = $user['userType'];
                 $response['userID'] = $user['userID'];
+                $response['userName'] = $user['name'];
             } else {
                 $response['error'] = "invalid_password"; // Incorrect password
             }

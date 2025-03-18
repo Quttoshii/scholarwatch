@@ -193,7 +193,7 @@ const Insights = ({
       <h2>Insights Dashboard</h2>
 
       <div className="dropdown-container">
-        <label htmlFor="courseSelect">Select Course: </label>
+        <label htmlFor="courseSelect">Select Coucrse: </label>
         <select
           id="courseSelect"
           value={selectedCourse}

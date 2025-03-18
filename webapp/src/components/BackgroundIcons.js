@@ -11,6 +11,8 @@ import icon7 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/we
 import icon8 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/alarm.svg';
 import icon9 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/study.svg';
 import icon10 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/page.svg';
+import icon11 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/MagnifyingGlass.svg';
+
 //import icon11 from './arrow.svg';
 
 const BackgroundIcons = () => {
@@ -31,6 +33,7 @@ const BackgroundIcons = () => {
       <img src={icon8} alt="Icon 8" className="background-icon" style={{ top: '-8%', left: '10%', }} />
       <img src={icon9} alt="Icon 9" className="background-icon" style={{ top: '9%', left: '-3%', }} />
       <img src={icon10} alt="Icon 10" className="background-icon" style={{ top: '9%', left: '70%', }} />
+      <img src={icon11} alt="Icon 11" className="background-icon" style={{ top: '-7%', left: '-12%', }} />
       
       
 

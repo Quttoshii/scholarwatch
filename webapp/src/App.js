@@ -1,4 +1,3 @@
-// App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
 import Header from './components/Header';
@@ -25,14 +24,12 @@ function App() {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState("");
   
-  
   const [results, setResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [emotionResults, setEmotionResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [postureResults, setPostureResults] = useState({ total_time:0, good_posture_time: 0, phone_use_time: 0 , no_person_time: 0, looking_right_time: 0, looking_left_time: 0, slouching_time: 0});
   const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
   const [isCalibrated, setIsCalibrated] = useState(false); // Track calibration globally
   const [invalidationCount, setInvalidationCount] = useState([]); // New state for invalidation count
-
   
   const incrementInvalidationCount = () => {
     const timestamp = new Date().toLocaleTimeString();
@@ -47,12 +44,12 @@ function App() {
         {userType === "Teacher" ? (
           <div className="main-container">
             <div className="sidebar">
-              <Link to="/"><button>Home</button></Link>
-              <Link to="/createLecture"><button>Lectures</button></Link>
-              <Link to="/createQuiz"><button>Quizzes</button></Link>
-              <Link to="/insights"><button>Insights</button></Link>
-              <Link to="/attendanceMonitoring"><button>Attendance Monitoring</button></Link> 
-              <Link to="/logout"><button>Log out</button></Link>
+              <Link to="/"><button style={{ '--animation-order': 1 }}>Home</button></Link>
+              <Link to="/createLecture"><button style={{ '--animation-order': 2 }}>Lectures</button></Link>
+              <Link to="/createQuiz"><button style={{ '--animation-order': 3 }}>Quizzes</button></Link>
+              <Link to="/insights"><button style={{ '--animation-order': 4 }}>Insights</button></Link>
+              <Link to="/attendanceMonitoring"><button style={{ '--animation-order': 5 }}>Attendance Monitoring</button></Link>
+              <Link to="/logout"><button style={{ '--animation-order': 6 }}>Log out</button></Link>
             </div>
             <div className="content">
               <Routes>
@@ -69,17 +66,16 @@ function App() {
         ) : (userType === "Student") ? (
           <div className="main-container">
             <div className="sidebar">
-
-              <Link to="/lectures"><button>Lectures</button></Link>
-              <Link to="/liveFeed"><button>Emotion Detection</button></Link>
-              <Link to="/postureDetection"><button>Posture Detection</button></Link>
-              <Link to="/quizzes"><button>Quizzes</button></Link>
-              <Link to="/StudentInsights"><button>Insights</button></Link>
-              <Link to="/logout"><button>Log out</button></Link>
+              <Link to="/"><button style={{ '--animation-order': 1 }}>Home</button></Link>
+              <Link to="/lectures"><button style={{ '--animation-order': 2 }}>Lectures</button></Link>
+              <Link to="/liveFeed"><button style={{ '--animation-order': 3 }}>Emotion Detection</button></Link>
+              <Link to="/postureDetection"><button style={{ '--animation-order': 4 }}>Posture Detection</button></Link>
+              <Link to="/quizzes"><button style={{ '--animation-order': 5 }}>Quizzes</button></Link>
+              <Link to="/StudentInsights"><button style={{ '--animation-order': 6 }}>Insights</button></Link>
+              <Link to="/logout"><button style={{ '--animation-order': 7 }}>Log out</button></Link>
             </div>
             <div className="content">
               <Routes>
-
                 <Route path="/" element={<Home userType={userType} userID={userID} userName={userName} email={email} />} />
                 <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} />} />
                 <Route path="/liveFeed" element={<LiveFeed setEmotionResults={setEmotionResults} />} />
