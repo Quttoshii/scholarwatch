@@ -42,7 +42,7 @@ async def generate_mcqs(request: MCQRequest):
         print("Request received:", request)
         
         # Load API Key
-        api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", "AIzaSyC9NW3A-UEqFyKVV3aPQk5pCeNWudOV_8s")
+        api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", "")
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro')
 
