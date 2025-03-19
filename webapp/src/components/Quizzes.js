@@ -69,8 +69,8 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     const selectedPages = pageNumbers.length > 5 
     ? pageNumbers.slice(0, 5) 
     : pageNumbers.map(page => (isNaN(page) || page === null) ? pageNumbers.length : page);
-    
-    console.log(selectedPages);
+
+    // console.log(selectedPages);
     const requestBody = {
       pdf_location: `${lecturesDir}${selectedLecture}`,
       page_numbers: selectedPages,
@@ -78,7 +78,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     };
 
     try {
-      const response = await fetch("http://localhost:8000/generate-mcqs", {
+      const response = await fetch("http://localhost:8001/generate-mcqs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -155,7 +155,6 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
           </form>
 
           <div className="quiz-buttons">
-            {/* Back Button - Fixed Styling */}
             <button
               className="back-btn"
               onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
@@ -164,17 +163,15 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
               Back
             </button>
 
-            {/* Next Button - Always Enabled Except for the Last Question */}
             <button
               className="next-btn"
               onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
-              disabled={currentQuestionIndex >= questions.length - 1}
+              disabled={questions.length === 0 || currentQuestionIndex >= questions.length - 1}
             >
               Next
             </button>
 
-            {/* Submit Button - Only Shows on Last Question */}
-            {currentQuestionIndex >= questions.length - 1 && (
+            {questions.length > 0 && currentQuestionIndex === questions.length - 1 && (
               <button onClick={submitQuiz} className="submit-quiz-btn">
                 Submit Quiz
               </button>

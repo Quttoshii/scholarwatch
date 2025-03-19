@@ -14,6 +14,7 @@ from typing import List, Dict, Any, Optional
 app = FastAPI()
 
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+GAK = ""
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,7 +43,7 @@ async def generate_mcqs(request: MCQRequest):
         print("Request received:", request)
         
         # Load API Key
-        api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", GAK)
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro')
 
@@ -101,9 +102,9 @@ async def generate_mcqs(request: MCQRequest):
             text_splitter=text_splitter
         )
         index = index_creator.from_loaders([loader])
-
+        print("Keywords extracted: ", keywords)
         # Perform similarity search using generated keywords
-        retrieved_docs = index.vectorstore.similarity_search(keywords, k=4)
+        retrieved_docs = index.vectorstore.similarity_search(keywords)
         context = "\n".join([doc.page_content for doc in retrieved_docs])
 
         # Generate MCQs

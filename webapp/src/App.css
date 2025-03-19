@@ -670,6 +670,7 @@ input[type="number"] {
 }
 
 /* Quizzes.js */
+/* General container styling */
 .quiz-container {
   max-width: 600px;
   margin: 40px auto;
@@ -680,12 +681,14 @@ input[type="number"] {
   text-align: center;
 }
 
+/* Quiz header */
 .quiz-container h2 {
   font-size: 24px;
   font-weight: bold;
   color: #333;
 }
 
+/* Quiz Question */
 .quiz-question {
   text-align: left;
   margin-top: 20px;
@@ -701,6 +704,7 @@ input[type="number"] {
   font-weight: bold;
 }
 
+/* Options */
 .option {
   display: flex;
   align-items: center;
@@ -709,19 +713,25 @@ input[type="number"] {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin: 5px 0;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
 }
 
 .option:hover {
   transform: scale(1.05);
+  background-color: #ffe6cc;
 }
 
 .option input {
   margin-right: 10px;
+  cursor: pointer;
 }
 
+/* Buttons */
 .quiz-buttons {
   margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .quiz-buttons button {
@@ -732,27 +742,57 @@ input[type="number"] {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s, box-shadow 0.3s;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
-.quiz-buttons button:first-child {
+/* Back Button */
+.back-btn {
+  background-color: #999;
+}
+
+.back-btn:hover {
+  background-color: #777;
+  box-shadow: 0 0 10px 5px rgba(153, 153, 153, 0.95);
+  transform: scale(1.05);
+}
+
+.back-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Next Button */
+.next-btn {
   background-color: #f6a623;
 }
 
-.quiz-buttons button:first-child:hover {
+.next-btn:hover {
   background-color: #d48f20;
   box-shadow: 0 0 10px 5px rgba(246, 166, 35, 0.95);
   transform: scale(1.05);
 }
 
+.next-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Submit Button */
 .submit-quiz-btn {
   background-color: green;
 }
 
 .submit-quiz-btn:hover {
   background-color: darkgreen;
+  box-shadow: 0 0 10px 5px rgba(0, 128, 0, 0.7);
+  transform: scale(1.05);
 }
 
+/* Quiz Results */
 .quiz-results {
   margin-top: 20px;
   text-align: center;
@@ -764,6 +804,7 @@ input[type="number"] {
   color: #333;
 }
 
+/* Results Table */
 .results-table {
   width: 100%;
   border-collapse: collapse;
@@ -790,6 +831,7 @@ input[type="number"] {
   background-color: rgba(255, 0, 0, 0.2);
 }
 
+/* Take Quiz Button */
 .take-quiz-btn {
   padding: 12px 20px;
   background-color: #f6a623;
@@ -828,4 +870,11 @@ input[type="number"] {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Quiz Invalidated */
+.quiz-invalidated {
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
 }

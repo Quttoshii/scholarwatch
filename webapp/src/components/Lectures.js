@@ -49,7 +49,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
       });
 
       const data = await response.json();
-      console.log('Server Response:', data);
+      // console.log('Server Response:', data);
     } catch (error) {
       console.error('Error sending gaze tracking data:', error);
     }

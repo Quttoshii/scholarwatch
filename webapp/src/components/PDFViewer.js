@@ -13,9 +13,9 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [focusStartTime, setFocusStartTime] = useState(Date.now());
-console.log("Selected Lecture:", selectedLecture.split('/')[2]);
+// console.log("Selected Lecture:", selectedLecture.split('/')[2]);
   const lecturePath = `http://localhost/scholarwatch/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/')[2])}`;
-  console.log("Full PDF Path:", lecturePath);
+  // console.log("Full PDF Path:", lecturePath);
 
   useEffect(() => {
     if (numPages && pageNumber === numPages) {
