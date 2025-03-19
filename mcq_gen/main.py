@@ -11,13 +11,6 @@ import json
 import re
 from typing import List, Dict, Any, Optional
 
-# {
-#   "pdf_location": "C:/path/to/document.pdf",
-#   "page_numbers": [2, 5, 7],
-#   "num_questions": 5,
-#   "api_key": "your_google_api_key_here"
-# }
-
 app = FastAPI()
 
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
@@ -46,8 +39,10 @@ async def root():
 @app.post("/generate-mcqs", response_model=MCQResponse)
 async def generate_mcqs(request: MCQRequest):
     try:
+        print("Request received:", request)
+        
         # Load API Key
-        api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", "")
+        api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", "AIzaSyC9NW3A-UEqFyKVV3aPQk5pCeNWudOV_8s")
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-pro')
 
@@ -58,13 +53,20 @@ async def generate_mcqs(request: MCQRequest):
         # Load the PDF and extract text from specified pages
         loader = PyPDFLoader(request.pdf_location)
         documents = loader.load()
-        
+        total_pages = len(documents)  # Get total pages in PDF
+
         selected_texts = []
         for page in request.page_numbers:
-            if page < len(documents):
-                selected_texts.append(documents[page].page_content)
+            zero_based_page = page - 1  # Convert 1-based index to 0-based
+            
+            if 0 <= zero_based_page < total_pages:
+                selected_texts.append(documents[zero_based_page].page_content)
+                print(f"Added content from page {page} (actual index: {zero_based_page})")
             else:
-                raise HTTPException(status_code=400, detail=f"Page {page} is out of range for this PDF")
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Page {page} is out of range for this PDF (Total pages: {total_pages})"
+                )
 
         selected_text = "\n".join(selected_texts)
 
@@ -81,7 +83,6 @@ async def generate_mcqs(request: MCQRequest):
         """
 
         keyword_response = model.generate_content(keyword_prompt)
-
         if not keyword_response:
             raise HTTPException(status_code=500, detail="Failed to generate keywords: No response received.")
 
@@ -94,7 +95,7 @@ async def generate_mcqs(request: MCQRequest):
             chunk_overlap=200,
             separators=["\n\n", "\n", ".", " ", ""]
         )
-        
+
         index_creator = VectorstoreIndexCreator(
             embedding=embedding_function,
             text_splitter=text_splitter
@@ -133,7 +134,6 @@ async def generate_mcqs(request: MCQRequest):
         """
 
         mcq_response = model.generate_content(mcq_prompt)
-
         if not mcq_response:
             raise HTTPException(status_code=500, detail="Failed to generate MCQs: No response received.")
 

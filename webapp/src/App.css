@@ -584,3 +584,248 @@ input[type="number"] {
     transform: translateY(0); 
   }
 }
+
+/* CreateQuiz.js */
+.create-quiz-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #FFF5EE;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.create-quiz-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #f6a623;
+  outline: none;
+  box-shadow: 0 0 10px rgba(246, 166, 35, 0.8);
+  transition: box-shadow 0.3s ease;
+}
+
+.create-quiz-btn,
+.recreate-quiz-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #f6a623;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.create-quiz-btn:hover,
+.recreate-quiz-btn:hover {
+  background-color: #d48f20;
+  box-shadow: 0 0 15px 5px rgba(246, 166, 35, 0.95);
+  transform: scale(1.05);
+}
+
+.success-message {
+  font-size: 18px;
+  font-weight: bold;
+  color: green;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  font-size: 16px;
+  color: red;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Quizzes.js */
+.quiz-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #FFF5EE;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.quiz-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.quiz-question {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.quiz-question h3 {
+  font-size: 20px;
+  color: #f6a623;
+}
+
+.quiz-question p {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 5px 0;
+  transition: transform 0.2s ease;
+}
+
+.option:hover {
+  transform: scale(1.05);
+}
+
+.option input {
+  margin-right: 10px;
+}
+
+.quiz-buttons {
+  margin-top: 20px;
+}
+
+.quiz-buttons button {
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.quiz-buttons button:first-child {
+  background-color: #f6a623;
+}
+
+.quiz-buttons button:first-child:hover {
+  background-color: #d48f20;
+  box-shadow: 0 0 10px 5px rgba(246, 166, 35, 0.95);
+  transform: scale(1.05);
+}
+
+.submit-quiz-btn {
+  background-color: green;
+}
+
+.submit-quiz-btn:hover {
+  background-color: darkgreen;
+}
+
+.quiz-results {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.quiz-results h3 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.results-table th,
+.results-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.results-table th {
+  background-color: #f6a623;
+  color: white;
+}
+
+.results-table tr.correct {
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+.results-table tr.incorrect {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.take-quiz-btn {
+  padding: 12px 20px;
+  background-color: #f6a623;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+
+.take-quiz-btn:hover {
+  background-color: #d48f20;
+  box-shadow: 0 0 15px 5px rgba(246, 166, 35, 0.95);
+  transform: scale(1.05);
+}
+
+/* Loader animation */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #f6a623;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
