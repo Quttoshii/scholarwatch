@@ -51,7 +51,7 @@ const PDFViewer = () => {
             </label>
 
             {pdfData && (
-                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess}>
+                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess} onError={(error) => console.error('PDF loading error:', error)}>
                     <Page pageNumber={pageNumber} />
                 </Document>
             )}
