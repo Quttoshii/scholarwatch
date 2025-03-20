@@ -6,4 +6,5 @@ npm install --save-dev pdfjs-dist
 npm install pdfjs-dist@4.8.69
 npm install webgazer
 npm install chart.js react-chartjs-2
+npm install react-toastify
 npm install @tensorflow/tfjs @tensorflow-models/posenet

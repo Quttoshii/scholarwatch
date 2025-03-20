@@ -15,6 +15,8 @@ import AttendanceMonitoring from './components/AttendanceMonitoring';
 import BackgroundIcons from './components/BackgroundIcons'; 
 import Results from './components/Results.js';
 import Logout from './components/Logout.js';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import './App.css';
 
@@ -44,6 +46,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+      <ToastContainer />
       <BackgroundIcons />
         <Header userType={userType}/>
         {userType === "Teacher" ? (

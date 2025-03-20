@@ -19,14 +19,28 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
   }, []);
 
   const handleGazeData = (focusTime, unfocusTime, currentPage) => {
-    setFocusTimes((prev) => ({ ...prev, [currentPage]: (prev[currentPage] || 0) + focusTime }));
-    setUnfocusTimes((prev) => ({ ...prev, [currentPage]: (prev[currentPage] || 0) + unfocusTime }));
+    // console.log(`GazeTracking Data: Page ${currentPage}, Focus Time: ${focusTime}, Unfocus Time: ${unfocusTime}`);
+    
+    setFocusTimes((prev) => {
+      const newFocusTimes = { ...prev, [currentPage]: (prev[currentPage] || 0) + focusTime };
+      // console.log("Updated Focus Times:", newFocusTimes);
+      return newFocusTimes;
+    });
+    
+    setUnfocusTimes((prev) => {
+      const newUnfocusTimes = { ...prev, [currentPage]: (prev[currentPage] || 0) + unfocusTime };
+      // console.log("Updated Unfocus Times:", newUnfocusTimes);
+      return newUnfocusTimes;
+    });
   };
 
   const handleLectureFinish = () => {
     // Compute total focus and unfocus time
     const totalFocusTime = Object.values(focusTimes).reduce((acc, time) => acc + time, 0);
     const totalUnfocusTime = Object.values(unfocusTimes).reduce((acc, time) => acc + time, 0);
+
+    // console.log(`Total Focus Time: ${totalFocusTime}`);
+    // console.log(`Total Unfocus Time: ${totalUnfocusTime}`);
 
     // Sort page numbers by highest unfocusTime first
     const sortedPages = Object.keys(unfocusTimes)
@@ -35,6 +49,8 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
       .map((entry) => entry.page);
 
     setPageNumbers(sortedPages);
+
+    console.log("Sorted pages based on unfocus time:", sortedPages);
 
     // Send final gaze data when lecture is completed
     sendGazeDataToServer(totalFocusTime, totalUnfocusTime);
@@ -48,7 +64,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
         body: JSON.stringify({ FocusTime: totalFocusTime, UnfocusTime: totalUnfocusTime }),
       });
 
-      const data = await response.json();
+      const data = await response.json(); 
       // console.log('Server Response:', data);
     } catch (error) {
       console.error('Error sending gaze tracking data:', error);

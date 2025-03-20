@@ -4,6 +4,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { pdfjs } from "react-pdf";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -45,7 +46,7 @@ const CreateLecture = ({ userID }) => {
         const file = event.target.files[0];
 
         if (!file || file.type !== "application/pdf") {
-            alert("Please upload a valid PDF file.");
+            toast.error("Please upload a valid PDF file.");
             return;
         }
 
@@ -63,7 +64,7 @@ const CreateLecture = ({ userID }) => {
 
     const handleUpload = async () => {
         if (!selectedFile || !numPages || !lectureName.trim()) {
-            alert("Please select a valid PDF file and provide a lecture name.");
+            toast.error("Please select a valid PDF file and provide a lecture name.");
             return;
         }
 
@@ -81,7 +82,7 @@ const CreateLecture = ({ userID }) => {
             );
 
             if (response.data.success) {
-                alert("Lecture uploaded successfully!");
+                toast.success("Lecture uploaded successfully!");
                 setLectureName("");
                 setSelectedFile(null);
                 setPdfData(null);
@@ -89,10 +90,10 @@ const CreateLecture = ({ userID }) => {
                 setPageNumber(1);
                 setFetchTrigger(prev => prev + 1);
             } else {
-                alert(`Error uploading lecture: ${response.data.message || "Unknown error"}`);
+                toast.error(`Error uploading lecture: ${response.data.message || "Unknown error"}`);
             }
         } catch (error) {
-            alert(`Error uploading lecture: ${error.response?.data?.message || error.message || "Unknown error"}`);
+            toast.error(`Error uploading lecture: ${error.response?.data?.message || error.message || "Unknown error"}`);
         }
     };
 

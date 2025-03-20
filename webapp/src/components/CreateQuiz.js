@@ -94,7 +94,7 @@ function CreateQuiz({ userID, makeQuiz, setMakeQuiz, numQuestions, setNumQuestio
                             <option value="">-- Select a lecture --</option>
                             {lectures.map((lecture) => (
                                 <option key={lecture.lectureID} value={lecture.DirectoryPath}>
-                                    {lecture.lectureName} ({new Date(lecture.StartTimestamp).toLocaleDateString()})
+                                    {lecture.lectureName}
                                 </option>
                             ))}
                         </select>

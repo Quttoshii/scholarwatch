@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import for navigation
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, selectedLecture, pageNumbers, numQuestions }) {
   const [isQuizActive, setIsQuizActive] = useState(false);
@@ -10,7 +12,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
   const [loading, setLoading] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const lecturesDir = process.env.REACT_APP_LECTURES_DIR;
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isQuizActive) {
@@ -41,7 +43,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     setQuizCompleted(false);
     setUserAnswers({});
     incrementInvalidationCount();
-    alert("The quiz has been invalidated due to tab switching or resizing. Please retake the quiz.");
+    toast.error("Quiz invalidated due to tab switch or resizing. Please retake the quiz.");
   };
 
   const isBrowserMaximized = () => {
@@ -55,7 +57,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
 
   const startQuiz = async () => {
     if (!isBrowserMaximized()) {
-      alert("Please maximize your browser window to start the quiz.");
+      toast.warn("Please maximize your browser window to start the quiz.");
       return;
     }
 
@@ -67,10 +69,9 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     setUserAnswers({});
     
     const selectedPages = pageNumbers.length > 5 
-    ? pageNumbers.slice(0, 5) 
-    : pageNumbers.map(page => (isNaN(page) || page === null) ? pageNumbers.length : page);
+      ? pageNumbers.slice(0, 5) 
+      : pageNumbers.map(page => (isNaN(page) || page === null) ? pageNumbers.length : page);
 
-    // console.log(selectedPages);
     const requestBody = {
       pdf_location: `${lecturesDir}${selectedLecture}`,
       page_numbers: selectedPages,
@@ -88,9 +89,10 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
 
       const data = await response.json();
       setQuestions(data.questions);
+      toast.success("Quiz questions generated successfully!");
     } catch (error) {
       console.error("Error fetching MCQs:", error);
-      alert("Failed to generate quiz. Please try again later.");
+      toast.error("Failed to generate quiz. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -113,11 +115,12 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
   const submitQuiz = () => {
     setQuizCompleted(true);
     setIsQuizActive(false);
+    toast.success("Quiz submitted successfully!");
   };
 
   const returnToHome = () => {
-    setTakeQuiz(false); // Reset quiz availability
-    navigate("/"); // Redirect to home page
+    setTakeQuiz(false);
+    navigate("/");
   };
 
   return (
@@ -182,28 +185,6 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
         <div className="quiz-results">
           <h3>Quiz Completed!</h3>
           <p>Your Score: {calculateScore()} / {questions.length}</p>
-
-          <table className="results-table">
-            <thead>
-              <tr>
-                <th>Question</th>
-                <th>Your Answer</th>
-                <th>Correct Answer</th>
-                <th>Explanation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {questions.map((question, index) => (
-                <tr key={index} className={userAnswers[index] === question.correct_answer ? "correct" : "incorrect"}>
-                  <td>{question.question}</td>
-                  <td>{userAnswers[index] || "Not Answered"}</td>
-                  <td>{question.correct_answer}</td>
-                  <td>{question.explanation}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
           <button onClick={returnToHome} className="take-quiz-btn">
             Return to Home
           </button>
@@ -213,17 +194,6 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
           Take Quiz
         </button>
       ) : null}
-
-      {quizInvalidated && (
-        <div className="quiz-invalidated">
-          <p style={{ color: "red" }}>
-            The quiz has been invalidated due to tab switching or resizing. You must retake the quiz.
-          </p>
-          <button onClick={startQuiz} className="take-quiz-btn">
-            Retake Quiz
-          </button>
-        </div>
-      )}
     </div>
   );
 }
