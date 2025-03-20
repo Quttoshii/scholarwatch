@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import GazeTracking from './GazeTracking';
 import PDFViewer from './PDFViewer';
+import { toast } from "react-toastify";
 
 function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, setTakeQuiz, selectedLecture, setPageNumbers }) {
   const [cameraPermission, setCameraPermission] = useState(true);
@@ -17,6 +18,12 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
 
     checkCameraSupport();
   }, []);
+
+  useEffect(() => {
+    if (makeQuiz) {
+      toast.warn("There will be a quiz for this lecture. After finishing, go to Quizzes to take it.")
+    }
+  }, [makeQuiz]);
 
   const handleGazeData = (focusTime, unfocusTime, currentPage) => {
     // console.log(`GazeTracking Data: Page ${currentPage}, Focus Time: ${focusTime}, Unfocus Time: ${unfocusTime}`);
@@ -102,12 +109,6 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
               />
             ) : (
               <p style={{ color: 'orange' }}>Please complete calibration before starting the lecture.</p>
-            )}
-
-            {makeQuiz && (
-              <p style={{ color: 'red', fontWeight: 'bold' }}>
-                There will be a quiz for this lecture. After finishing, go to <strong>Quizzes</strong> to take it.
-              </p>
             )}
           </>
         )}
