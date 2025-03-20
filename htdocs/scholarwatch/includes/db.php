@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost:3306';
+$host = 'localhost:3307';
 $db = 'scholarwatch';  // Database name
 $user = 'root';     // Database username
-$pass = 'Abg6951.';     // Database password
+$pass = 'root';     // Database password
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);

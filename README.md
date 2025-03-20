@@ -3,7 +3,7 @@
 (One time only)
  - To create the database:
     - You can use either mysql Workbench or use vscode extension ( Create a connection, export sql, give the connections name and its password in db.php)
-    - uncomment the following lines in 'ScholarWatch.sql' to execute once, then recomment them:
+    - uncomment the following lines in `ScholarWatch.sql` to execute once, then recomment them:
         - ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password'; 
         - CREATE SCHEMA `scholarwatch` ; 
 
@@ -11,8 +11,9 @@
  - To set the environment for backend:
     - install xampp
     - Go to the directory where you have xampp installed.
-    - replace '/xampp/htdocs' folder with '/scholarwatch/htdocs' folder.
-    - update your database credentials in '/htdocs/scholarwatch/include/db.php' 
+    - replace `/xampp/htdocs` folder with `/scholarwatch/htdocs` folder.
+    - update your database credentials in `/htdocs/scholarwatch/include/db.php` 
+    - in `webapp\.env`, set `REACT_APP_LECTURES_DIR` the path to the directory where scholarwatch is in xampp
 
 - To run the backend: 
     - Run xampp (Apache and MYSQl)

@@ -8,40 +8,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 header("Content-Type: application/json");
 
-
 include 'includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!empty($_FILES['lecture_file']) && isset($_POST['num_pages']) && isset($_POST['lecture_name'])) {
+    if (!empty($_FILES['lecture_file']) && isset($_POST['num_pages'])) {
         $file = $_FILES['lecture_file'];
-        $numPages = intval($_POST['num_pages']); // Get the number of pages from the request
-        $lectureName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $_POST['lecture_name']); // Sanitize lecture name
+        $numPages = intval($_POST['num_pages']);
 
         $sessionID = 1;
         $courseID = 1;
 
-        // $startTimestamp = isset($_POST['startTimestamp']) ? $_POST['startTimestamp'] : date('Y-m-d H:i:s'); // Use current time if not provided
-
-
-        $uploadDir = 'lectures' . DIRECTORY_SEPARATOR . $lectureName . DIRECTORY_SEPARATOR;
-        $filePath = $uploadDir . basename($file['name']);
-
-        // Ensure the lecture directory exists
+        $uploadDir = __DIR__ . '/lectures/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        // Move the uploaded file
+        $filePath = $uploadDir . basename($file['name']);
+
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
             try {
-                // Save the lecture name, file path, and number of pages in the database
-                $stmt = $pdo->prepare("INSERT INTO lectures (SessionID, CourseID, lectureName, directoryPath, slideCount) 
+                $stmt = $pdo->prepare("INSERT INTO lecture (SessionID, CourseID, lectureName, directoryPath, slideCount) 
                                         VALUES (:sessionID, :courseID, :lectureName, :directoryPath, :slideCount)");
                 $stmt->execute([
                     'sessionID' => $sessionID,
                     'courseID' => $courseID,
-                    'lectureName' => $lectureName,
-                    'directoryPath' => $filePath,
+                    'lectureName' => pathinfo($file['name'], PATHINFO_FILENAME),
+                    'directoryPath' => '/lectures/' . basename($file['name']), // Now prefixed with /lectures/
                     'slideCount' => $numPages
                 ]);
 
