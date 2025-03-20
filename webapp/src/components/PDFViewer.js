@@ -1,76 +1,66 @@
-import React, { useState } from "react";
-import { Document, Page } from "react-pdf"; // Import Document and Page for PDF viewing
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css'; // Import styles for PDF annotations
-import 'react-pdf/dist/esm/Page/TextLayer.css'; // Import styles for PDF text layer
-import { pdfjs } from 'react-pdf';
+import React, { useState, useEffect } from "react";
+import { Document, Page } from "react-pdf";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+import { pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
 ).toString();
 
-const PDFViewer = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [numPages, setNumPages] = useState(null);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pdfData, setPdfData] = useState(null);
+const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeData }) => {
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [focusStartTime, setFocusStartTime] = useState(Date.now());
+// console.log("Selected Lecture:", selectedLecture.split('/')[2]);
+  const lecturePath = `http://localhost/scholarwatch/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/')[2])}`;
+  // console.log("Full PDF Path:", lecturePath);
 
-    const onFileLoad = event => {
-        const file = event.target.files[0];
-        const reader = new FileReader();
+  useEffect(() => {
+    if (numPages && pageNumber === numPages) {
+      setTakeQuiz(true);
+      onLectureFinish();
+    }
+  }, [pageNumber, numPages, setTakeQuiz, onLectureFinish]);
 
-        reader.onload = (e) => {
-            setPdfData(e.target.result); // Use result as the pdf data
-        };
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+    setPageNumber(1);
+  };
 
-        if (file && file.type === 'application/pdf') {
-            reader.readAsDataURL(file); // Only read the file if it's a PDF
-            setSelectedFile(file);
-        } else {
-            alert('Please upload a valid PDF file.');
-        }
-    };
+  const handlePageChange = (newPage) => {
+    const now = Date.now();
+    const focusTime = now - focusStartTime;
+    const unfocusTime = Math.max(0, focusTime * 0.1);
 
-    const onDocumentLoadSuccess = ({ numPages }) => {
-        setNumPages(numPages); // Set the number of pages
-    };
+    onPageGazeData(focusTime, unfocusTime, pageNumber);
 
-    return (
+    setPageNumber(newPage);
+    setFocusStartTime(Date.now());
+  };
+
+  return (
+    <div>
+      <h3>Lecture Material</h3>
+
+      {selectedLecture ? (
+        <Document file={lecturePath} onLoadSuccess={onDocumentLoadSuccess} onLoadError={(error) => console.error('PDF loading error:', error)}>
+          <Page pageNumber={pageNumber} />
+        </Document>
+      ) : (
+        <p style={{ color: "gray" }}>No lecture selected.</p>
+      )}
+
+      {numPages && (
         <div>
-            {/* <input type="file" accept=".pdf" onChange={onFileLoad} /> */}
-
-            <label htmlFor="file-upload" className="smaller-button take-quiz-btn">
-                Choose File
-                <input
-                    type="file"
-                    id="file-upload"
-                    accept=".pdf"
-                    onChange={onFileLoad}
-                    style={{ display: 'none' }} // Hide the default file input
-                />
-            </label>
-
-            {pdfData && (
-                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess}>
-                    <Page pageNumber={pageNumber} />
-                </Document>
-            )}
-
-            {pdfData && numPages && (
-                <div>
-                    <p>
-                        Page {pageNumber} of {numPages}
-                    </p>
-                    <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
-                        Previous
-                    </button>
-                    <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
-                        Next
-                    </button>
-                </div>
-            )}
+          <p>Page {pageNumber} of {numPages}</p>
+          <button disabled={pageNumber <= 1} onClick={() => handlePageChange(pageNumber - 1)}>Previous</button>
+          <button disabled={pageNumber >= numPages} onClick={() => handlePageChange(pageNumber + 1)}>Next</button>
         </div>
-    );
-}
+      )}
+    </div>
+  );
+};
 
 export default PDFViewer;

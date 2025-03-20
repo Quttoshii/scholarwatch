@@ -1,16 +1,18 @@
 import React from 'react';
 import './BackgroundIcons.css';
 
-import icon1 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/icon_1.svg'; 
-import icon2 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/pencil.svg';
-import icon3 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/icon_3.svg';
-import icon4 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/lights.svg';
-import icon5 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/icon_5.svg';
-import icon6 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/QnA_f.svg';
-import icon7 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/alarm.svg';
-import icon8 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/alarm.svg';
-import icon9 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/study.svg';
-import icon10 from '/Users/apple.store.pk/Desktop/University/scholarwatch-eman/webapp/src/page.svg';
+import icon1 from '../icon_1.svg'; 
+import icon2 from '../pencil.svg';
+import icon3 from '../icon_3.svg';
+import icon4 from '../lights.svg';
+import icon5 from '../icon_5.svg';
+import icon6 from '../QnA_f.svg';
+import icon7 from '../alarm.svg';
+import icon8 from '../alarm.svg';
+import icon9 from '../study.svg';
+import icon10 from '../page.svg';
+import icon11 from '../MagnifyingGlass.svg';
+
 //import icon11 from './arrow.svg';
 
 const BackgroundIcons = () => {
@@ -31,6 +33,7 @@ const BackgroundIcons = () => {
       <img src={icon8} alt="Icon 8" className="background-icon" style={{ top: '-8%', left: '10%', }} />
       <img src={icon9} alt="Icon 9" className="background-icon" style={{ top: '9%', left: '-3%', }} />
       <img src={icon10} alt="Icon 10" className="background-icon" style={{ top: '9%', left: '70%', }} />
+      <img src={icon11} alt="Icon 11" className="background-icon" style={{ top: '-7%', left: '-12%', }} />
       
       
 

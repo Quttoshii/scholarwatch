@@ -4,6 +4,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { pdfjs } from "react-pdf";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -15,28 +16,21 @@ const CreateLecture = ({ userID }) => {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [pdfData, setPdfData] = useState(null);
-    const [lectureName, setLectureName] = useState(""); // State for lecture name
-    const [lectures, setLectures] = useState([]); // State to store fetched lectures
+    const [lectureName, setLectureName] = useState("");
+    const [lectures, setLectures] = useState([]);
+    const [fetchTrigger, setFetchTrigger] = useState(0);
 
-    const [fetchTrigger, setFetchTrigger] = useState(0); // Trigger state
-
-    // Fetch lecture data from the backend
     useEffect(() => {
         const fetchLectures = async () => {
-
             try {
                 const response = await axios.post(
                     "http://localhost/scholarwatch/fetchLecture.php",
-                    { userID }, // Send the userID in the request body
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
+                    { userID },
+                    { headers: { "Content-Type": "application/json" } }
                 );
-    
+
                 if (response.data.success) {
-                    setLectures(response.data.data); // Update lectures state with fetched data
+                    setLectures(response.data.data);
                 } else {
                     console.error("Error fetching lectures:", response.data.message);
                 }
@@ -44,25 +38,24 @@ const CreateLecture = ({ userID }) => {
                 console.error("Error:", error);
             }
         };
-    
+
         fetchLectures();
-    }, [userID, fetchTrigger]); // Dependency on userID
-    
+    }, [userID, fetchTrigger]);
 
     const onFileLoad = (event) => {
         const file = event.target.files[0];
-        const reader = new FileReader();
 
-        reader.onload = (e) => {
-            setPdfData(e.target.result);
-        };
-
-        if (file && file.type === "application/pdf") {
-            reader.readAsDataURL(file);
-            setSelectedFile(file);
-        } else {
-            alert("Please upload a valid PDF file.");
+        if (!file || file.type !== "application/pdf") {
+            toast.error("Please upload a valid PDF file.");
+            return;
         }
+
+        setSelectedFile(file);
+        setPdfData(URL.createObjectURL(file));
+
+        const reader = new FileReader();
+        reader.onload = () => setPdfData(reader.result);
+        reader.readAsDataURL(file);
     };
 
     const onDocumentLoadSuccess = ({ numPages }) => {
@@ -70,62 +63,39 @@ const CreateLecture = ({ userID }) => {
     };
 
     const handleUpload = async () => {
-    if (!selectedFile || !numPages || !lectureName.trim()) {
-        alert("Please select a valid PDF file, ensure it is loaded, and provide a lecture name.");
-        return;
-    }
-
-    try {
-        // Log the state of the file before upload
-        console.log("Selected File:", {
-            name: selectedFile.name,
-            type: selectedFile.type,
-            size: selectedFile.size
-        });
-
-        const formData = new FormData();
-        formData.append("lecture_file", selectedFile);
-        formData.append("lecture_name", lectureName.trim());
-        formData.append("num_pages", numPages);
-
-        // Log formData contents
-        for (let [key, value] of formData.entries()) {
-            console.log(`FormData - ${key}:`, value);
+        if (!selectedFile || !numPages || !lectureName.trim()) {
+            toast.error("Please select a valid PDF file and provide a lecture name.");
+            return;
         }
 
-        const response = await axios.post(
-            "http://localhost/scholarwatch/insertLecture.php", 
-            formData, 
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
+        try {
+            const sanitizedFileName = lectureName.replace(/[^a-zA-Z0-9-_]/g, "_") + ".pdf";
+
+            const formData = new FormData();
+            formData.append("lecture_file", selectedFile, sanitizedFileName);
+            formData.append("num_pages", numPages);
+
+            const response = await axios.post(
+                "http://localhost/scholarwatch/insertLecture.php",
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            if (response.data.success) {
+                toast.success("Lecture uploaded successfully!");
+                setLectureName("");
+                setSelectedFile(null);
+                setPdfData(null);
+                setNumPages(null);
+                setPageNumber(1);
+                setFetchTrigger(prev => prev + 1);
+            } else {
+                toast.error(`Error uploading lecture: ${response.data.message || "Unknown error"}`);
             }
-        );
-
-        if (response.data.success) {
-            alert("Lecture uploaded successfully!");
-            // Reset states
-            setLectureName("");
-            setSelectedFile(null);
-            setPdfData(null);
-            setNumPages(null);
-            setPageNumber(1);
-
-            setFetchTrigger((prev) => prev + 1);
-        } else {
-            alert(`Error uploading lecture: ${response.data.message || 'Unknown error'}`);
+        } catch (error) {
+            toast.error(`Error uploading lecture: ${error.response?.data?.message || error.message || "Unknown error"}`);
         }
-
-        console.log("Full response:", response);
-
-        // Rest of the code remains the same
-    } catch (error) {
-        console.error("Full error object:", error);
-        console.error("Error response:", error.response);
-        alert(`Error uploading lecture: ${error.response?.data?.message || error.message || 'Unknown error'}`);
-    }
-};
+    };
 
     return (
         <div>
@@ -144,9 +114,9 @@ const CreateLecture = ({ userID }) => {
                             lectures.map((lecture) => (
                                 <tr key={lecture.lectureID}>
                                     <td>
-                                        <a href={`http://localhost/scholarwatch/${lecture.DirectoryPath}`} target="_blank" rel="noopener noreferrer">
+                                    <a href={`http://localhost/scholarwatch${lecture.directoryPath}`} target="_blank" rel="noopener noreferrer">
                                         {lecture.lectureName}
-                                        </a>
+                                    </a>
                                     </td>
                                     <td>{lecture.slideCount}</td>
                                     <td>{new Date(lecture.StartTimestamp).toLocaleString()}</td>
@@ -154,7 +124,7 @@ const CreateLecture = ({ userID }) => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4">No lectures available.</td>
+                                <td colSpan="3">No lectures available.</td>
                             </tr>
                         )}
                     </tbody>
@@ -172,9 +142,9 @@ const CreateLecture = ({ userID }) => {
                 id="lecture-name"
                 value={lectureName}
                 onChange={(e) => setLectureName(e.target.value)}
-                placeholder="lecture name"
+                placeholder="Lecture name (used as filename)"
             />
-            <br></br><br></br>
+            <br /><br />
             <label htmlFor="file-upload" className="smaller-button take-quiz-btn">
                 Choose File
                 <input
@@ -194,19 +164,11 @@ const CreateLecture = ({ userID }) => {
 
             {pdfData && numPages && (
                 <div>
-                    <p>
-                        Page {pageNumber} of {numPages}
-                    </p>
-                    <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>
-                        Previous
-                    </button>
-                    <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>
-                        Next
-                    </button>
+                    <p>Page {pageNumber} of {numPages}</p>
+                    <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>Previous</button>
+                    <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>Next</button>
                     <br />
-                    <button onClick={handleUpload} className="take-quiz-btn">
-                        Upload Lecture
-                    </button>
+                    <button onClick={handleUpload} className="take-quiz-btn">Upload Lecture</button>
                 </div>
             )}
         </div>

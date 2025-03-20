@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 
-function Login({ setUserType, setUserID,setUserName ,email,setEmail}) {
-    
+function Login({ setUserType, setUserID, setUserName }) {
+    const [email, setEmail] = useState(""); // Adding state to handle email input
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
 
     const handleLogin = (e) => {
         e.preventDefault();
-        
-        // Prepare login data
         const loginData = {
             email: email,
             password: password,
         };
 
-        // Send login request to PHP backend
         fetch("http://localhost/scholarwatch/fetchlogin.php", {
             method: "POST",
             headers: {
@@ -22,27 +20,28 @@ function Login({ setUserType, setUserID,setUserName ,email,setEmail}) {
             },
             body: JSON.stringify(loginData),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.error) {
-                    // Handle error response
-                    setError(data.error === "invalid_email" ? "Invalid email" : "Invalid password");
-                } else if (data.userType) {
-                    // Set user type on successful login
-                    setUserType(data.userType);
-                    setUserID(data.userID);
-                    setUserName(data.userName); 
-                    
-                }
-            })
-            .catch((error) => {
-                setError("An error occurred. Please try again.");
-                console.error("Error during login:", error);
-            });
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                setError(data.error === "invalid_email" ? "Invalid email" : "Invalid password");
+            } else if (data.userType) {
+                setUserType(data.userType);
+                setUserID(data.userID);
+                setUserName(data.userName);
+            }
+        })
+        .catch((error) => {
+            setError("An error occurred. Please try again.");
+            console.error("Error during login:", error);
+        });
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     return (
-        <div className="login-container" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.9)' }}>
+        <div className="login-container">
             <form className="login-form" onSubmit={handleLogin}>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>
@@ -55,21 +54,22 @@ function Login({ setUserType, setUserID,setUserName ,email,setEmail}) {
                         required
                     />
                 </div>
-                <div className="form-group">
+                <div className="form-group password-group">
                     <label htmlFor="password">Password</label>
                     <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
                         required
                     />
+                    <span className="password-toggle-icon" onClick={togglePasswordVisibility}>
+                        {showPassword ? '🙈' : '👁️'}
+                    </span>
                 </div>
                 {error && <p className="error">{error}</p>}
-                <button type="submit" className="login-button">
-                    Login
-                </button>
+                <button type="submit" className="login-button">Login</button>
             </form>
         </div>
     );

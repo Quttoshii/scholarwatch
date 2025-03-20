@@ -2,7 +2,9 @@ npm install react-pdf
 npm install react-router-dom
 npm install axios
 npm install --save-dev pdfjs-dist
-npm i --save --save-exact pdfjs-dist@4.4.168
+# npm i --save --save-exact pdfjs-dist@4.4.168
+npm install pdfjs-dist@4.8.69
 npm install webgazer
 npm install chart.js react-chartjs-2
+npm install react-toastify
 npm install @tensorflow/tfjs @tensorflow-models/posenet
