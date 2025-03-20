@@ -18,8 +18,6 @@ import Results from './components/Results.js';
 import Logout from './components/Logout.js';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 import './App.css';
 

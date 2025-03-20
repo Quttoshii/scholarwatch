@@ -6,3 +6,4 @@ nltk
 torch
 pdfplumber
 fastapi
+tf-keras
