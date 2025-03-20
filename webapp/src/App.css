@@ -878,3 +878,160 @@ input[type="number"] {
   font-weight: bold;
   margin-top: 20px;
 }
+
+/* Slide Generation Container */
+#slide-generation-container {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #FFF5EE; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* File Upload Section */
+.file-upload-container {
+  margin-bottom: 10px;
+  text-align: left;;
+}
+
+/* Custom styled "Choose File" button */
+/* .file-input {
+  
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f6a623;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  justify-content: left;
+  text-align: center;
+  width: 20%; 
+  height: 10%;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+} */
+
+.file-input:hover {
+  background-color: #d48f20; 
+  box-shadow: 0 0 15px 5px rgba(246, 166, 35, 0.95);
+  transform: scale(1.05);
+}
+
+.file-input:focus {
+  border-color: #f6a623;
+  outline: none;
+  box-shadow: 0 0 10px rgba(246, 166, 35, 0.8);
+}
+
+.file-input::-webkit-file-upload-button {
+  display: none; /* Hide the default file upload button */
+}
+
+.file-input::before {
+  content: 'Choose File';
+  padding: 12px 20px;
+  font-size: 16px;
+  color: white;
+  background-color: #f6a623;
+  border-radius: 5px;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.file-input:hover::before {
+  background-color: #d48f20;
+  transform: scale(1.01);
+}
+
+.file-name {
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  padding-top: 10px;
+  font-weight: normal;
+  display: block;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Generate and Download Buttons */
+.generate-button, .download-button {
+  padding: 12px 20px;
+  background-color: #f6a623;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 20px;
+  width: 23%;
+}
+
+.generate-button:hover, .download-button:hover {
+  background-color: #d48f20;
+  box-shadow: 0 0 15px 5px rgba(246, 166, 35, 0.95);
+  transform: scale(1.05);
+}
+
+/* Remove underline from the link wrapping the download button */
+.download-container a {
+  text-decoration: none; /* Prevent underline */
+}
+
+/* Download Button */
+.download-button {
+  background-color: #f6a623;
+}
+
+.download-button:hover {
+  background-color: #d48f20;
+  box-shadow: 0 0 15px 5px rgba(246, 166, 35, 0.95);
+  transform: scale(1.05);
+}
+/* Centered content */
+.centered-content {
+  text-align: center;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  font-size: 18px;
+  color: #333;
+  padding: 20px;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #slide-generation-container {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  .file-input, .generate-button, .download-button {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+
+  .file-upload-container {
+    margin-bottom: 15px;
+  }
+
+  .generate-button, .download-button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
