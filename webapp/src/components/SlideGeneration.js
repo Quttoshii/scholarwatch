@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { toast } from "react-toastify";
 
 function SlideGeneration() {
   const [pdfFile, setPdfFile] = useState(null);
@@ -13,14 +14,14 @@ function SlideGeneration() {
       setPdfFile(file);
       setDownloadLink(null); 
     } else {
-      alert('Please upload a valid PDF file.');
+      toast.error('Please upload a valid PDF file.');
     }
   };
 
 
   const handleGenerateSlides = async () => {
     if (!pdfFile) {
-      alert('Please select a PDF file first.');
+      toast.error('Please select a PDF file first.');
       return;
     }
 
@@ -52,7 +53,7 @@ function SlideGeneration() {
 
       setIsLoading(false);
 
-      alert('An error occurred while generating the slides. Please try again later.');
+      toast.error('An error occurred while generating the slides. Please try again later.');
       
     }
   };
@@ -80,12 +81,14 @@ function SlideGeneration() {
             className="generate-button"
           >
             {isLoading ? 'Generating...' : 'Generate Slides'}
+            
           </button>
         )}
 
         {isLoading && (
-          <div className="loading-indicator">
-            <p>Generating slides... Please wait.</p>
+          <div className="loader-container">
+            <div className="loader"></div>
+            <p>Generating Slides...</p>
           </div>
         )}
 

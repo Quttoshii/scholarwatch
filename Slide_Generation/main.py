@@ -81,9 +81,13 @@ async def generate_presentation(file: UploadFile = File(...)):
     with open(pdf_path, "wb") as f:
         f.write(pdf_text)
 
+    print("Extracting test from PDF...")
     pdf_text = extract_text_from_pdf(pdf_path)
+    print("Summarizing text...")
     summaries = summarize_text(pdf_text)
+    print("Extracting topic...")
     topic = extract_topic(pdf_text)
+    print("Creating presentation...")
     ppt_stream = create_presentation(topic, summaries)
 
     ppt_filename = "generated_presentation.pptx"
