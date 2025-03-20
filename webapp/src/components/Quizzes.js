@@ -1,116 +1,228 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import for navigation
 
-function Quizzes({ incrementInvalidationCount }) {
-  const [isQuizActive, setIsQuizActive] = useState(false); // State to track if the quiz is active
-  const [hasSwitchedTabOrResized, setHasSwitchedTabOrResized] = useState(false); // State to track tab switching or resize
-  const [quizInvalidated, setQuizInvalidated] = useState(false); // State to track if the quiz was invalidated
-  const [initialWindowSize, setInitialWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, selectedLecture, pageNumbers, numQuestions }) {
+  const [isQuizActive, setIsQuizActive] = useState(false);
+  const [quizInvalidated, setQuizInvalidated] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const lecturesDir = process.env.REACT_APP_LECTURES_DIR;
+  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
     if (isQuizActive) {
-      // Add event listener for tab visibility change and window resizing
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      window.addEventListener('resize', handleResize);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+      window.addEventListener("resize", handleResize);
     }
-
     return () => {
-      // Clean up listeners when the quiz ends or component unmounts
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('resize', handleResize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("resize", handleResize);
     };
-  }, [isQuizActive, initialWindowSize]);
+  }, [isQuizActive]);
 
-  // Handle tab visibility change (when user switches tabs or minimizes)
   const handleVisibilityChange = () => {
     if (document.hidden) {
-      invalidateQuiz(); // User switched tab, invalidate the quiz
-    }
-  };
-
-  // Handle window resizing
-  const handleResize = () => {
-    const newWidth = window.innerWidth;
-    const newHeight = window.innerHeight;
-
-    // If the window is resized from the initial size, invalidate the quiz
-    if (newWidth !== initialWindowSize.width || newHeight !== initialWindowSize.height) {
       invalidateQuiz();
     }
   };
 
-  // Function to invalidate the quiz when tab switch or resize is detected
+  const handleResize = () => {
+    invalidateQuiz();
+  };
+
   const invalidateQuiz = () => {
     setIsQuizActive(false);
     setQuizInvalidated(true);
-    incrementInvalidationCount(); // Track the invalidation event
-    alert('The quiz has been invalidated due to tab switching or resizing. Please retake the quiz.');
+    setQuestions([]);
+    setCurrentQuestionIndex(0);
+    setQuizCompleted(false);
+    setUserAnswers({});
+    incrementInvalidationCount();
+    alert("The quiz has been invalidated due to tab switching or resizing. Please retake the quiz.");
   };
 
   const isBrowserMaximized = () => {
     const windowWidth = window.outerWidth;
     const windowHeight = window.outerHeight;
-    const screenWidth = window.screen.availWidth; // Available screen space excluding system UI like taskbars
+    const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
-  
-    const threshold = 50; // Margin of error to account for browser chrome
-    return (
-      windowWidth >= screenWidth - threshold && windowHeight >= screenHeight - threshold
-    );
+    const threshold = 50;
+    return windowWidth >= screenWidth - threshold && windowHeight >= screenHeight - threshold;
   };
-  
 
-  // Start the quiz and reset the invalidation state
-  const startQuiz = () => {
-    if (isBrowserMaximized()) {
-      // Proceed with the quiz if the browser is maximized
-      setIsQuizActive(true); // Start the quiz
-      setQuizInvalidated(false); // Reset invalidation flag
-      setHasSwitchedTabOrResized(false); // Reset warning flag
-      setInitialWindowSize({ width: window.innerWidth, height: window.innerHeight }); // Set initial window size
-    } else {
-      alert('Please maximize your browser window to start the quiz.');
+  const startQuiz = async () => {
+    if (!isBrowserMaximized()) {
+      alert("Please maximize your browser window to start the quiz.");
+      return;
+    }
+
+    setIsQuizActive(true);
+    setQuizInvalidated(false);
+    setLoading(true);
+    setQuizCompleted(false);
+    setQuestions([]);
+    setUserAnswers({});
+    
+    const selectedPages = pageNumbers.length > 5 
+    ? pageNumbers.slice(0, 5) 
+    : pageNumbers.map(page => (isNaN(page) || page === null) ? pageNumbers.length : page);
+
+    // console.log(selectedPages);
+    const requestBody = {
+      pdf_location: `${lecturesDir}${selectedLecture}`,
+      page_numbers: selectedPages,
+      num_questions: numQuestions,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8001/generate-mcqs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch quiz questions");
+
+      const data = await response.json();
+      setQuestions(data.questions);
+    } catch (error) {
+      console.error("Error fetching MCQs:", error);
+      alert("Failed to generate quiz. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Retake the quiz when the user clicks the button
-  const retakeQuiz = () => {
-    setIsQuizActive(false); // Reset quiz active state
-    setQuizInvalidated(false); // Reset invalidation flag
-    setHasSwitchedTabOrResized(false); // Reset warning flag
+  const handleAnswerChange = (questionIndex, selectedOption) => {
+    setUserAnswers({ ...userAnswers, [questionIndex]: selectedOption });
+  };
+
+  const calculateScore = () => {
+    let correctCount = 0;
+    questions.forEach((question, index) => {
+      if (userAnswers[index] === question.correct_answer) {
+        correctCount++;
+      }
+    });
+    return correctCount;
+  };
+
+  const submitQuiz = () => {
+    setQuizCompleted(true);
+    setIsQuizActive(false);
+  };
+
+  const returnToHome = () => {
+    setTakeQuiz(false); // Reset quiz availability
+    navigate("/"); // Redirect to home page
   };
 
   return (
-    <div>
+    <div className="quiz-container">
       <h2>Quizzes</h2>
 
-      {!isQuizActive && !quizInvalidated ? (
+      {!makeQuiz ? (
+        <p style={{ color: "gray" }}>There are no quizzes at the moment.</p>
+      ) : !takeQuiz ? (
+        <p style={{ color: "gray" }}>Complete your lectures before taking the quiz.</p>
+      ) : isQuizActive && loading ? (
+        <div className="loader-container">
+          <div className="loader"></div>
+          <p>Generating quiz questions...</p>
+        </div>
+      ) : isQuizActive && questions.length > 0 ? (
+        <div className="quiz-question">
+          <h3>Question {currentQuestionIndex + 1} of {questions.length}</h3>
+          <p><strong>{questions[currentQuestionIndex].question}</strong></p>
+
+          <form>
+            {Object.entries(questions[currentQuestionIndex].options).map(([key, value]) => (
+              <div key={key} className="option">
+                <input
+                  type="radio"
+                  id={`option-${key}`}
+                  name="quiz-option"
+                  value={key}
+                  checked={userAnswers[currentQuestionIndex] === key}
+                  onChange={() => handleAnswerChange(currentQuestionIndex, key)}
+                />
+                <label htmlFor={`option-${key}`}>{`${key}: ${value}`}</label>
+              </div>
+            ))}
+          </form>
+
+          <div className="quiz-buttons">
+            <button
+              className="back-btn"
+              onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
+              disabled={currentQuestionIndex === 0}
+            >
+              Back
+            </button>
+
+            <button
+              className="next-btn"
+              onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+              disabled={questions.length === 0 || currentQuestionIndex >= questions.length - 1}
+            >
+              Next
+            </button>
+
+            {questions.length > 0 && currentQuestionIndex === questions.length - 1 && (
+              <button onClick={submitQuiz} className="submit-quiz-btn">
+                Submit Quiz
+              </button>
+            )}
+          </div>
+        </div>
+      ) : quizCompleted ? (
+        <div className="quiz-results">
+          <h3>Quiz Completed!</h3>
+          <p>Your Score: {calculateScore()} / {questions.length}</p>
+
+          <table className="results-table">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Explanation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {questions.map((question, index) => (
+                <tr key={index} className={userAnswers[index] === question.correct_answer ? "correct" : "incorrect"}>
+                  <td>{question.question}</td>
+                  <td>{userAnswers[index] || "Not Answered"}</td>
+                  <td>{question.correct_answer}</td>
+                  <td>{question.explanation}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <button onClick={returnToHome} className="take-quiz-btn">
+            Return to Home
+          </button>
+        </div>
+      ) : !isQuizActive && !quizInvalidated ? (
         <button onClick={startQuiz} className="take-quiz-btn">
           Take Quiz
         </button>
       ) : null}
 
-      {isQuizActive ? (
-        <p>The quiz is now active. Please do not switch tabs or resize the window.</p>
-      ) : null}
-
       {quizInvalidated && (
-        <div>
-          <p style={{ color: 'red' }}>
-            The quiz has been invalidated. You must retake the quiz due to tab switching or resizing.
+        <div className="quiz-invalidated">
+          <p style={{ color: "red" }}>
+            The quiz has been invalidated due to tab switching or resizing. You must retake the quiz.
           </p>
-          <button onClick={retakeQuiz} className="take-quiz-btn">
+          <button onClick={startQuiz} className="take-quiz-btn">
             Retake Quiz
           </button>
         </div>
-      )}
-
-      {hasSwitchedTabOrResized && (
-        <p style={{ color: 'red' }}>
-          Warning: You have switched tabs or resized the window during the quiz!
-        </p>
       )}
     </div>
   );
