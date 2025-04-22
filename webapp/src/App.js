@@ -11,6 +11,7 @@ import PostureDetection from './components/PostureDetection';
 import Login from './components/Login';
 import CreateQuiz from './components/CreateQuiz';
 import CreateLecture from './components/CreateLecture';
+import SlideGeneration from './components/SlideGeneration'; // Import SlideGeneration component
 import AttendanceMonitoring from './components/AttendanceMonitoring';
 import BackgroundIcons from './components/BackgroundIcons'; 
 import Results from './components/Results.js';
@@ -46,8 +47,8 @@ function App() {
   return (
     <Router>
       <div className="App">
-      <ToastContainer />
-      <BackgroundIcons />
+        <ToastContainer />
+        <BackgroundIcons />
         <Header userType={userType}/>
         {userType === "Teacher" ? (
           <div className="main-container">
@@ -57,7 +58,8 @@ function App() {
               <Link to="/createQuiz"><button style={{ '--animation-order': 3 }}>Quizzes</button></Link>
               <Link to="/insights"><button style={{ '--animation-order': 4 }}>Insights</button></Link>
               <Link to="/attendanceMonitoring"><button style={{ '--animation-order': 5 }}>Attendance Monitoring</button></Link>
-              <Link to="/logout"><button style={{ '--animation-order': 6 }}>Log out</button></Link>
+              <Link to="/slideGeneration"><button style={{ '--animation-order': 6 }}>Slide Generation</button></Link> {/* Added Slide Generation link */}
+              <Link to="/logout"><button style={{ '--animation-order': 7 }}>Log out</button></Link>
             </div>
             <div className="content">
               <Routes>
@@ -66,6 +68,7 @@ function App() {
                 <Route path="/createQuiz" element={<CreateQuiz userID={userID} makeQuiz={makeQuiz} setMakeQuiz={setMakeQuiz} numQuestions={numQuestions} setNumQuestions={setNumQuestions} setSelectedLecture={setSelectedLecture}/>} />
                 <Route path="/insights" element={<Insights emotionResults={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
                 <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults}/>} /> 
+                <Route path="/slideGeneration" element={<SlideGeneration />} /> {/* Added route for Slide Generation */}
                 <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
