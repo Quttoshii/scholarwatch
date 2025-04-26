@@ -47,8 +47,8 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <ToastContainer />
-        <BackgroundIcons />
+      <ToastContainer />
+      <BackgroundIcons />
         <Header userType={userType}/>
         {userType === "Teacher" ? (
           <div className="main-container">

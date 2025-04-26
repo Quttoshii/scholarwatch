@@ -14,7 +14,7 @@ from typing import List, Dict, Any, Optional
 app = FastAPI()
 
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-GAK = "AIzaSyC9NW3A-UEqFyKVV3aPQk5pCeNWudOV_8s"
+GAK = ""
 
 app.add_middleware(
     CORSMiddleware,
