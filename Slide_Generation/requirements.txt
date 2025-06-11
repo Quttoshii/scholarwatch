@@ -1,0 +1,9 @@
+PyMuPDF
+python-pptx
+transformers
+spacy
+nltk
+torch
+pdfplumber
+fastapi
+tf-keras
