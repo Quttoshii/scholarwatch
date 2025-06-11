@@ -42,11 +42,20 @@ async def generate_mcqs(request: MCQRequest):
     try:
         print("Request received:", request)
         
+        def load_env_file(filepath=".env"):
+            with open(filepath) as f:
+                for line in f:
+                    if line.strip() and not line.startswith("#"):
+                        key, value = line.strip().split("=", 1)
+                        os.environ[key] = value
+
+        load_env_file()
+
         # Load API Key
         api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", GAK)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-pro')
-
+        # model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('gemini-2.0-flash-lite')
         # Check if PDF exists
         if not os.path.exists(request.pdf_location):
             raise HTTPException(status_code=404, detail=f"PDF file not found at {request.pdf_location}")
@@ -117,19 +126,21 @@ async def generate_mcqs(request: MCQRequest):
         **FORMAT:**
         ```json
         {{
-          "questions": [
+        "questions": [
             {{
-              "question": "The complete question text?",
-              "options": {{
+            "question": "The complete question text?",
+            "options": {{
                 "A": "Option 1",
                 "B": "Option 2",
                 "C": "Option 3",
                 "D": "Option 4"
-              }},
-              "correct_answer": "A",
-              "explanation": "Brief explanation"
+            }},
+            "correct_answer": "A",
+            "explanation": "Brief explanation",
+            "topic": "One word topic",
+            "page_number": 3
             }}
-          ]
+        ]
         }}
         ```
         """
@@ -147,6 +158,7 @@ async def generate_mcqs(request: MCQRequest):
             if json_match:
                 try:
                     mcq_data = json.loads(json_match.group(1))
+                    print(mcq_data)
                     return mcq_data
                 except json.JSONDecodeError:
                     raise HTTPException(status_code=500, detail="Failed to parse JSON response from model")
@@ -154,4 +166,6 @@ async def generate_mcqs(request: MCQRequest):
                 raise HTTPException(status_code=500, detail="Failed to extract JSON from model response")
 
     except Exception as e:
+        from traceback import format_exc
+        print(format_exc())
         raise HTTPException(status_code=500, detail=f"Error generating MCQs: {str(e)}")

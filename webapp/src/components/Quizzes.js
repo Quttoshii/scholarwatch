@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import for navigation
 import { toast } from "react-toastify";
 
-function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, selectedLecture, pageNumbers, numQuestions }) {
+function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, selectedLecture, pageNumbers, numQuestions, setWeakAreas }) {
+  const [score, setScore] = useState(null);
   const [isQuizActive, setIsQuizActive] = useState(false);
   const [quizInvalidated, setQuizInvalidated] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -101,15 +102,52 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     setUserAnswers({ ...userAnswers, [questionIndex]: selectedOption });
   };
 
-  const calculateScore = () => {
-    let correctCount = 0;
-    questions.forEach((question, index) => {
-      if (userAnswers[index] === question.correct_answer) {
-        correctCount++;
-      }
-    });
-    return correctCount;
-  };
+  useEffect(() => {
+    if (quizCompleted && questions.length > 0) {
+      let correctCount = 0;
+
+      questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const correctAnswer = question.correct_answer;
+        const topic = question.topic;
+        const page = question.page_number;
+        const lectureName = selectedLecture.split('/').pop().split('.')[0];
+
+        if (userAnswer === correctAnswer) {
+          correctCount++;
+        } else {
+          // Update weakAreas with the nested structure
+          setWeakAreas(prev => {
+            const newWeakAreas = JSON.parse(JSON.stringify(prev)); // Deep clone
+            
+            // Initialize structure if it doesn't exist
+            if (!newWeakAreas.lectures) {
+              newWeakAreas.lectures = {};
+            }
+            
+            if (!newWeakAreas.lectures[lectureName]) {
+              newWeakAreas.lectures[lectureName] = { Slides: {} };
+            }
+            
+            if (!newWeakAreas.lectures[lectureName].Slides[`${page}`]) {
+              newWeakAreas.lectures[lectureName].Slides[`${page}`] = { Topics: {} };
+            }
+            
+            if (!newWeakAreas.lectures[lectureName].Slides[`${page}`].Topics[topic]) {
+              newWeakAreas.lectures[lectureName].Slides[`${page}`].Topics[topic] = 0;
+            }
+            
+            // Increment the count
+            newWeakAreas.lectures[lectureName].Slides[`${page}`].Topics[topic]++;
+            
+            return newWeakAreas;
+          });
+        }
+      });
+
+      setScore(correctCount);
+    }
+  }, [quizCompleted, questions, userAnswers, selectedLecture, setWeakAreas]);
 
   const submitQuiz = () => {
     setQuizCompleted(true);
@@ -183,7 +221,8 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
       ) : quizCompleted ? (
         <div className="quiz-results">
           <h3>Quiz Completed!</h3>
-          <p>Your Score: {calculateScore()} / {questions.length}</p>
+          {/* <p>Your Score: {calculateScore()} / {questions.length}</p> */}
+          <p>Your Score: {score !== null ? `${score} / ${questions.length}` : "Calculating..."}</p>
 
           <table className="results-table">
             <thead>
