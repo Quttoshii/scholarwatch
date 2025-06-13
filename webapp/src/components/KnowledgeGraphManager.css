@@ -1,0 +1,125 @@
+.knowledge-graph-manager {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.knowledge-graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.knowledge-graph-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.course-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-selector label {
+  font-weight: 500;
+  color: #555;
+}
+
+.course-selector select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 200px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.course-selector select:hover {
+  border-color: #2196f3;
+}
+
+.knowledge-graph-content {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.no-course-selected {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #666;
+  font-size: 16px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #666;
+  font-size: 18px;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #f44336;
+  font-size: 18px;
+  text-align: center;
+  padding: 20px;
+  gap: 15px;
+}
+
+.retry-button {
+  padding: 8px 16px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #1976d2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .knowledge-graph-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .course-selector {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .course-selector select {
+    width: 100%;
+    max-width: 300px;
+  }
+} 

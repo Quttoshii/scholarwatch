@@ -165,7 +165,7 @@ CREATE TABLE `PostureDetection` (
   PRIMARY KEY (`PostureDetectionID`),
   KEY `SessionID` (`SessionID`),
   CONSTRAINT `posturedetection_ibfk_1` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Dumping data for table `PostureDetection`
@@ -431,3 +431,83 @@ VALUES
 (3, 1.2, 0.8, 1.8, 0.7), 
 (4, 2.5, 0.3, 2.1, 0.6), 
 (5, 1.8, 0.6, 2.3, 0.4);
+
+-- ----------------------------
+-- Knowledge Graph Tables
+-- ----------------------------
+DROP TABLE IF EXISTS `KnowledgeGraph`;
+CREATE TABLE `KnowledgeGraph` (
+  `GraphID` int NOT NULL AUTO_INCREMENT,
+  `CourseID` int NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `Description` text,
+  `CreatedAt` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`GraphID`),
+  FOREIGN KEY (`CourseID`) REFERENCES `Course` (`CourseID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `KnowledgeNode`;
+CREATE TABLE `KnowledgeNode` (
+  `NodeID` int NOT NULL AUTO_INCREMENT,
+  `GraphID` int NOT NULL,
+  `LectureID` int,
+  `Name` varchar(255) NOT NULL,
+  `Type` enum('LECTURE', 'TOPIC', 'CONCEPT') NOT NULL,
+  `Description` text,
+  `PositionX` float,
+  `PositionY` float,
+  PRIMARY KEY (`NodeID`),
+  FOREIGN KEY (`GraphID`) REFERENCES `KnowledgeGraph` (`GraphID`),
+  FOREIGN KEY (`LectureID`) REFERENCES `Lecture` (`LectureID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `KnowledgeEdge`;
+CREATE TABLE `KnowledgeEdge` (
+  `EdgeID` int NOT NULL AUTO_INCREMENT,
+  `GraphID` int NOT NULL,
+  `SourceNodeID` int NOT NULL,
+  `TargetNodeID` int NOT NULL,
+  `Type` enum('PREREQUISITE', 'RELATED_TO', 'PART_OF') NOT NULL,
+  `Weight` float DEFAULT 1.0,
+  PRIMARY KEY (`EdgeID`),
+  FOREIGN KEY (`GraphID`) REFERENCES `KnowledgeGraph` (`GraphID`),
+  FOREIGN KEY (`SourceNodeID`) REFERENCES `KnowledgeNode` (`NodeID`),
+  FOREIGN KEY (`TargetNodeID`) REFERENCES `KnowledgeNode` (`NodeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+-- Dummy data for Computer Science Course Knowledge Graph
+INSERT INTO `KnowledgeGraph` (`GraphID`, `CourseID`, `Name`, `Description`, `CreatedAt`) VALUES
+(1, 1, 'Computer Science Knowledge Graph', 'Complete knowledge graph for Computer Science course', NOW()),
+(2, 2, 'Mathematics Knowledge Graph', 'Complete knowledge graph for Mathematics course', NOW());
+
+-- Computer Science Lectures (well-connected)
+INSERT INTO `KnowledgeNode` (`NodeID`, `GraphID`, `LectureID`, `Name`, `Type`, `Description`, `PositionX`, `PositionY`) VALUES
+(1, 1, 1, 'Introduction to Programming', 'LECTURE', 'Basic programming concepts and syntax', 100, 100),
+(2, 1, 2, 'Variables and Data Types', 'LECTURE', 'Understanding different data types and variables', 250, 100),
+(3, 1, 3, 'Control Structures', 'LECTURE', 'Loops and conditional statements', 400, 100),
+(4, 1, 4, 'Arrays and Lists', 'LECTURE', 'Working with arrays and list data structures', 550, 100),
+(5, 1, 5, 'Functions and Methods', 'LECTURE', 'Creating and using functions', 700, 100);
+
+-- Prerequisite relationships for Computer Science
+INSERT INTO `KnowledgeEdge` (`EdgeID`, `GraphID`, `SourceNodeID`, `TargetNodeID`, `Type`, `Weight`) VALUES
+(1, 1, 1, 2, 'PREREQUISITE', 1.0),
+(2, 1, 2, 3, 'PREREQUISITE', 1.0),
+(3, 1, 3, 4, 'PREREQUISITE', 1.0),
+(4, 1, 4, 5, 'PREREQUISITE', 1.0);
+
+-- Mathematics Lectures (well-connected)
+INSERT INTO `KnowledgeNode` (`NodeID`, `GraphID`, `LectureID`, `Name`, `Type`, `Description`, `PositionX`, `PositionY`) VALUES
+(6, 2, 6, 'Basic Algebra', 'LECTURE', 'Introduction to algebraic expressions', 100, 100),
+(7, 2, 7, 'Linear Equations', 'LECTURE', 'Solving linear equations', 250, 100),
+(8, 2, 8, 'Quadratic Equations', 'LECTURE', 'Solving quadratic equations', 400, 100),
+(9, 2, 9, 'Functions', 'LECTURE', 'Understanding mathematical functions', 550, 100),
+(10, 2, 10, 'Derivatives', 'LECTURE', 'Introduction to calculus', 700, 100);
+
+-- Prerequisite relationships for Mathematics
+INSERT INTO `KnowledgeEdge` (`EdgeID`, `GraphID`, `SourceNodeID`, `TargetNodeID`, `Type`, `Weight`) VALUES
+(5, 2, 6, 7, 'PREREQUISITE', 1.0),
+(6, 2, 7, 8, 'PREREQUISITE', 1.0),
+(7, 2, 8, 9, 'PREREQUISITE', 1.0),
+(8, 2, 9, 10, 'PREREQUISITE', 1.0);

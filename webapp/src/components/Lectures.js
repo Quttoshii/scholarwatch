@@ -1,120 +1,104 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import GazeTracking from './GazeTracking';
 import PDFViewer from './PDFViewer';
-import { toast } from "react-toastify";
+import KnowledgeGraph from './KnowledgeGraph';
+import './Lectures.css';
 
-function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, setTakeQuiz, selectedLecture, setPageNumbers }) {
-  const [cameraPermission, setCameraPermission] = useState(true);
-  const [focusTimes, setFocusTimes] = useState({});
-  const [unfocusTimes, setUnfocusTimes] = useState({});
-  const lecturesRef = useRef(null);
+function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, setTakeQuiz, selectedLecture, setPageNumbers, isInstructor }) {
+    const [cameraPermission, setCameraPermission] = useState(true);
+    const [focusTimes, setFocusTimes] = useState({});
+    const [unfocusTimes, setUnfocusTimes] = useState({});
+    const [activeTab, setActiveTab] = useState('lectures');
+    const lecturesRef = useRef(null);
 
-  useEffect(() => {
-    const checkCameraSupport = () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraPermission(false);
-      }
+    const handleGazeData = (focusTime, unfocusTime, currentPage) => {
+        setFocusTimes(prev => ({
+            ...prev,
+            [currentPage]: (prev[currentPage] || 0) + focusTime
+        }));
+        setUnfocusTimes(prev => ({
+            ...prev,
+            [currentPage]: (prev[currentPage] || 0) + unfocusTime
+        }));
+        setGazeResults(focusTime, unfocusTime, currentPage);
     };
 
-    checkCameraSupport();
-  }, []);
+    const handleLectureFinish = () => {
+        if (makeQuiz) {
+            setTakeQuiz(true);
+        }
+    };
 
-  useEffect(() => {
-    if (makeQuiz) {
-      toast.warn("There will be a quiz for this lecture. After finishing, go to Quizzes to take it.")
-    }
-  }, [makeQuiz]);
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'lectures':
+                return (
+                    <div className="lectures-content">
+                        {selectedLecture === "" ? (
+                            <p className="no-lectures">No lectures to attend.</p>
+                        ) : (
+                            <>
+                                {cameraPermission === false && (
+                                    <p className="camera-warning">Please allow access to your camera to use gaze tracking.</p>
+                                )}
 
-  const handleGazeData = (focusTime, unfocusTime, currentPage) => {
-    // console.log(`GazeTracking Data: Page ${currentPage}, Focus Time: ${focusTime}, Unfocus Time: ${unfocusTime}`);
-    
-    setFocusTimes((prev) => {
-      const newFocusTimes = { ...prev, [currentPage]: (prev[currentPage] || 0) + focusTime };
-      // console.log("Updated Focus Times:", newFocusTimes);
-      return newFocusTimes;
-    });
-    
-    setUnfocusTimes((prev) => {
-      const newUnfocusTimes = { ...prev, [currentPage]: (prev[currentPage] || 0) + unfocusTime };
-      // console.log("Updated Unfocus Times:", newUnfocusTimes);
-      return newUnfocusTimes;
-    });
-  };
+                                {cameraPermission === true && (
+                                    <GazeTracking 
+                                        isCalibrated={isCalibrated} 
+                                        setIsCalibrated={setIsCalibrated} 
+                                        lecturesRef={lecturesRef}
+                                        setGazeResults={handleGazeData}
+                                    />
+                                )}
 
-  const handleLectureFinish = () => {
-    // Compute total focus and unfocus time
-    const totalFocusTime = Object.values(focusTimes).reduce((acc, time) => acc + time, 0);
-    const totalUnfocusTime = Object.values(unfocusTimes).reduce((acc, time) => acc + time, 0);
+                                {isCalibrated ? (
+                                    <PDFViewer 
+                                        setTakeQuiz={setTakeQuiz} 
+                                        selectedLecture={selectedLecture} 
+                                        onLectureFinish={handleLectureFinish}
+                                        onPageGazeData={handleGazeData}
+                                    />
+                                ) : (
+                                    <p className="calibration-warning">Please complete calibration before starting the lecture.</p>
+                                )}
+                            </>
+                        )}
+                    </div>
+                );
 
-    // console.log(`Total Focus Time: ${totalFocusTime}`);
-    // console.log(`Total Unfocus Time: ${totalUnfocusTime}`);
+            case 'knowledge-graph':
+                return (
+                    <div className="knowledge-graph-container">
+                        <KnowledgeGraph courseId={1} isTeacher={isInstructor} />
+                    </div>
+                );
 
-    // Sort page numbers by highest unfocusTime first
-    const sortedPages = Object.keys(unfocusTimes)
-      .map((page) => ({ page: parseInt(page), unfocusTime: unfocusTimes[page] }))
-      .sort((a, b) => b.unfocusTime - a.unfocusTime)
-      .map((entry) => entry.page);
+            default:
+                return null;
+        }
+    };
 
-    setPageNumbers(sortedPages);
-
-    console.log("Sorted pages based on unfocus time:", sortedPages);
-
-    // Send final gaze data when lecture is completed
-    sendGazeDataToServer(totalFocusTime, totalUnfocusTime);
-  };
-
-  const sendGazeDataToServer = async (totalFocusTime, totalUnfocusTime) => {
-    try {
-      const response = await fetch('http://localhost/scholarwatch/insertGazeTracking.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ FocusTime: totalFocusTime, UnfocusTime: totalUnfocusTime }),
-      });
-
-      const data = await response.json(); 
-      // console.log('Server Response:', data);
-    } catch (error) {
-      console.error('Error sending gaze tracking data:', error);
-    }
-  };
-
-  return (
-    <div className="lectures-container" ref={lecturesRef}>
-      <div className="lectures-content">
-        <h2>Lectures</h2>
-
-        {selectedLecture === "" ? (
-          <p style={{ color: 'gray' }}>No lectures to attend.</p>
-        ) : (
-          <>
-            {cameraPermission === false && (
-              <p style={{ color: 'red' }}>Please allow access to your camera to use gaze tracking.</p>
-            )}
-
-            {cameraPermission === true && (
-              <GazeTracking 
-                isCalibrated={isCalibrated} 
-                setIsCalibrated={setIsCalibrated} 
-                lecturesRef={lecturesRef}
-                setGazeResults={handleGazeData}
-              />
-            )}
-
-            {isCalibrated ? (
-              <PDFViewer 
-                setTakeQuiz={setTakeQuiz} 
-                selectedLecture={selectedLecture} 
-                onLectureFinish={handleLectureFinish}
-                onPageGazeData={handleGazeData}
-              />
-            ) : (
-              <p style={{ color: 'orange' }}>Please complete calibration before starting the lecture.</p>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
+    return (
+        <div className="lectures-page" ref={lecturesRef}>
+            <div className="tabs">
+                <button 
+                    className={`tab-button ${activeTab === 'lectures' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('lectures')}
+                >
+                    Lectures
+                </button>
+                <button 
+                    className={`tab-button ${activeTab === 'knowledge-graph' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('knowledge-graph')}
+                >
+                    Knowledge Graph
+                </button>
+            </div>
+            <div className="content">
+                {renderContent()}
+            </div>
+        </div>
+    );
 }
 
 export default Lectures;

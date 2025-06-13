@@ -1,0 +1,132 @@
+.lectures-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #FFF5EE;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #f6a623;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    background-color: #d48f20;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button.active {
+    background-color: #d48f20;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow: auto;
+}
+
+.lectures-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
+}
+
+.no-lectures {
+    color: #666;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+}
+
+.camera-warning {
+    color: #d32f2f;
+    text-align: center;
+    padding: 1rem;
+    background-color: #ffebee;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #ffcdd2;
+}
+
+.calibration-warning {
+    color: #f57c00;
+    text-align: center;
+    padding: 1rem;
+    background-color: #fff3e0;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #ffe0b2;
+}
+
+.knowledge-graph-container {
+    height: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+/* PDF Viewer Styles */
+.pdf-container {
+    width: 100%;
+    height: calc(100vh - 200px);
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
+}
+
+/* Gaze Tracking Styles */
+.gaze-tracking-container {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #FFF5EE;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tabs {
+        padding: 0.75rem;
+    }
+
+    .tab-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .content {
+        padding: 1rem;
+    }
+
+    .lectures-content {
+        padding: 1rem;
+    }
+
+    .pdf-container {
+        height: calc(100vh - 150px);
+    }
+} 

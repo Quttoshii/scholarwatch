@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
 import Header from './components/Header';
 import Home from './components/Home';
 import Lectures from './components/Lectures';
@@ -11,7 +11,7 @@ import PostureDetection from './components/PostureDetection';
 import Login from './components/Login';
 import CreateQuiz from './components/CreateQuiz';
 import CreateLecture from './components/CreateLecture';
-import SlideGeneration from './components/SlideGeneration'; // Import SlideGeneration component
+import SlideGeneration from './components/SlideGeneration';
 import AttendanceMonitoring from './components/AttendanceMonitoring';
 import BackgroundIcons from './components/BackgroundIcons'; 
 import Results from './components/Results.js';
@@ -20,7 +20,7 @@ import { ToastContainer } from "react-toastify";
 import WeakAreaAnalysis from './components/WeakAreaAnalysis';
 import TeacherWeakAreaAnalysis from './components/TeacherWeakAreaAnalysis';
 import "react-toastify/dist/ReactToastify.css";
-
+import KnowledgeGraph from './components/KnowledgeGraph';
 import './App.css';
 
 function App() {
@@ -34,7 +34,6 @@ function App() {
   const [selectedLecture, setSelectedLecture] = useState('');
   const [pageNumbers, setPageNumbers] = useState([]);
   
-  // const [results, setResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [emotionResults, setEmotionResults] = useState({ awake_time: 0, drowsy_time: 0 });
   const [postureResults, setPostureResults] = useState({ total_time:0, good_posture_time: 0, phone_use_time: 0 , no_person_time: 0, looking_right_time: 0, looking_left_time: 0, slouching_time: 0});
   const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
@@ -51,8 +50,8 @@ function App() {
   return (
     <Router>
       <div className="App">
-      <ToastContainer />
-      <BackgroundIcons />
+        <ToastContainer />
+        <BackgroundIcons />
         <Header userType={userType}/>
         {userType === "Teacher" ? (
           <div className="main-container">
@@ -60,17 +59,19 @@ function App() {
               <Link to="/"><button style={{ '--animation-order': 1 }}>Home</button></Link>
               <Link to="/createLecture"><button style={{ '--animation-order': 2 }}>Lectures</button></Link>
               <Link to="/createQuiz"><button style={{ '--animation-order': 3 }}>Quizzes</button></Link>
-              <Link to="/insights"><button style={{ '--animation-order': 4 }}>Insights</button></Link>
-              <Link to="/attendanceMonitoring"><button style={{ '--animation-order': 5 }}>Attendance Monitoring</button></Link>
-              <Link to="/slideGeneration"><button style={{ '--animation-order': 6 }}>Slide Generation</button></Link>
-              <Link to="/AggregatedWeakAreaAnalysis"> <button style={{ '--animation-order': 7 }}>Weak Area Analysis</button> </Link>
-              <Link to="/logout"><button style={{ '--animation-order': 8 }}>Log out</button></Link>
+              <Link to="/knowledge-graph"><button style={{ '--animation-order': 4 }}>Knowledge Graph</button></Link>
+              <Link to="/insights"><button style={{ '--animation-order': 5 }}>Insights</button></Link>
+              <Link to="/attendanceMonitoring"><button style={{ '--animation-order': 6 }}>Attendance Monitoring</button></Link>
+              <Link to="/slideGeneration"><button style={{ '--animation-order': 7 }}>Slide Generation</button></Link>
+              <Link to="/AggregatedWeakAreaAnalysis"><button style={{ '--animation-order': 8 }}>Weak Area Analysis</button></Link>
+              <Link to="/logout"><button style={{ '--animation-order': 9 }}>Log out</button></Link>
             </div>
             <div className="content">
               <Routes>
                 <Route path="/" element={<Home userType={userType} userID={userID} userName={userName}  email={email} />} />
                 <Route path="/createLecture" element={<CreateLecture userID={userID}/>} />
                 <Route path="/createQuiz" element={<CreateQuiz userID={userID} makeQuiz={makeQuiz} setMakeQuiz={setMakeQuiz} numQuestions={numQuestions} setNumQuestions={setNumQuestions} setSelectedLecture={setSelectedLecture}/>} />
+                <Route path="/knowledge-graph" element={<KnowledgeGraph courseId={1} />} />
                 <Route path="/insights" element={<Insights emotionResults={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
                 <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults}/>} /> 
                 <Route path="/slideGeneration" element={<SlideGeneration />} /> 
@@ -95,7 +96,18 @@ function App() {
             <div className="content">
               <Routes>
                 <Route path="/" element={<Home userType={userType} userID={userID} userName={userName} email={email} />} />
-                <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} makeQuiz={makeQuiz} setTakeQuiz={setTakeQuiz} selectedLecture={selectedLecture} setPageNumbers={setPageNumbers}/>} />
+                <Route path="/lectures" element={
+                  <Lectures 
+                    isCalibrated={isCalibrated} 
+                    setIsCalibrated={setIsCalibrated} 
+                    setGazeResults={setGazeResults} 
+                    makeQuiz={makeQuiz} 
+                    setTakeQuiz={setTakeQuiz} 
+                    selectedLecture={selectedLecture} 
+                    setPageNumbers={setPageNumbers}
+                    isInstructor={userType === "Teacher"}
+                  />
+                } />
                 <Route path="/liveFeed" element={<LiveFeed setEmotionResults={setEmotionResults} />} />
                 <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} makeQuiz={makeQuiz} takeQuiz={takeQuiz} setTakeQuiz={setTakeQuiz} selectedLecture={selectedLecture} pageNumbers={pageNumbers} numQuestions={numQuestions} setWeakAreas={setWeakAreas}/>} />
                 <Route path="/postureDetection" element={<PostureDetection setPostureResults={setPostureResults}/>} />

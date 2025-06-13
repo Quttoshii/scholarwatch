@@ -1,5 +1,5 @@
 <?php
-$host = 'localhost:3307';
+$host = 'localhost';
 $db = 'scholarwatch';  // Database name
 $user = 'root';     // Database username
 $pass = 'root';     // Database password
@@ -9,5 +9,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     //echo "successfully connected to db!\n";
 } catch (PDOException $e) {
-    die("Could not connect to the database $db :" . $e->getMessage());
+    header('Content-Type: application/json');
+    echo json_encode(["error" => "db_connection_failed", "message" => $e->getMessage()]);
+    exit;
 }
