@@ -1,0 +1,41 @@
+As Admin:
+	Site administration -> Appearance -> Advanced theme settings -> custom menu items:
+		Add ("Scholarwatch | http://localhost:3000")
+
+	Site administration -> General -> Avdvanced features: 
+		Enable (Web Services)
+
+	Site administration -> Server -> Web services -> Manage protocols:
+		Enable (REST Protocol)
+		
+	Site administration -> Server -> Web services -> External services:
+		Add new service ("Scholarwatch API")
+		Enabled (Yes)
+	
+		After creating, Add functions:
+			core_webservice_get_site_info (to get user info)
+			core_course_get_courses (to fetch courses)
+
+	Site administration -> Server -> Web services -> Manage tokens -> Create Token:
+		Name (Teacher)
+		User (Choose teacher account)
+		Service (Scholarwatch API)
+		Valid until (Disabled)
+		Create & Copy token
+
+	Site administration -> Server -> Web services -> Manage tokens -> Create Token:
+		Name (Student)
+		User (Choose student account)
+		Service (Scholarwatch API)
+		Valid until (Disabled)
+		Create & Copy token
+
+Users->Permissions->Define roles: 
+	edit your role and
+
+	Context types where this role may be assigned
+	[checkButton] System
+
+ScholarWatch | /local/scholarwatch/index.php
+
+Increment the version number every time you change install.xml
