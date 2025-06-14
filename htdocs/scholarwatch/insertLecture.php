@@ -11,12 +11,22 @@ header("Content-Type: application/json");
 include 'includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!empty($_FILES['lecture_file']) && isset($_POST['num_pages'])) {
+    if (!empty($_FILES['lecture_file']) && isset($_POST['num_pages']) && isset($_POST['courseID'])) {
         $file = $_FILES['lecture_file'];
         $numPages = intval($_POST['num_pages']);
+        $courseID = intval($_POST['courseID']);
+        $sessionID = isset($_POST['sessionID']) ? intval($_POST['sessionID']) : 1;
 
-        $sessionID = 1;
-        $courseID = 1;
+        // Validate that the teacher owns the course
+        $stmt = $pdo->prepare("SELECT TeacherID FROM Course WHERE CourseID = :courseID");
+        $stmt->execute(['courseID' => $courseID]);
+        $course = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$course) {
+            echo json_encode(["success" => false, "message" => "Invalid course"]);
+            exit;
+        }
+        // Optionally, check if the teacher is authorized (e.g., via a session or token)
+        // For now, we assume the teacher is authorized if the course exists
 
         $uploadDir = __DIR__ . '/lectures/';
         if (!is_dir($uploadDir)) {
@@ -33,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'sessionID' => $sessionID,
                     'courseID' => $courseID,
                     'lectureName' => pathinfo($file['name'], PATHINFO_FILENAME),
-                    'directoryPath' => '/lectures/' . basename($file['name']), // Now prefixed with /lectures/
+                    'directoryPath' => '/lectures/' . basename($file['name']),
                     'slideCount' => $numPages
                 ]);
 

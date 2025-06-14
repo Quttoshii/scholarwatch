@@ -1,9 +1,17 @@
 /* Header.css */
 .header {
     text-align: center;
-    background-color: #f6a523;
-    padding: 20px;
-    color: white;
+    background: #f6a523;
+    padding: 28px 0 22px 0;
+    color: #fff;
+    box-shadow: 0 4px 18px 0 rgba(246, 165, 35, 0.13);
+    border-radius: 0;
+    animation: headlineSlideDown 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  @keyframes headlineSlideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
   .header-content {
@@ -13,9 +21,23 @@
   }
   
   .header h1 {
-    font-size: 36px;
-    font-weight: bold;
+    font-size: 44px;
+    font-weight: 900;
     margin-left: 15px;
+    letter-spacing: 1.5px;
+    color: #f6a523;
+    background: none;
+    text-shadow: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+    text-fill-color: unset;
+    animation: headlineTextFadeIn 1.1s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  @keyframes headlineTextFadeIn {
+    from { opacity: 0; letter-spacing: 0; }
+    to { opacity: 1; letter-spacing: 1.5px; }
   }
   
   .logo {

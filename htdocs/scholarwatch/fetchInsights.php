@@ -13,7 +13,7 @@ try {
     $response['total_students'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_students'];
 
     // Retrieve total uploaded lectures
-    $stmt = $pdo->query("SELECT COUNT(*) as total_lectures FROM content");
+    $stmt = $pdo->query("SELECT COUNT(*) as total_lectures FROM lecture");
     $response['total_lectures'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_lectures'];
 
     // Retrieve invalidation count (number of invalid quizzes)
