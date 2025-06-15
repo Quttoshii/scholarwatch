@@ -7,49 +7,46 @@ function Home({ userType, userID, userName, email }) {
     name: userName,
     rollNo: userID,
     status: "Loading...",
-    gender: "Loading...",
-    dob: "Loading...",
     mobileNumber: "Loading...",
     nationality: "Loading...",
     email: email
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Make sure the correct userID is passed to the PHP file
-        const response = await fetch(`http://localhost/scholarwatch/fetchUserDetails.php?userID=${userID}`);
+        const response = await fetch(`http://localhost/local/scholarwatch/api/fetchUserDetails.php?userID=${userID}`, {
+          credentials: 'include'
+        });
         const data = await response.json();
 
         if (data.error) {
           setError(data.error);
-          setLoading(false);
         } else {
           setUserInfo({
-            name: data.Name || userName,
-            rollNo: data.UserID || userID,
-            status: data.Status,
-            gender: data.Gender,
-            dob: data.DOB,
-            mobileNumber: data.MobileNumber,
-            nationality: data.Nationality,
-            email: data.Email || email
+            name: `${data.firstname ?? userName} ${data.lastname ?? ''}`,
+            rollNo: data.id ?? userID,
+            status: data.suspended === 1 ? "Suspended" : "Active",
+            mobileNumber: data.phone1 ?? "N/A",     // phone1 used as fallback
+            nationality: data.country ?? "N/A",     // country used as fallback
+            email: data.email ?? email
           });
-          setLoading(false);
         }
       } catch (err) {
-        setError('Failed to fetch user details.');
-        setLoading(false);
         console.error("Error during fetch:", err);
+        setError('Failed to fetch user details.');
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [userID, userName, email]);  // Dependency array ensures fetch runs when these values change
+  }, [userID, userName, email]);
 
-  const welcomeMessage = userType === 'Teacher' ? `Welcome, ${userInfo.name}!` : `Welcome, ${userInfo.name}!`;
+  const welcomeMessage = `Welcome, ${userInfo.name}!`;
 
   if (loading) {
     return <div className="home-container">Loading user details...</div>;
@@ -57,7 +54,7 @@ function Home({ userType, userID, userName, email }) {
 
   return (
     <div className="home-container">
-      <img src={duckSvg} alt="Duck" className="peek-a-boo-duck" /> {/* New image tag for the duck */}
+      <img src={duckSvg} alt="Duck" className="peek-a-boo-duck" />
       <div className="profile-header">
         <h1>{welcomeMessage}</h1>
       </div>
@@ -69,8 +66,6 @@ function Home({ userType, userID, userName, email }) {
             <p><strong>Status:</strong> {userInfo.status}</p>
             <p><strong>Email:</strong> {userInfo.email}</p>
             <p><strong>Nationality:</strong> {userInfo.nationality}</p>
-            <p><strong>Gender:</strong> {userInfo.gender}</p>
-            <p><strong>DOB:</strong> {userInfo.dob}</p>
             <p><strong>Mobile Number:</strong> {userInfo.mobileNumber}</p>
           </>
         }

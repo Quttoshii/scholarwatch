@@ -24,9 +24,9 @@ const CreateLecture = ({ userID }) => {
         const fetchLectures = async () => {
             try {
                 const response = await axios.post(
-                    "http://localhost/scholarwatch/fetchLecture.php",
+                    "http://localhost/local/scholarwatch/api/fetchLecture.php",
                     { userID },
-                    { headers: { "Content-Type": "application/json" } }
+                    { headers: { "Content-Type": "application/json" }, withCredentials: true }
                 );
 
                 if (response.data.success) {
@@ -74,11 +74,12 @@ const CreateLecture = ({ userID }) => {
             const formData = new FormData();
             formData.append("lecture_file", selectedFile, sanitizedFileName);
             formData.append("num_pages", numPages);
+            formData.append("courseID", 1);
 
             const response = await axios.post(
-                "http://localhost/scholarwatch/insertLecture.php",
+                "http://localhost/local/scholarwatch/api/insertLecture.php",
                 formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+                { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
             );
 
             if (response.data.success) {
@@ -114,12 +115,16 @@ const CreateLecture = ({ userID }) => {
                             lectures.map((lecture) => (
                                 <tr key={lecture.lectureID}>
                                     <td>
-                                    <a href={`http://localhost/scholarwatch${lecture.directoryPath}`} target="_blank" rel="noopener noreferrer">
+                                    <a
+                                        href={`http://localhost/local/scholarwatch/api/serveLecture.php?file=${lecture.directoryPath.split('/').pop()}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        >
                                         {lecture.lectureName}
                                     </a>
                                     </td>
                                     <td>{lecture.slideCount}</td>
-                                    <td>{new Date(lecture.StartTimestamp).toLocaleString()}</td>
+                                    <td>{new Date(lecture.StartTimestamp* 1000).toLocaleString()}</td>
                                 </tr>
                             ))
                         ) : (

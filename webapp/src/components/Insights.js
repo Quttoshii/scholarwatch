@@ -63,19 +63,26 @@ const Insights = ({
   const [attendance, setAttendance] = useState({ present: 0, absent: 0 });
 
   useEffect(() => {
-    fetch('http://localhost/scholarwatch/fetchTeacherInsights.php')
+    fetch('http://localhost/local/scholarwatch/api/fetchTeacherInsights.php', {
+      credentials: 'include',
+    })
       .then((response) => response.json())
-      .then((data) => {
+      .then((resData) => {
+        const course = resData.courses?.[0] || {};
+        const emotions = course.emotions || { awake_time: 0, drowsy_time: 0 };
+        const attention = course.attention || { focused_time: 0, unfocused_time: 0 };
+
         setData({
-          totalStudents: data.total_students,
-          totalLectures: data.total_lectures,
-          invalidationCount: data.invalidation_count,
-          emotions: data.emotions,
-          attention: data.attention,
+          totalStudents: resData.all_students ?? 0,
+          totalLectures: resData.total_lectures, 
+          invalidationCount: resData.invalidation_count,
+          emotions,
+          attention,
         });
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
+
 
   const slideData = {
     English: [15, 25, 10, 15, 20],
@@ -150,6 +157,7 @@ const Insights = ({
       chartType: 'doughnut',
     },
   ];
+
 
   const createChartData = (data) => ({
     labels: data.map((d) => d.name),
@@ -282,17 +290,17 @@ const Insights = ({
 
           <div className="dashboard-card compact-card">
             <h3>Total Enrolled Students</h3>
-            <p className="compact-card-font">30</p>
+            <p className="compact-card-font">{data.totalStudents}</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Total Uploaded Lectures:</h3>
-            <p className="compact-card-font">2</p>
+            <p className="compact-card-font">{data.totalLectures}</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Quiz Invalidations</h3>
-            <p className="compact-card-font">1</p>
+            <p className="compact-card-font">{data.invalidationCount}</p>
           </div>
         </div>
 
