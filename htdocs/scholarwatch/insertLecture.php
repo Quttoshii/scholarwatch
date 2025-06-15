@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $filePath = $uploadDir . basename($file['name']);
+        $dbPath = '/lectures/' . basename($file['name']);
 
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
             try {
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'sessionID' => $sessionID,
                     'courseID' => $courseID,
                     'lectureName' => pathinfo($file['name'], PATHINFO_FILENAME),
-                    'directoryPath' => '/lectures/' . basename($file['name']),
+                    'directoryPath' => $dbPath,
                     'slideCount' => $numPages
                 ]);
 

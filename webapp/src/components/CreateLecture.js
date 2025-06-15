@@ -130,16 +130,16 @@ const CreateLecture = ({ userID }) => {
                     </thead>
                     <tbody>
                             {lectures.map((lecture, idx) => (
-                                <tr key={lecture.lectureID} style={{ background: idx % 2 === 0 ? '#fffbe9' : '#fff', color: '#2C1810' }}>
+                                <tr key={lecture.lectureID || lecture.LectureID || idx} style={{ background: idx % 2 === 0 ? '#fffbe9' : '#fff', color: '#2C1810' }}>
                                     <td style={{ padding: '12px 14px', border: 'none' }}>
-                                        <a href={`http://localhost/scholarwatch${lecture.directoryPath}`} target="_blank" rel="noopener noreferrer" style={{ color: '#2C1810', fontWeight: 700, textDecoration: 'none', fontSize: '1.08rem' }}
+                                        <a href={`http://localhost/scholarwatch${lecture.directoryPath || lecture.DirectoryPath}`} target="_blank" rel="noopener noreferrer" style={{ color: '#2C1810', fontWeight: 700, textDecoration: 'none', fontSize: '1.08rem' }}
                                             onMouseOver={e => e.currentTarget.style.color = '#f6a523'}
                                             onMouseOut={e => e.currentTarget.style.color = '#2C1810'}
                                         >
-                                        {lecture.lectureName}
+                                        {lecture.lectureName || lecture.LectureName}
                                     </a>
                                     </td>
-                                    <td style={{ padding: '12px 14px', border: 'none' }}>{lecture.slideCount}</td>
+                                    <td style={{ padding: '12px 14px', border: 'none' }}>{lecture.slideCount || lecture.SlideCount}</td>
                                     <td style={{ padding: '12px 14px', border: 'none' }}>{new Date(lecture.StartTimestamp).toLocaleString()}</td>
                                 </tr>
                             ))}

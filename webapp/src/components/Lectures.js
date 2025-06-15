@@ -25,6 +25,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
 
                 if (response.data.success) {
                     setLectures(response.data.data);
+                    console.log('Fetched lectures:', response.data.data);
                 } else {
                     console.error("Error fetching lectures:", response.data.message);
                 }
@@ -35,6 +36,12 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
 
         fetchLectures();
     }, [userID]);
+
+    useEffect(() => {
+        console.log('lectures:', lectures);
+        console.log('selectedLecture:', selectedLecture);
+        console.log('selectedLectureId:', selectedLectureId);
+    }, [lectures, selectedLecture, selectedLectureId]);
 
     const handleGazeData = (focusTime, unfocusTime, currentPage) => {
         setFocusTimes(prev => ({
@@ -56,9 +63,9 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
 
     const handleLectureSelect = (lectureId) => {
         setSelectedLectureId(lectureId);
-        const lecture = lectures.find(l => l.lectureID === lectureId);
+        const lecture = lectures.find(l => l.lectureID === lectureId || l.LectureID === lectureId);
         if (lecture) {
-            setSelectedLecture({ name: lecture.lectureName, path: lecture.DirectoryPath });
+            setSelectedLecture({ name: lecture.lectureName || lecture.LectureName, path: lecture.directoryPath || lecture.DirectoryPath });
         }
     };
 
@@ -78,17 +85,15 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                                 >
                                     <option value="">-- Select a lecture --</option>
                                     {lectures.map((lecture) => (
-                                        <option key={lecture.lectureID} value={lecture.lectureID}>
-                                            {lecture.lectureName}
+                                        <option key={lecture.lectureID || lecture.LectureID} value={lecture.lectureID || lecture.LectureID}>
+                                            {lecture.lectureName || lecture.LectureName}
                                         </option>
                                     ))}
                                 </select>
                             </div>
-                        ) : (
-                            <p className="no-lectures">No lectures to attend.</p>
-                        )}
+                        ) : null}
 
-                        {selectedLecture && selectedLecture.path ? (
+                        {lectures.length > 0 && selectedLecture && selectedLecture.path ? (
                             <>
                                 <div className="current-lecture-banner">
                                     <span role="img" aria-label="book" style={{ marginRight: 8 }}>📖</span>
@@ -118,9 +123,9 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                                     <p className="calibration-warning">Please complete calibration before starting the lecture.</p>
                                 )}
                             </>
-                        ) : (
+                        ) : lectures.length > 0 && !selectedLecture?.path ? (
                             <p className="no-lectures">No lecture selected.</p>
-                        )}
+                        ) : null}
                     </div>
                 );
 

@@ -94,8 +94,8 @@ function CreateQuiz({ userID, makeQuiz, setMakeQuiz, numQuestions, setNumQuestio
                         >
                             <option value="">-- Select a lecture --</option>
                             {lectures.map((lecture) => (
-                                <option key={lecture.lectureID} value={lecture.DirectoryPath}>
-                                    {lecture.lectureName}
+                                <option key={lecture.lectureID || lecture.LectureID} value={lecture.DirectoryPath || lecture.directoryPath}>
+                                    {lecture.lectureName || lecture.LectureName}
                                 </option>
                             ))}
                         </select>

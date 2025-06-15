@@ -31,7 +31,7 @@ function App() {
   const [makeQuiz, setMakeQuiz] = useState(false)
   const [takeQuiz, setTakeQuiz] = useState(false)
   const [numQuestions, setNumQuestions] = useState(1);
-  const [selectedLecture, setSelectedLecture] = useState('');
+  const [selectedLecture, setSelectedLecture] = useState({ name: '', path: '' });
   const [pageNumbers, setPageNumbers] = useState([]);
   
   const [emotionResults, setEmotionResults] = useState({ awake_time: 0, drowsy_time: 0 });
