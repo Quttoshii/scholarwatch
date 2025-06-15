@@ -9,7 +9,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
   const [unfocusTimes, setUnfocusTimes] = useState({});
   const lecturesRef = useRef(null);
 
-  useEffect(() => {
+  useEffect(() => {;
     const checkCameraSupport = () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         setCameraPermission(false);
@@ -65,7 +65,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
 
   const sendGazeDataToServer = async (totalFocusTime, totalUnfocusTime) => {
     try {
-      const response = await fetch('http://localhost/scholarwatch/insertGazeTracking.php', {
+      const response = await fetch('http://localhost/local/scholarwatch/api/insertGazeTracking.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ FocusTime: totalFocusTime, UnfocusTime: totalUnfocusTime }),

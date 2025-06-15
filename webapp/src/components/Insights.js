@@ -201,7 +201,7 @@ const Insights = ({
       <h2>Insights Dashboard</h2>
 
       <div className="dropdown-container">
-        <label htmlFor="courseSelect">Select Coucrse: </label>
+        <label htmlFor="courseSelect">Select Course: </label>
         <select
           id="courseSelect"
           value={selectedCourse}
@@ -295,12 +295,12 @@ const Insights = ({
 
           <div className="dashboard-card compact-card">
             <h3>Total Uploaded Lectures:</h3>
-            <p className="compact-card-font">{data.totalLectures}</p>
+            <p className="compact-card-font">2</p>
           </div>
 
           <div className="dashboard-card compact-card">
             <h3>Quiz Invalidations</h3>
-            <p className="compact-card-font">{data.invalidationCount}</p>
+            <p className="compact-card-font">1</p>
           </div>
         </div>
 

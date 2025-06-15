@@ -33,7 +33,7 @@ function PostureDetection({ setPostureResults }) {
         setPostureResults(postureResults);
 
         // Send data to PHP backend for storage
-        fetch('http://localhost/scholarwatch/insertPostureDetection.php', {
+        fetch('http://localhost/local/scholarwatch/api/insertPostureDetection.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

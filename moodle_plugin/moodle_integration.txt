@@ -1,7 +1,4 @@
 As Admin:
-	Site administration -> Appearance -> Advanced theme settings -> custom menu items:
-		Add ("Scholarwatch | http://localhost:3000")
-
 	Site administration -> General -> Avdvanced features: 
 		Enable (Web Services)
 
@@ -11,31 +8,21 @@ As Admin:
 	Site administration -> Server -> Web services -> External services:
 		Add new service ("Scholarwatch API")
 		Enabled (Yes)
-	
-		After creating, Add functions:
-			core_webservice_get_site_info (to get user info)
-			core_course_get_courses (to fetch courses)
 
-	Site administration -> Server -> Web services -> Manage tokens -> Create Token:
-		Name (Teacher)
-		User (Choose teacher account)
-		Service (Scholarwatch API)
-		Valid until (Disabled)
-		Create & Copy token
+Plugin Steps:
+	Users->Permissions->Define roles: 
+		edit your role and
 
-	Site administration -> Server -> Web services -> Manage tokens -> Create Token:
-		Name (Student)
-		User (Choose student account)
-		Service (Scholarwatch API)
-		Valid until (Disabled)
-		Create & Copy token
+		Context types where this role may be assigned
+		[checkButton] System
 
-Users->Permissions->Define roles: 
-	edit your role and
+	ScholarWatch | /local/scholarwatch/index.php
 
-	Context types where this role may be assigned
-	[checkButton] System
+	Increment the version number every time you change install.xml
 
-ScholarWatch | /local/scholarwatch/index.php
+	Add in /server/moodle/config.php:
+		$CFG->allowframembedding = true;
 
-Increment the version number every time you change install.xml
+	Update \scholarwatch\webapp\.env:
+		REACT_APP_MOODLE_DATA_LECTURES_DIR = "C:/moodlePackage/server/moodledata/local_scholarwatch/lectures/"
+		to your where your /server/moodledata/local_scholarwatch/lectures/ is

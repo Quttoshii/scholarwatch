@@ -11,7 +11,9 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
   const [userAnswers, setUserAnswers] = useState({});
   const [loading, setLoading] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const lecturesDir = process.env.REACT_APP_LECTURES_DIR;
+  // const lecturesDir = process.env.REACT_APP_LECTURES_DIR;
+  const lecturesDir = process.env.REACT_APP_MOODLE_DATA_LECTURES_DIR;
+  // const lecturesDir = "C:/moodlePackage/server/moodledata/local_scholarwatch/lectures/";
   const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
@@ -74,7 +76,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
 
     // console.log(selectedPages);
     const requestBody = {
-      pdf_location: `${lecturesDir}${selectedLecture}`,
+      pdf_location: `${lecturesDir}${selectedLecture}.pdf`,
       page_numbers: selectedPages,
       num_questions: numQuestions,
     };

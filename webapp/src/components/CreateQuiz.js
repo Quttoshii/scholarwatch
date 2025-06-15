@@ -11,9 +11,9 @@ function CreateQuiz({ userID, makeQuiz, setMakeQuiz, numQuestions, setNumQuestio
         const fetchLectures = async () => {
             try {
                 const response = await axios.post(
-                    "http://localhost/scholarwatch/fetchLecture.php",
+                    "http://localhost/local/scholarwatch/api/fetchLecture.php",
                     { userID },
-                    { headers: { "Content-Type": "application/json" } }
+                    { headers: { "Content-Type": "application/json" }, withCredentials: true }
                 );
 
                 if (response.data.success) {
@@ -85,7 +85,7 @@ function CreateQuiz({ userID, makeQuiz, setMakeQuiz, numQuestions, setNumQuestio
                             id="lecture-select"
                             value={selectLecture}
                             onChange={(e) => {
-                                setSelectLecture(e.target.value);
+                                setSelectLecture(e.target.value); 
                                 setSelectedLecture(e.target.value);
                                 setSuccessMessage(null);
                             }}

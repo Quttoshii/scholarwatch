@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Document, Page } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
@@ -13,9 +13,14 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [focusStartTime, setFocusStartTime] = useState(Date.now());
-// console.log("Selected Lecture:", selectedLecture.split('/')[2]);
-  const lecturePath = `http://localhost/scholarwatch/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/')[2])}`;
+  // console.log("Selected Lecture:", selectedLecture.split('/').pop());  
+  // const lecturePath = `http://localhost/local/scholarwatch/api/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/').pop())}.pdf`;
+
   // console.log("Full PDF Path:", lecturePath);
+  const fileObject = useMemo(() => ({
+    url: `http://localhost/local/scholarwatch/api/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/').pop())}.pdf`,
+    withCredentials: true,
+  }), [selectedLecture]);
 
   useEffect(() => {
     if (numPages && pageNumber === numPages) {
@@ -45,7 +50,9 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
       <h3>Lecture Material</h3>
 
       {selectedLecture ? (
-        <Document file={lecturePath} onLoadSuccess={onDocumentLoadSuccess} onLoadError={(error) => console.error('PDF loading error:', error)}>
+        <Document file={fileObject} 
+                      onLoadSuccess={onDocumentLoadSuccess} 
+                      onLoadError={(error) => console.error('PDF loading error:', error)}>
           <Page pageNumber={pageNumber} />
         </Document>
       ) : (

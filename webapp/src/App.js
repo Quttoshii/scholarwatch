@@ -19,6 +19,7 @@ import { ToastContainer } from "react-toastify";
 import WeakAreaAnalysis from './components/WeakAreaAnalysis';
 import TeacherWeakAreaAnalysis from './components/TeacherWeakAreaAnalysis';
 import "react-toastify/dist/ReactToastify.css";
+import useCachedState from './hooks/useCachedState';
 
 import './App.css';
 
@@ -29,13 +30,13 @@ function App() {
   const [userID, setUserID] = useState('');
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
-  const [makeQuiz, setMakeQuiz] = useState(false);
-  const [takeQuiz, setTakeQuiz] = useState(false);
-  const [numQuestions, setNumQuestions] = useState(1);
-  const [selectedLecture, setSelectedLecture] = useState('');
+  const [makeQuiz, setMakeQuiz] = useCachedState("makeQuiz", false);
+  const [takeQuiz, setTakeQuiz] = useCachedState("takeQuiz", false);
+  const [numQuestions, setNumQuestions] = useCachedState("numQuestions", 4);
+  const [selectedLecture, setSelectedLecture] = useCachedState("selectedLecture", "");
   const [pageNumbers, setPageNumbers] = useState([]);
-  const [emotionResults, setEmotionResults] = useState({ awake_time: 0, drowsy_time: 0 });
-  const [postureResults, setPostureResults] = useState({
+  const [emotionResults, setEmotionResults] = useCachedState("emotionResults", { awake_time: 0, drowsy_time: 0 });
+  const [postureResults, setPostureResults] = useCachedState("postureResults", {
     total_time: 0,
     good_posture_time: 0,
     phone_use_time: 0,
@@ -44,10 +45,10 @@ function App() {
     looking_left_time: 0,
     slouching_time: 0
   });
-  const [gazeResults, setGazeResults] = useState({ focused_time: 0, unfocused_time: 0 });
+  const [gazeResults, setGazeResults] = useCachedState("gazeResults", { focused_time: 0, unfocused_time: 0 });
   const [isCalibrated, setIsCalibrated] = useState(false);
-  const [invalidationCount, setInvalidationCount] = useState([]);
-  const [weakAreas, setWeakAreas] = useState({});
+  const [invalidationCount, setInvalidationCount] = useCachedState("invalidationCount", []);
+  const [weakAreas, setWeakAreas] = useCachedState("weakAreas", {});
   const [loading, setLoading] = useState(true);
 
   const incrementInvalidationCount = () => {
@@ -84,7 +85,7 @@ function App() {
   if (loading) return <div className="loading">Loading user info...</div>;
   if (!userType || !userID) {
     if (!loggingOut) {
-      return <div className="error">User info missing or invalid. Please access via Moodle.</div>;
+      return <div className="error"  style={{ padding: '2rem', textAlign: 'center', fontSize: '1.5rem' }}>User info missing or invalid. Please access via Moodle.</div>;
     } else {
       return<div className="logout-message" style={{ padding: '2rem', textAlign: 'center', fontSize: '1.5rem' }}>
       Logging out of ScholarWatch... Please wait.

@@ -10,7 +10,7 @@ const LiveFeed = ({ setEmotionResults }) => {
   const startEmotionDetection = async () => {
     setIsDetecting(true);
     try {
-      const response = await axios.post('http://localhost:8000/start_detection/');
+      const response = await axios.post('http://localhost:8003/start_detection/');
       // console.log("Start Detection Response:", response.data);
     } catch (error) {
       console.error("Error starting detection:", error);
@@ -20,7 +20,7 @@ const LiveFeed = ({ setEmotionResults }) => {
 
   const stopEmotionDetection = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/stop_detection/');
+      const response = await axios.post('http://localhost:8003/stop_detection/');
       // console.log("Stop Detection Response:", response.data);
       setEmotionResults(response.data.results); // Update results here
       // console.log(response.data.results);
