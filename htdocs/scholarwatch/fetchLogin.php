@@ -1,12 +1,12 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:3000"); // Allow requests from React app's origin
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Specify allowed request methods
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Specify allowed headers
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization"); 
 header("Content-Type: application/json");
 
 include 'includes/db.php';
 
-// Read JSON input data
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 try {
@@ -33,16 +33,16 @@ try {
                 $response['userID'] = $user['userID'];
                 $response['userName'] = $user['name'];
             } else {
-                $response['error'] = "invalid_password"; // Incorrect password
+                $response['error'] = "invalid_password"; 
             }
         } else {
-            $response['error'] = "invalid_email"; // Invalid email
+            $response['error'] = "invalid_email";
         }
 
         echo json_encode($response);
     } else {
-        echo json_encode(["error" => "Invalid input"]); // Missing email or password
+        echo json_encode(["error" => "Invalid input"]); 
     }
 } catch (PDOException $e) {
-    echo json_encode(["error" => $e->getMessage()]); // Database error
+    echo json_encode(["error" => $e->getMessage()]); 
 }

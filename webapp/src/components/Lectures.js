@@ -1,120 +1,168 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import GazeTracking from './GazeTracking';
 import PDFViewer from './PDFViewer';
-import { toast } from "react-toastify";
+import KnowledgeGraph from './KnowledgeGraph';
+import './Lectures.css';
+import axios from 'axios';
 
-function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, setTakeQuiz, selectedLecture, setPageNumbers }) {
-  const [cameraPermission, setCameraPermission] = useState(true);
-  const [focusTimes, setFocusTimes] = useState({});
-  const [unfocusTimes, setUnfocusTimes] = useState({});
-  const lecturesRef = useRef(null);
+function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, setTakeQuiz, selectedLecture, setSelectedLecture, setPageNumbers, isInstructor, userID, userType }) {
+    const [cameraPermission, setCameraPermission] = useState(true);
+    const [focusTimes, setFocusTimes] = useState({});
+    const [unfocusTimes, setUnfocusTimes] = useState({});
+    const [activeTab, setActiveTab] = useState('lectures');
+    const lecturesRef = useRef(null);
+    const [lectures, setLectures] = useState([]);
+    const [selectedLectureId, setSelectedLectureId] = useState(null);
 
-  useEffect(() => {;
-    const checkCameraSupport = () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraPermission(false);
-      }
+    useEffect(() => {
+        const fetchLectures = async () => {
+            try {
+                const response = await axios.post(
+                    "http://localhost/local/scholarwatch/api/fetchLecture.php",
+                    { userID },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+
+                if (response.data.success) {
+                    setLectures(response.data.data);
+                    console.log('Fetched lectures:', response.data.data);
+                } else {
+                    console.error("Error fetching lectures:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+
+        fetchLectures();
+    }, [userID]);
+
+    useEffect(() => {;
+        const checkCameraSupport = () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            setCameraPermission(false);
+        }
+        };
+
+        checkCameraSupport();
+    }, []);
+
+    useEffect(() => {
+        console.log('lectures:', lectures);
+        console.log('selectedLecture:', selectedLecture);
+        console.log('selectedLectureId:', selectedLectureId);
+    }, [lectures, selectedLecture, selectedLectureId]);
+
+    const handleGazeData = (focusTime, unfocusTime, currentPage) => {
+        setFocusTimes(prev => ({
+            ...prev,
+            [currentPage]: (prev[currentPage] || 0) + focusTime
+        }));
+        setUnfocusTimes(prev => ({
+            ...prev,
+            [currentPage]: (prev[currentPage] || 0) + unfocusTime
+        }));
+        // Do NOT call setGazeResults here to avoid infinite loop
     };
 
-    checkCameraSupport();
-  }, []);
+    const handleLectureFinish = () => {
+        // Compute total focus and unfocus time
+        const totalFocusTime = Object.values(focusTimes).reduce((acc, time) => acc + time, 0);
+        const totalUnfocusTime = Object.values(unfocusTimes).reduce((acc, time) => acc + time, 0);
+        
+        // console.log("Sorted pages based on unfocus time:", sortedPages);
+        if (makeQuiz) {
+            setTakeQuiz(true);
+        }
+    };
 
-  useEffect(() => {
-    if (makeQuiz) {
-      toast.warn("There will be a quiz for this lecture. After finishing, go to Quizzes to take it.")
-    }
-  }, [makeQuiz]);
+    const handleLectureSelect = (lectureId) => {
+        setSelectedLectureId(lectureId);
+        const lecture = lectures.find(l => l.lectureID === lectureId || l.LectureID === lectureId);
+        if (lecture) {
+            setSelectedLecture({ name: lecture.lectureName || lecture.LectureName, path: lecture.directoryPath || lecture.DirectoryPath });
+        }
+    };
 
-  const handleGazeData = (focusTime, unfocusTime, currentPage) => {
-    // console.log(`GazeTracking Data: Page ${currentPage}, Focus Time: ${focusTime}, Unfocus Time: ${unfocusTime}`);
-    
-    setFocusTimes((prev) => {
-      const newFocusTimes = { ...prev, [currentPage]: (prev[currentPage] || 0) + focusTime };
-      // console.log("Updated Focus Times:", newFocusTimes);
-      return newFocusTimes;
-    });
-    
-    setUnfocusTimes((prev) => {
-      const newUnfocusTimes = { ...prev, [currentPage]: (prev[currentPage] || 0) + unfocusTime };
-      // console.log("Updated Unfocus Times:", newUnfocusTimes);
-      return newUnfocusTimes;
-    });
-  };
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'lectures':
+                return (
+                    <div className="lectures-content">
+                        {lectures.length > 0 ? (
+                            <div>
+                                <label htmlFor="lecture-select" style={{ fontWeight: 700, color: '#2C1810', fontSize: '1.12rem', marginBottom: '8px', display: 'inline-block' }}>Select Lecture: </label>
+                                <select
+                                    id="lecture-select"
+                                    value={selectedLectureId || ""}
+                                    onChange={(e) => handleLectureSelect(parseInt(e.target.value))}
+                                    style={{ padding: '10px 16px', borderRadius: '8px', border: '2px solid #ffe5b4', margin: '0 0 18px 12px', fontSize: '1rem', outline: 'none', width: '60%', marginBottom: '18px' }}
+                                >
+                                    <option value="">-- Select a lecture --</option>
+                                    {lectures.map((lecture) => (
+                                        <option key={lecture.lectureID || lecture.LectureID} value={lecture.lectureID || lecture.LectureID}>
+                                            {lecture.lectureName || lecture.LectureName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : null}
 
-  const handleLectureFinish = () => {
-    // Compute total focus and unfocus time
-    const totalFocusTime = Object.values(focusTimes).reduce((acc, time) => acc + time, 0);
-    const totalUnfocusTime = Object.values(unfocusTimes).reduce((acc, time) => acc + time, 0);
+                        {lectures.length > 0 && selectedLecture && selectedLecture.path ? (
+                            <>
+                                <div className="current-lecture-banner">
+                                    <span role="img" aria-label="book" style={{ marginRight: 8 }}>📖</span>
+                                    <span>Currently Attending: <strong>{selectedLecture.name}</strong></span>
+                                </div>
+                                {cameraPermission === false && (
+                                    <p className="camera-warning">Please allow access to your camera to use gaze tracking.</p>
+                                )}
 
-    // console.log(`Total Focus Time: ${totalFocusTime}`);
-    // console.log(`Total Unfocus Time: ${totalUnfocusTime}`);
+                                {cameraPermission === true && (
+                                    <GazeTracking 
+                                        isCalibrated={isCalibrated} 
+                                        setIsCalibrated={setIsCalibrated} 
+                                        lecturesRef={lecturesRef}
+                                        setGazeResults={handleGazeData}
+                                    />
+                                )}
 
-    // Sort page numbers by highest unfocusTime first
-    const sortedPages = Object.keys(unfocusTimes)
-      .map((page) => ({ page: parseInt(page), unfocusTime: unfocusTimes[page] }))
-      .sort((a, b) => b.unfocusTime - a.unfocusTime)
-      .map((entry) => entry.page);
+                                {isCalibrated ? (
+                                    <PDFViewer 
+                                        setTakeQuiz={setTakeQuiz} 
+                                        selectedLecture={selectedLecture} 
+                                        onLectureFinish={handleLectureFinish}
+                                        onPageGazeData={handleGazeData}
+                                    />
+                                ) : (
+                                    <p className="calibration-warning">Please complete calibration before starting the lecture.</p>
+                                )}
+                            </>
+                        ) : lectures.length > 0 && !selectedLecture?.path ? (
+                            <p className="no-lectures">No lecture selected.</p>
+                        ) : null}
+                    </div>
+                );
 
-    setPageNumbers(sortedPages);
+            case 'knowledge-graph':
+                return (
+                    <div className="knowledge-graph-container">
+                        <KnowledgeGraph courseId={1} isTeacher={userType === 'Teacher'} teacherId={userType === 'Teacher' ? userID : undefined} studentId={userType === 'Student' ? userID : undefined} />
+                    </div>
+                );
 
-    console.log("Sorted pages based on unfocus time:", sortedPages);
+            default:
+                return null;
+        }
+    };
 
-    // Send final gaze data when lecture is completed
-    sendGazeDataToServer(totalFocusTime, totalUnfocusTime);
-  };
-
-  const sendGazeDataToServer = async (totalFocusTime, totalUnfocusTime) => {
-    try {
-      const response = await fetch('http://localhost/local/scholarwatch/api/insertGazeTracking.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ FocusTime: totalFocusTime, UnfocusTime: totalUnfocusTime }),
-      });
-
-      const data = await response.json(); 
-      // console.log('Server Response:', data);
-    } catch (error) {
-      console.error('Error sending gaze tracking data:', error);
-    }
-  };
-
-  return (
-    <div className="lectures-container" ref={lecturesRef}>
-      <div className="lectures-content">
-        <h2>Lectures</h2>
-
-        {selectedLecture === "" ? (
-          <p style={{ color: 'gray' }}>No lectures to attend.</p>
-        ) : (
-          <>
-            {cameraPermission === false && (
-              <p style={{ color: 'red' }}>Please allow access to your camera to use gaze tracking.</p>
-            )}
-
-            {cameraPermission === true && (
-              <GazeTracking 
-                isCalibrated={isCalibrated} 
-                setIsCalibrated={setIsCalibrated} 
-                lecturesRef={lecturesRef}
-                setGazeResults={handleGazeData}
-              />
-            )}
-
-            {isCalibrated ? (
-              <PDFViewer 
-                setTakeQuiz={setTakeQuiz} 
-                selectedLecture={selectedLecture} 
-                onLectureFinish={handleLectureFinish}
-                onPageGazeData={handleGazeData}
-              />
-            ) : (
-              <p style={{ color: 'orange' }}>Please complete calibration before starting the lecture.</p>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
+    return (
+        <div className="lectures-page" ref={lecturesRef}>
+            <div className="content" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                {renderContent()}
+            </div>
+        </div>
+    );
 }
 
 export default Lectures;

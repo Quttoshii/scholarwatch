@@ -18,7 +18,7 @@
  -- FLUSH PRIVILEGES;
 
 
--- CREATE SCHEMA `scholarwatch` ;
+ -- CREATE SCHEMA `scholarwatch` ;
 
 use scholarwatch;
 SET NAMES utf8mb4;
@@ -165,7 +165,7 @@ CREATE TABLE `PostureDetection` (
   PRIMARY KEY (`PostureDetectionID`),
   KEY `SessionID` (`SessionID`),
   CONSTRAINT `posturedetection_ibfk_1` FOREIGN KEY (`SessionID`) REFERENCES `Session` (`SessionID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Dumping data for table `PostureDetection`
@@ -431,3 +431,154 @@ VALUES
 (3, 1.2, 0.8, 1.8, 0.7), 
 (4, 2.5, 0.3, 2.1, 0.6), 
 (5, 1.8, 0.6, 2.3, 0.4);
+
+-- ----------------------------
+-- Knowledge Graph Tables
+-- ----------------------------
+DROP TABLE IF EXISTS `KnowledgeGraph`;
+CREATE TABLE `KnowledgeGraph` (
+  `GraphID` int NOT NULL AUTO_INCREMENT,
+  `CourseID` int NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `Description` text,
+  `CreatedAt` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`GraphID`),
+  FOREIGN KEY (`CourseID`) REFERENCES `Course` (`CourseID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `KnowledgeNode`;
+CREATE TABLE `KnowledgeNode` (
+  `NodeID` int NOT NULL AUTO_INCREMENT,
+  `GraphID` int NOT NULL,
+  `LectureID` int,
+  `Name` varchar(255) NOT NULL,
+  `Type` enum('LECTURE', 'TOPIC', 'CONCEPT') NOT NULL,
+  `Description` text,
+  `PositionX` float,
+  `PositionY` float,
+  `Status` ENUM('LOCKED', 'UNLOCKED', 'COMPLETED') NOT NULL DEFAULT 'LOCKED',
+  PRIMARY KEY (`NodeID`),
+  FOREIGN KEY (`GraphID`) REFERENCES `KnowledgeGraph` (`GraphID`),
+  FOREIGN KEY (`LectureID`) REFERENCES `Lecture` (`LectureID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `KnowledgeEdge`;
+CREATE TABLE `KnowledgeEdge` (
+  `EdgeID` int NOT NULL AUTO_INCREMENT,
+  `GraphID` int NOT NULL,
+  `SourceNodeID` int NOT NULL,
+  `TargetNodeID` int NOT NULL,
+  `Type` enum('PREREQUISITE', 'RELATED_TO', 'PART_OF') NOT NULL,
+  `Weight` float DEFAULT 1.0,
+  PRIMARY KEY (`EdgeID`),
+  FOREIGN KEY (`GraphID`) REFERENCES `KnowledgeGraph` (`GraphID`),
+  FOREIGN KEY (`SourceNodeID`) REFERENCES `KnowledgeNode` (`NodeID`),
+  FOREIGN KEY (`TargetNodeID`) REFERENCES `KnowledgeNode` (`NodeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+-- Dummy data for Computer Science Course Knowledge Graph
+INSERT INTO `KnowledgeGraph` (`GraphID`, `CourseID`, `Name`, `Description`, `CreatedAt`) VALUES
+(1, 1, 'Computer Science Knowledge Graph', 'Complete knowledge graph for Computer Science course', NOW()),
+(2, 2, 'Mathematics Knowledge Graph', 'Complete knowledge graph for Mathematics course', NOW());
+
+-- Computer Science Lectures (well-connected)
+INSERT INTO `KnowledgeNode` (`NodeID`, `GraphID`, `LectureID`, `Name`, `Type`, `Description`, `PositionX`, `PositionY`, `Status`) VALUES
+(1, 1, 1, 'Introduction to Programming', 'LECTURE', 'Basic programming concepts and syntax', 100, 100, 'COMPLETED'),
+(2, 1, 2, 'Variables and Data Types', 'LECTURE', 'Understanding different data types and variables', 250, 100, 'UNLOCKED'),
+(3, 1, 3, 'Control Structures', 'LECTURE', 'Loops and conditional statements', 400, 100, 'LOCKED'),
+(4, 1, 4, 'Arrays and Lists', 'LECTURE', 'Working with arrays and list data structures', 550, 100, 'LOCKED'),
+(5, 1, 5, 'Functions and Methods', 'LECTURE', 'Creating and using functions', 700, 100, 'LOCKED'),
+(11, 1, 11, 'Object-Oriented Programming', 'LECTURE', 'Introduction to OOP concepts', 850, 100, 'LOCKED');
+
+-- Prerequisite relationships for Computer Science
+INSERT INTO `KnowledgeEdge` (`EdgeID`, `GraphID`, `SourceNodeID`, `TargetNodeID`, `Type`, `Weight`) VALUES
+(1, 1, 1, 2, 'PREREQUISITE', 1.0),
+(2, 1, 2, 3, 'PREREQUISITE', 1.0),
+(3, 1, 3, 4, 'PREREQUISITE', 1.0),
+(4, 1, 4, 5, 'PREREQUISITE', 1.0);
+
+-- Mathematics Lectures (well-connected)
+INSERT INTO `KnowledgeNode` (`NodeID`, `GraphID`, `LectureID`, `Name`, `Type`, `Description`, `PositionX`, `PositionY`, `Status`) VALUES
+(6, 2, 6, 'Basic Algebra', 'LECTURE', 'Introduction to algebraic expressions', 100, 100, 'COMPLETED'),
+(7, 2, 7, 'Linear Equations', 'LECTURE', 'Solving linear equations', 250, 100, 'UNLOCKED'),
+(8, 2, 8, 'Quadratic Equations', 'LECTURE', 'Solving quadratic equations', 400, 100, 'LOCKED'),
+(9, 2, 9, 'Functions', 'LECTURE', 'Understanding mathematical functions', 550, 100, 'LOCKED'),
+(10, 2, 10, 'Derivatives', 'LECTURE', 'Introduction to calculus', 700, 100, 'LOCKED');
+
+-- Prerequisite relationships for Mathematics
+INSERT INTO `KnowledgeEdge` (`EdgeID`, `GraphID`, `SourceNodeID`, `TargetNodeID`, `Type`, `Weight`) VALUES
+(5, 2, 6, 7, 'PREREQUISITE', 1.0),
+(6, 2, 7, 8, 'PREREQUISITE', 1.0),
+(7, 2, 8, 9, 'PREREQUISITE', 1.0),
+(8, 2, 9, 10, 'PREREQUISITE', 1.0);
+
+-- Migration for existing data
+UPDATE KnowledgeNode SET Status = 'UNLOCKED' WHERE Status = 'IN_PROGRESS';
+
+-- Table to track each student's status for each lecture node
+CREATE TABLE IF NOT EXISTS StudentLectureStatus (
+    StudentID INT NOT NULL,
+    NodeID INT NOT NULL,
+    Status ENUM('LOCKED', 'UNLOCKED', 'COMPLETED') NOT NULL DEFAULT 'LOCKED',
+    PRIMARY KEY (StudentID, NodeID),
+    FOREIGN KEY (StudentID) REFERENCES user(UserID),
+    FOREIGN KEY (NodeID) REFERENCES KnowledgeNode(NodeID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- On student registration or first access, initialize their statuses for all nodes in the course (all LOCKED except the first node(s), which can be UNLOCKED)
+
+-- Dummy data for StudentLectureStatus for Computer Science (CourseID=1, GraphID=1, NodeIDs 1-5, 11)
+INSERT INTO StudentLectureStatus (StudentID, NodeID, Status) VALUES
+(3, 1, 'UNLOCKED'), -- First node unlocked for student 3
+(3, 2, 'LOCKED'),
+(3, 3, 'LOCKED'),
+(3, 4, 'LOCKED'),
+(3, 5, 'LOCKED'),
+(3, 11, 'LOCKED'),
+(4, 1, 'UNLOCKED'), -- First node unlocked for student 4
+(4, 2, 'LOCKED'),
+(4, 3, 'LOCKED'),
+(4, 4, 'LOCKED'),
+(4, 5, 'LOCKED'),
+(4, 11, 'LOCKED');
+
+-- Dummy data for StudentLectureStatus for Mathematics (CourseID=2, GraphID=2, NodeIDs 6-10)
+INSERT INTO StudentLectureStatus (StudentID, NodeID, Status) VALUES
+(3, 6, 'UNLOCKED'),
+(3, 7, 'LOCKED'),
+(3, 8, 'LOCKED'),
+(3, 9, 'LOCKED'),
+(3, 10, 'LOCKED'),
+(4, 6, 'UNLOCKED'),
+(4, 7, 'LOCKED'),
+(4, 8, 'LOCKED'),
+(4, 9, 'LOCKED'),
+(4, 10, 'LOCKED');
+
+
+
+CREATE TABLE IF NOT EXISTS attendance (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    lecture_id INT NOT NULL,
+    session_id INT NOT NULL,
+    status ENUM('present', 'absent') NOT NULL,
+    presence_score FLOAT NOT NULL,
+    total_time INT NOT NULL,
+    focused_time INT NOT NULL,
+    unfocused_time INT NOT NULL,
+    awake_time INT NOT NULL,
+    drowsy_time INT NOT NULL,
+    good_posture_time INT NOT NULL,
+    slouching_time INT NOT NULL,
+    phone_use_time INT NOT NULL,
+    no_person_time INT NOT NULL,
+    looking_right_time INT NOT NULL,
+    looking_left_time INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES user(userID),
+    FOREIGN KEY (lecture_id) REFERENCES lecture(lectureID),
+    FOREIGN KEY (session_id) REFERENCES session(sessionID)
+); 

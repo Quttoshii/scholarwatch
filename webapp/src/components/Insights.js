@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Pie, Line, Bar, Bubble } from 'react-chartjs-2'; 
 
 import {
@@ -62,6 +62,12 @@ const Insights = ({
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [attendance, setAttendance] = useState({ present: 0, absent: 0 });
 
+  // THEME COLORS
+  const THEME_ORANGE = '#f6a523';
+  const THEME_DARK = '#2C1810';
+  const THEME_GOLD = '#ffe5b4';
+  const THEME_PEACH = '#fffbe9';
+
   useEffect(() => {
     fetch('http://localhost/local/scholarwatch/api/fetchTeacherInsights.php', {
       credentials: 'include',
@@ -95,23 +101,22 @@ const Insights = ({
       {
         label: 'English',
         data: [15, 20, 25, 18, 22],
-        borderColor: '#0671B7',
-        backgroundColor: '#0671B7',
-        fill: false,
+        borderColor: THEME_ORANGE,
+        backgroundColor: 'rgba(246, 165, 35, 0.18)',
+        fill: true,
       },
       {
         label: 'History',
         data: [10, 18, 20, 15, 17],
-        borderColor: '#e64072',
-        backgroundColor: '#e64072',
-        fill: false,
+        borderColor: THEME_DARK,
+        backgroundColor: 'rgba(44, 24, 16, 0.13)',
+        fill: true,
       },
     ],
   };
 
-  // Updated quiz data to be arrays of scores for box and whisker plot
   const quizData = {
-    1: [60, 65, 75, 80, 90], // Example quiz scores
+    1: [60, 65, 75, 80, 90],
     2: [70, 75, 80, 85, 92],
   };
 
@@ -120,8 +125,8 @@ const Insights = ({
     datasets: [
       {
         data: [25, 15],
-        backgroundColor: ['#0671B7', '#e64072'],
-        borderColor: ['#0671B7', '#e64072'],
+        backgroundColor: [THEME_ORANGE, THEME_GOLD],
+        borderColor: [THEME_ORANGE, THEME_GOLD],
         borderWidth: 1,
       },
     ],
@@ -133,11 +138,11 @@ const Insights = ({
       data: [
         {
           name: 'Awake',
-          value: emotionResults.awake_time,
+          value: data.emotions?.awake_time ?? emotionResults.awake_time,
         },
         {
           name: 'Drowsy',
-          value: emotionResults.drowsy_time,
+          value: data.emotions?.drowsy_time ?? emotionResults.drowsy_time,
         },
       ],
       chartType: 'bar',
@@ -147,11 +152,11 @@ const Insights = ({
       data: [
         {
           name: 'Focused',
-          value: gazeResults.focused_time,
+          value: data.attention?.focused_time ?? gazeResults.focused_time,
         },
         {
           name: 'Unfocused',
-          value: gazeResults.unfocused_time,
+          value: data.attention?.unfocused_time ?? gazeResults.unfocused_time,
         },
       ],
       chartType: 'doughnut',
@@ -165,8 +170,8 @@ const Insights = ({
       {
         label: 'Time (minutes)',
         data: data.map((d) => d.value),
-        backgroundColor: ['#0671B7', '#e64072'],
-        borderColor: ['#0671B7', '#e64072'],
+        backgroundColor: [THEME_ORANGE, THEME_GOLD],
+        borderColor: [THEME_ORANGE, THEME_GOLD],
         borderWidth: 1,
       },
     ],
@@ -178,14 +183,13 @@ const Insights = ({
       {
         label: 'Average Time (minutes)',
         data: slideData[selectedCourse],
-        backgroundColor: '#0671B7',
-        borderColor: '#0671B7',
-        borderWidth: 1,
+        backgroundColor: THEME_ORANGE,
+        borderColor: THEME_ORANGE,
+        borderWidth: 2,
       },
     ],
   };
 
-  // Update attendance when selectedCourse or selectedDate changes
   useEffect(() => {
     const dateString = selectedDate.toISOString().split('T')[0];
     const courseAttendanceData = attendanceData[selectedCourse] || {};
@@ -196,302 +200,163 @@ const Insights = ({
 
   const selectedQuizData = quizData[selectedQuiz];
 
+  // --- Dashboard Cards Data ---
+  const statsCards = useMemo(() => [
+    { label: 'Total Courses', value: 2 }, // TODO: Make dynamic if you have course count
+    { label: 'Total Students', value: data.totalStudents },
+    { label: 'Total Lectures', value: data.totalLectures },
+    { label: 'Quiz Invalidations', value: data.invalidationCount },
+  ], [data]);
+
+  // --- Dynamic Pie Chart: Viewed vs Not Viewed Lectures ---
+  const lectureViewPieData = useMemo(() => ({
+    labels: ['Viewed Lectures', 'Not Viewed'],
+    datasets: [
+      {
+        data: [25, 15], // TODO: Replace with dynamic value
+        backgroundColor: [THEME_ORANGE, THEME_GOLD],
+        borderColor: [THEME_ORANGE, THEME_GOLD],
+        borderWidth: 1,
+      },
+    ],
+  }), [THEME_ORANGE, THEME_GOLD]);
+
+  // --- Dynamic Bar Chart: Quiz Scores ---
+  const quizScoreData = useMemo(() => ({
+    labels: ['Quiz 1', 'Quiz 2', 'Quiz 3', 'Quiz 4', 'Quiz 5'],
+    datasets: [
+      {
+        label: 'Quiz Scores',
+        data: [60, 65, 75, 80, 90], // TODO: Replace with dynamic values
+        backgroundColor: THEME_ORANGE,
+        borderColor: THEME_ORANGE,
+        borderWidth: 1,
+      },
+    ],
+  }), [THEME_ORANGE]);
+
+  // --- Dynamic Doughnut Chart: Attention ---
+  const attentionDoughnutData = useMemo(() => ({
+    labels: ['Focused', 'Unfocused'],
+    datasets: [
+      {
+        data: [data.attention?.focused_time ?? 0, data.attention?.unfocused_time ?? 0],
+        backgroundColor: [THEME_ORANGE, THEME_GOLD],
+        borderWidth: 1,
+      },
+    ],
+  }), [data.attention, THEME_ORANGE, THEME_GOLD]);
+
+  // --- Dynamic Bar Chart: Emotions ---
+  const emotionBarData = useMemo(() => ({
+    labels: ['Awake', 'Drowsy'],
+    datasets: [
+      {
+        label: 'Time (minutes)',
+        data: [data.emotions?.awake_time ?? 0, data.emotions?.drowsy_time ?? 0],
+        backgroundColor: [THEME_ORANGE, THEME_GOLD],
+        borderColor: [THEME_ORANGE, THEME_GOLD],
+        borderWidth: 1,
+      },
+    ],
+  }), [data.emotions, THEME_ORANGE, THEME_GOLD]);
+
+  // --- Dynamic Line Chart: Average Time Spent Reading Lectures ---
+  const averageTimeLineData = useMemo(() => ({
+    labels: ['January', 'February', 'March', 'April', 'June'],
+    datasets: [
+      {
+        label: 'English',
+        data: [15, 20, 25, 18, 22], // TODO: Replace with dynamic values
+        borderColor: THEME_ORANGE,
+        backgroundColor: 'rgba(246, 165, 35, 0.18)',
+        fill: true,
+      },
+      {
+        label: 'History',
+        data: [10, 18, 20, 15, 17], // TODO: Replace with dynamic values
+        borderColor: THEME_DARK,
+        backgroundColor: 'rgba(44, 24, 16, 0.13)',
+        fill: true,
+      },
+    ],
+  }), [THEME_ORANGE, THEME_DARK]);
+
+  // Add this style object for chart containers
+  const chartContainerStyle = {
+    height: '260px',
+    maxHeight: '260px',
+    minHeight: '220px',
+    width: '100%',
+    margin: '0 auto',
+  };
+
   return (
-    <div>
-      <h2>Insights Dashboard</h2>
-
-      <div className="dropdown-container">
-        <label htmlFor="courseSelect">Select Course: </label>
-        <select
-          id="courseSelect"
-          value={selectedCourse}
-          onChange={(e) => setSelectedCourse(e.target.value)}
-        >
-          <option value="English">English</option>
-          <option value="History">History</option>
-        </select>
-      </div>
-
-      <div className="dashboard-grid">
-        <div className="top-section">
-          <div className="dashboard-card">
-            <h3>Lecture Views</h3>
-            <div className="chart-container">
-              <Pie
-                data={lectureViewData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { position: 'top' } },
-                }}
-              />
+    <div style={{ background: THEME_PEACH, minHeight: '100vh', padding: '32px 0' }}>
+      <h2 style={{ color: THEME_DARK, fontWeight: 800, fontSize: '2rem', marginBottom: '32px', letterSpacing: '1px', textAlign: 'center' }}>Insights Dashboard</h2>
+      <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '4fr 1fr', gap: '32px', alignItems: 'flex-start', padding: '0 24px' }}>
+        <div className="main-charts" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '32px' }}>
+          {/* Pie: Viewed vs Not Viewed Lectures */}
+          <div className="dashboard-card" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '22px', textAlign: 'center' }}>
+            <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>Lecture Views</h3>
+            <div className="chart-container" style={chartContainerStyle}>
+              <Pie data={lectureViewPieData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: THEME_DARK, font: { weight: 600 } } } } }} />
             </div>
           </div>
-
-          {insights.map((insight, index) => (
-            <div key={index} className="dashboard-card">
-              <h3>{insight.title}</h3>
-              <div className="chart-container">
-                {insight.chartType === 'bar' ? (
-                  <Bar
-                    data={createChartData(insight.data)}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: { legend: { display: false } },
-                      scales: {
-                        x: { grid: { display: false } },
-                        y: {
-                          grid: { display: false },
-                          beginAtZero: true,
-                          ticks: { display: false },
-                        },
-                      },
-                    }}
-                  />
-                ) : (
-                  <Pie
-                    data={createChartData(insight.data)}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: { legend: { position: 'top' } },
-                      cutout: '50%',
-                    }}
-                  />
-                )}
-              </div>
+          {/* Bar: Quiz Scores */}
+          <div className="dashboard-card" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '22px', textAlign: 'center' }}>
+            <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>Quiz Scores</h3>
+            <div className="chart-container" style={chartContainerStyle}>
+              <Bar data={quizScoreData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: THEME_DARK } } }, scales: { x: { grid: { display: false }, title: { display: true, text: 'Quizzes', color: THEME_DARK } }, y: { grid: { display: false }, beginAtZero: true, title: { display: true, text: 'Scores', color: THEME_DARK } } } }} />
+            </div>
+          </div>
+          {/* Doughnut: Attention */}
+          <div className="dashboard-card" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '22px', textAlign: 'center' }}>
+            <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>Attention</h3>
+            <div className="chart-container" style={chartContainerStyle}>
+              <Pie data={attentionDoughnutData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: THEME_DARK } } }, cutout: '50%' }} />
+            </div>
+          </div>
+          {/* Bar: Emotions */}
+          <div className="dashboard-card" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '22px', textAlign: 'center' }}>
+            <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>Emotions</h3>
+            <div className="chart-container" style={chartContainerStyle}>
+              <Bar data={emotionBarData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: THEME_DARK } }, y: { grid: { display: false }, beginAtZero: true, ticks: { color: THEME_DARK } } } }} />
+            </div>
+          </div>
+          {/* Line: Average Time Spent Reading Lectures */}
+          <div className="dashboard-card wide-chart" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '22px', textAlign: 'center', gridColumn: 'span 2' }}>
+            <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>Average Time Spent Reading Lectures</h3>
+            <div className="chart-container" style={chartContainerStyle}>
+              <Line data={averageTimeLineData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: THEME_DARK } } }, scales: { x: { grid: { display: false }, title: { display: true, text: 'Months', color: THEME_DARK } }, y: { grid: { display: false }, beginAtZero: true, title: { display: true, text: 'Minutes', color: THEME_DARK } } } }} />
+            </div>
+          </div>
+          {/* Attendance Section */}
+          <div className="dashboard-card" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '22px', textAlign: 'center' }}>
+            <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>Attendance</h3>
+            <label style={{ color: THEME_DARK, fontWeight: 600, marginBottom: '8px' }}>Select Date:</label>
+            <input
+              type="date"
+              value={selectedDate.toISOString().split('T')[0]}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              style={{ padding: '8px 14px', border: `1.5px solid ${THEME_ORANGE}`, borderRadius: '6px', fontSize: '1rem', background: '#fff', color: THEME_DARK, fontWeight: 500, marginBottom: '10px' }}
+            />
+            <div className="attendance-numbers" style={{ marginTop: '10px' }}>
+              <p style={{ color: THEME_DARK, fontWeight: 700 }}>Present Students: {attendance.present}</p>
+              <p style={{ color: THEME_DARK, fontWeight: 700 }}>Absent Students: {attendance.absent}</p>
+            </div>
+          </div>
+        </div>
+        {/* Stats Cards */}
+        <div className="right-section" style={{ display: 'grid', gap: '18px', alignContent: 'start' }}>
+          {statsCards.map((card, idx) => (
+            <div key={idx} className="dashboard-card compact-card" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '16px', textAlign: 'center', fontSize: '1rem' }}>
+              <h3 style={{ color: THEME_DARK, fontWeight: 700, fontSize: '1rem', marginBottom: '8px' }}>{card.label}</h3>
+              <p style={{ color: THEME_ORANGE, fontWeight: 700, fontSize: '1.1rem' }}>{card.value}</p>
             </div>
           ))}
-
-          {/* Attendance Section */}
-          <div className="dashboard-card">
-            <h3>Attendance</h3>
-            <div className="attendance-container">
-              <label>Select Date: </label>
-              <input
-                type="date"
-                value={selectedDate.toISOString().split('T')[0]}
-                onChange={(e) => setSelectedDate(new Date(e.target.value))}
-              />
-              <div className="attendance-numbers">
-                <p>Present Students: {attendance.present}</p>
-                <p>Absent Students: {attendance.absent}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="right-section">
-          <div className="dashboard-card compact-card">
-            <h3>Total Courses:</h3>
-            <p className="compact-card-font">2</p>
-          </div>
-
-          <div className="dashboard-card compact-card">
-            <h3>Total Enrolled Students</h3>
-            <p className="compact-card-font">{data.totalStudents}</p>
-          </div>
-
-          <div className="dashboard-card compact-card">
-            <h3>Total Uploaded Lectures:</h3>
-            <p className="compact-card-font">2</p>
-          </div>
-
-          <div className="dashboard-card compact-card">
-            <h3>Quiz Invalidations</h3>
-            <p className="compact-card-font">1</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card middle-section">
-          <h3>Average Time Spent on Each Lecture</h3>
-          <div className="chart-container bar-chart">
-            <Bar
-              data={averageTimePerSlideData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                  x: {
-                    grid: { display: false },
-                    title: { display: true, text: 'Lecture' },
-                  },
-                  y: {
-                    grid: { display: false },
-                    beginAtZero: true,
-                    title: { display: true, text: 'Average Time (minutes)' },
-                  },
-                },
-              }}
-            />
-          </div>
-        </div>
-
-        {/* QUIZ STATISTICS SECTION (REPLACED WITH BOX AND WHISKER PLOT) */}
-        <div className="dashboard-card middle-section">
-          <h3>Quiz Statistics</h3>
-          <div className="top-section">
-            <label htmlFor="quizSelect">Select Quiz: </label>
-            <select
-              id="quizSelect"
-              value={selectedQuiz}
-              onChange={(e) => setSelectedQuiz(Number(e.target.value))}
-            >
-              {Object.keys(quizData).map((quiz) => (
-                <option key={quiz} value={quiz}>
-                  Quiz {quiz}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="chart-container">
-            <Plot
-              data={[
-                {
-                  y: selectedQuizData,
-                  type: 'box',
-                  name: `Quiz ${selectedQuiz}`,
-                  // boxpoints: 'all',
-                  jitter: 0.5,
-                  marker: { color: '#0671B7' },
-                  line: { width: 2 },
-                },
-              ]}
-              layout={{
-                title: `Quiz ${selectedQuiz} Scores`,
-                yaxis: { title: 'Scores', zeroline: false },
-                xaxis: { title: 'Quiz', zeroline: false },
-                autosize: true,
-                showlegend: false,
-              }}
-              style={{ width: '100%', height: '100%' }}
-            />
-          </div>
-        </div>
-        {/* END QUIZ STATISTICS SECTION */}
-
-        <div className="dashboard-card bottom-section">
-          <h3>Average Time Spent Reading Lectures</h3>
-          <div className="chart-container bar-chart">
-            <Line
-              data={averageTimeData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'top' } },
-                scales: {
-                  x: {
-                    grid: { display: false },
-                    title: { display: true, text: 'Days' },
-                  },
-                  y: {
-                    grid: { display: false },
-                    beginAtZero: true,
-                    title: { display: true, text: 'Average Time (minutes)' },
-                  },
-                },
-              }}
-            />
-          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: 4fr 1fr;
-          gap: 10px;
-        }
-
-        .top-section {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 10px;
-        }
-
-        .right-section {
-          display: grid;
-          gap: 10px;
-          align-content: start;
-        }
-
-        .middle-section {
-          grid-column: span 2;
-        }
-
-        .bottom-section {
-          grid-column: span 2;
-        }
-
-        .dashboard-card {
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          background-color: #f9f9f9;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          text-align: center;
-          font-size: 14px;
-        }
-
-        .dropdown-container {
-          margin-bottom: 10px;
-          text-align: left;
-        }
-
-        .chart-container {
-          width: 100%;
-          height: 100%;
-          max-height: 250px;
-        }
-
-        .chart-container.bar-chart {
-          width: 100%;
-          height: 100%;
-          max-height: 250px;
-          padding: 0;
-          margin: 0;
-          display: block;
-        }
-
-        .compact-card {
-          padding: 5px;
-          font-size: 12px;
-        }
-
-        .compact-card-font {
-          color: #e64072;
-        }
-
-        h3 {
-          font-size: 14px;
-          margin: 0 0 8px;
-        }
-
-        p {
-          font-size: 16px;
-          font-weight: bold;
-          color: #333;
-          margin: 0;
-        }
-
-        .attendance-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .attendance-numbers {
-          margin-top: 10px;
-        }
-
-        .attendance-numbers p {
-          margin: 5px 0;
-          font-size: 16px;
-          color: #333;
-        }
-      `}</style>
     </div>
   );
 };

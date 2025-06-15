@@ -4,10 +4,6 @@ function PostureDetection({ setPostureResults }) {
   const postureDetectionRef = useRef(null);
 
   useEffect(() => {
-    const container = document.querySelector('.main-container');
-    const isWideScreen = window.innerWidth > 768;
-    document.documentElement.style.setProperty('--dynamic-height', isWideScreen ? '85vh' : '85vh');
-
     const handlePostMessage = (event) => {
       if (event.data.postureData) {
         console.log('Posture Data:', event.data.postureData);
@@ -28,7 +24,7 @@ function PostureDetection({ setPostureResults }) {
           UsingPhoneTime: phoneUse
         };
 
-        console.log("Sending Posture Data to Backend:", JSON.stringify(postureResults)); // Debugging log
+        console.log("Sending Posture Data to Backend:", JSON.stringify(postureResults));
 
         setPostureResults(postureResults);
 
@@ -44,11 +40,11 @@ function PostureDetection({ setPostureResults }) {
             if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.text(); // Get raw response first
+            return response.text();
           })
           .then((text) => {
             try {
-              const data = JSON.parse(text); // Try parsing JSON
+              const data = JSON.parse(text);
               if (data.status === 'success') {
                 console.log('Posture data stored successfully.');
               } else {
@@ -61,7 +57,6 @@ function PostureDetection({ setPostureResults }) {
           .catch((error) => {
             console.error('Fetch error:', error);
           });
-
       }
     };
 
@@ -69,19 +64,29 @@ function PostureDetection({ setPostureResults }) {
 
     return () => {
       window.removeEventListener('message', handlePostMessage);
-      document.documentElement.style.setProperty('--dynamic-height', '');
     };
-
   }, []);
 
+  // Helper to send a message to the iframe
+  const sendToIframe = (msg) => {
+    if (postureDetectionRef.current && postureDetectionRef.current.contentWindow) {
+      postureDetectionRef.current.contentWindow.postMessage(msg, '*');
+    }
+  };
+
   return (
-    <div id="posture-detection-container" className="postureDetection">
-      <h2>Posture Detection</h2>
+    <div className="posture-video-page">
       <iframe
         ref={postureDetectionRef}
         src="/postureDetection.html"
         title="Posture Detection"
+        className="posture-iframe-large"
+        allow="camera"
       />
+      <div className="posture-btn-group no-card">
+        <button className="posture-btn start" onClick={() => sendToIframe('startLecture')}>Start Lecture</button>
+        <button className="posture-btn end" onClick={() => sendToIframe('endLecture')}>End Lecture</button>
+      </div>
     </div>
   );
 }

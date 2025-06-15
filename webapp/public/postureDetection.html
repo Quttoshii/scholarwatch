@@ -4,6 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Posture Detection Iframe</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+    }
+    #posture-detection-container {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      border-radius: 20px !important;
+      box-shadow: 0 8px 32px rgba(246, 166, 35, 0.18);
+      border: 2.5px solid #ffe5b4;
+      background: #fff;
+      margin: 0 auto;
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      max-width: 480px;
+      max-height: 360px;
+      min-width: 240px;
+      min-height: 180px;
+      object-fit: contain;
+    }
+    @media (max-width: 600px) {
+      canvas {
+        max-width: 98vw;
+        max-height: 54vw;
+        min-width: 120px;
+        min-height: 90px;
+      }
+    }
+  </style>
   <!--Posture Detection-->
   <!-- Load ml5.js first -->
   <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
@@ -45,7 +84,7 @@
         let showResults = false;  // Controls the display of timing results
 
         p.setup = () => {
-          let canvas = p.createCanvas(800, 500);
+          let canvas = p.createCanvas(640, 480);
           canvas.parent('posture-detection-container'); // Attach canvas to the div
 
           capture = p.createCapture(p.VIDEO);
@@ -57,15 +96,6 @@
             posenet.on('pose', receivedPoses);
             cocossd = window.ml5.objectDetector('cocossd', modelLoaded);
           };
-
-          // Add buttons
-          let startButton = p.createButton('Start Lecture');
-          startButton.position(canvas.position().x, canvas.position().y + canvas.height); // 20 pixels below the canvas
-          startButton.mousePressed(startTiming);
-
-          let stopButton = p.createButton('End Lecture');
-          stopButton.position(canvas.position().x + 100, canvas.position().y + canvas.height); // 100 pixels to the right of the start button
-          stopButton.mousePressed(stopTiming);
         };
 
         function modelLoaded() {
@@ -277,10 +307,12 @@
 
         p.draw = () => {
           p.image(capture, 0, 0);
-          drawBoundingBox();
-          p.fill(255, 0, 0);
-          p.textSize(24);
-          p.text(alertMessage, 20, p.height - 30);
+          p.textSize(22);
+          p.textAlign(p.CENTER, p.BOTTOM);
+          p.fill(246, 166, 35, 220);
+          p.noStroke();
+          p.rectMode(p.CENTER);
+          p.text(alertMessage, p.width / 2, p.height - 18);
 
           if (showResults) {
             displayResults();
@@ -289,7 +321,8 @@
 
         function displayResults() {
           p.textSize(14);
-          p.fill(255);
+          p.fill(60, 60, 60, 220);
+          p.textAlign(p.LEFT, p.TOP);
           p.text(`Total time: ${totalSessionTime.toFixed(2)} s`, 10, 20);
           p.text(`Good posture time: ${goodPostureTime.toFixed(2)} s`, 10, 40);
           p.text(`No person: ${(detectionDurations.noPerson / 1000).toFixed(2)} s`, 10, 60);
@@ -299,16 +332,15 @@
           p.text(`Slouching: ${(detectionDurations.slouching / 1000).toFixed(2)} s`, 10, 140);
         }
 
-        function drawBoundingBox() {
-          const margin = 10;  // Margin from the edges of the canvas
-          const bboxWidth = p.width - 18 * margin;  // Width of the bounding box
-          const bboxHeight = p.height - 40;  // Height of the bounding box
-
-          p.stroke(0, 255, 0);  // Green color for visibility
-          p.noFill();
-          p.strokeWeight(2);
-          p.rect(margin, margin, bboxWidth, bboxHeight);  // Draw bounding box with margins
-        }
+        window.addEventListener('message', (event) => {
+          if (typeof event.data === 'string') {
+            if (event.data === 'startLecture') {
+              startTiming();
+            } else if (event.data === 'endLecture') {
+              stopTiming();
+            }
+          }
+        });
       };
 
       // Create a new p5 instance with the sketch function

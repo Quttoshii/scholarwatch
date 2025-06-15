@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
 import Header from './components/Header';
 import Home from './components/Home';
 import Lectures from './components/Lectures';
@@ -20,7 +20,7 @@ import WeakAreaAnalysis from './components/WeakAreaAnalysis';
 import TeacherWeakAreaAnalysis from './components/TeacherWeakAreaAnalysis';
 import "react-toastify/dist/ReactToastify.css";
 import useCachedState from './hooks/useCachedState';
-
+import KnowledgeGraph from './components/KnowledgeGraph';
 import './App.css';
 
 function App() {
@@ -33,7 +33,7 @@ function App() {
   const [makeQuiz, setMakeQuiz] = useCachedState("makeQuiz", false);
   const [takeQuiz, setTakeQuiz] = useCachedState("takeQuiz", false);
   const [numQuestions, setNumQuestions] = useCachedState("numQuestions", 4);
-  const [selectedLecture, setSelectedLecture] = useCachedState("selectedLecture", "");
+  const [selectedLecture, setSelectedLecture] = useCachedState("selectedLecture", { name: '', path: '' });
   const [pageNumbers, setPageNumbers] = useState([]);
   const [emotionResults, setEmotionResults] = useCachedState("emotionResults", { awake_time: 0, drowsy_time: 0 });
   const [postureResults, setPostureResults] = useCachedState("postureResults", {
@@ -99,58 +99,49 @@ function App() {
       <div className="App">
         <ToastContainer />
         <BackgroundIcons />
-        <Header userType={userType} />
-        {userType === "Teacher" ? (
-          <div className="main-container">
-            <div className="sidebar">
-              <Link to="/"><button style={{ '--animation-order': 1 }}>Home</button></Link>
-              <Link to="/createLecture"><button style={{ '--animation-order': 2 }}>Lectures</button></Link>
-              <Link to="/createQuiz"><button style={{ '--animation-order': 3 }}>Quizzes</button></Link>
-              <Link to="/insights"><button style={{ '--animation-order': 4 }}>Insights</button></Link>
-              <Link to="/attendanceMonitoring"><button style={{ '--animation-order': 5 }}>Attendance Monitoring</button></Link>
-              <Link to="/slideGeneration"><button style={{ '--animation-order': 6 }}>Slide Generation</button></Link>
-              <Link to="/AggregatedWeakAreaAnalysis"><button style={{ '--animation-order': 7 }}>Weak Area Analysis</button></Link>
-              <Link to="/logout"><button style={{ '--animation-order': 8 }}>Log out</button></Link>
-            </div>
-            <div className="content">
-              <Routes>
-                <Route path="/" element={<Home userType={userType} userID={userID} userName={userName} email={email} />} />
-                <Route path="/createLecture" element={<CreateLecture userID={userID} />} />
-                <Route path="/createQuiz" element={
-                  <CreateQuiz userID={userID} makeQuiz={makeQuiz} setMakeQuiz={setMakeQuiz} numQuestions={numQuestions} setNumQuestions={setNumQuestions} setSelectedLecture={setSelectedLecture} />}
-                />
+        <Header userType={userType}/>
+        <TopNavbarWrapper userType={userType} />
+        <div className="main-content">
+          <Routes>
+            {userType === "Teacher" ? (
+              <>
+                <Route path="/" element={<Home userType={userType} userID={userID} userName={userName}  email={email} />} />
+                <Route path="/createLecture" element={<CreateLecture userID={userID}/>} />
+                <Route path="/createQuiz" element={<CreateQuiz userID={userID} makeQuiz={makeQuiz} setMakeQuiz={setMakeQuiz} numQuestions={numQuestions} setNumQuestions={setNumQuestions} setSelectedLecture={setSelectedLecture}/>} />
+                <Route path="/knowledge-graph" element={<KnowledgeGraph courseId={1} isTeacher={true} teacherId={userID} />} />
                 <Route path="/insights" element={<Insights emotionResults={emotionResults} gazeResults={gazeResults} invalidationCount={invalidationCount} />} />
                 <Route path="/attendanceMonitoring" element={<AttendanceMonitoring emotionResults={emotionResults} gazeResults={gazeResults} postureResults={postureResults} />} />
                 <Route path="/slideGeneration" element={<SlideGeneration />} />
                 <Route path="/AggregatedWeakAreaAnalysis" element={<TeacherWeakAreaAnalysis aggregatedWeakAreas={weakAreas} />} />
                 <Route path="/logout" element={<Logout setUserType={setUserType} returnTo={returnTo} setLoggingOut={setLoggingOut}/>} />
                 <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </div>
-          </div>
-        ) : (
-          <div className="main-container">
-            <div className="sidebar">
-              <Link to="/"><button style={{ '--animation-order': 1 }}>Home</button></Link>
-              <Link to="/lectures"><button style={{ '--animation-order': 2 }}>Lectures</button></Link>
-              <Link to="/liveFeed"><button style={{ '--animation-order': 3 }}>Emotion Detection</button></Link>
-              <Link to="/postureDetection"><button style={{ '--animation-order': 4 }}>Posture Detection</button></Link>
-              <Link to="/quizzes"><button style={{ '--animation-order': 5 }}>Quizzes</button></Link>
-              <Link to="/StudentInsights"><button style={{ '--animation-order': 6 }}>Insights</button></Link>
-              <Link to="/weakAreaAnalysis"><button style={{ '--animation-order': 7 }}>Weak Area Analysis</button></Link>
-              <Link to="/logout"><button style={{ '--animation-order': 8 }}>Log out</button></Link>
-            </div>
-            <div className="content">
-              <Routes>
+              </>
+            ) :  (
+              <>
                 <Route path="/" element={<Home userType={userType} userID={userID} userName={userName} email={email} />} />
-                <Route path="/lectures" element={<Lectures isCalibrated={isCalibrated} setIsCalibrated={setIsCalibrated} setGazeResults={setGazeResults} makeQuiz={makeQuiz} setTakeQuiz={setTakeQuiz} selectedLecture={selectedLecture} setPageNumbers={setPageNumbers} />} />
+                <Route path="/lectures" element={
+                  <Lectures 
+                    isCalibrated={isCalibrated} 
+                    setIsCalibrated={setIsCalibrated} 
+                    setGazeResults={setGazeResults} 
+                    makeQuiz={makeQuiz} 
+                    setTakeQuiz={setTakeQuiz} 
+                    selectedLecture={selectedLecture} 
+                    setSelectedLecture={setSelectedLecture}
+                    setPageNumbers={setPageNumbers}
+                    isInstructor={userType === "Teacher"}
+                    userID={userID}
+                    userType={userType}
+                  />
+                } />
                 <Route path="/liveFeed" element={<LiveFeed setEmotionResults={setEmotionResults} />} />
                 <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} makeQuiz={makeQuiz} takeQuiz={takeQuiz} setTakeQuiz={setTakeQuiz} selectedLecture={selectedLecture} pageNumbers={pageNumbers} numQuestions={numQuestions} setWeakAreas={setWeakAreas} />} />
                 <Route path="/postureDetection" element={<PostureDetection setPostureResults={setPostureResults} />} />
                 <Route path="/StudentInsights" element={<StudentInsights results={emotionResults} gazeResults={gazeResults} />} />
-                <Route path="/results" element={<Results emotionResults={emotionResults} />} />
-                <Route path="/weakAreaAnalysis" element={<WeakAreaAnalysis weakAreas={weakAreas} />} />
-                <Route path="/logout" element={<Logout setUserType={setUserType} returnTo={returnTo} setLoggingOut={setLoggingOut} />} />
+                <Route path="/results" element={<Results emotionResults={emotionResults}/>} />
+                <Route path="/WeakAreaAnalysis" element={ <WeakAreaAnalysis weakAreas={weakAreas} /> } />
+                <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
+                <Route path="/knowledge-graph" element={<KnowledgeGraph courseId={1} isTeacher={false} studentId={userID} />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
@@ -159,6 +150,47 @@ function App() {
       </div>
     </Router>
   );
+}
+
+// Wrapper to use useLocation inside Router context
+function TopNavbarWrapper({ userType }) {
+  return <TopNavbarInner userType={userType} />;
+}
+
+function TopNavbarInner({ userType }) {
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+  if (userType === "Teacher") {
+    return (
+      <div className="top-navbar">
+        <Link to="/"><button className={isActive("/") ? "active" : ""} style={{ '--animation-order': 1 }}>Home</button></Link>
+        <Link to="/createLecture"><button className={isActive("/createLecture") ? "active" : ""} style={{ '--animation-order': 2 }}>Lectures</button></Link>
+        <Link to="/createQuiz"><button className={isActive("/createQuiz") ? "active" : ""} style={{ '--animation-order': 3 }}>Quizzes</button></Link>
+        <Link to="/knowledge-graph"><button className={isActive("/knowledge-graph") ? "active" : ""} style={{ '--animation-order': 4 }}>Knowledge Graph</button></Link>
+        <Link to="/insights"><button className={isActive("/insights") ? "active" : ""} style={{ '--animation-order': 5 }}>Insights</button></Link>
+        <Link to="/attendanceMonitoring"><button className={isActive("/attendanceMonitoring") ? "active" : ""} style={{ '--animation-order': 6 }}>Attendance Monitoring</button></Link>
+        <Link to="/slideGeneration"><button className={isActive("/slideGeneration") ? "active" : ""} style={{ '--animation-order': 7 }}>Slide Generation</button></Link>
+        <Link to="/AggregatedWeakAreaAnalysis"><button className={isActive("/AggregatedWeakAreaAnalysis") ? "active" : ""} style={{ '--animation-order': 8 }}>Weak Area Analysis</button></Link>
+        <Link to="/logout"><button className={isActive("/logout") ? "active" : ""} style={{ '--animation-order': 9 }}>Log out</button></Link>
+      </div>
+    );
+  } else if (userType === "Student") {
+    return (
+      <div className="top-navbar">
+        <Link to="/"><button className={isActive("/") ? "active" : ""} style={{ '--animation-order': 1 }}>Home</button></Link>
+        <Link to="/lectures"><button className={isActive("/lectures") ? "active" : ""} style={{ '--animation-order': 2 }}>Lectures</button></Link>
+        <Link to="/liveFeed"><button className={isActive("/liveFeed") ? "active" : ""} style={{ '--animation-order': 3 }}>Emotion Detection</button></Link>
+        <Link to="/postureDetection"><button className={isActive("/postureDetection") ? "active" : ""} style={{ '--animation-order': 4 }}>Posture Detection</button></Link>
+        <Link to="/quizzes"><button className={isActive("/quizzes") ? "active" : ""} style={{ '--animation-order': 5 }}>Quizzes</button></Link>
+        <Link to="/StudentInsights"><button className={isActive("/StudentInsights") ? "active" : ""} style={{ '--animation-order': 6 }}>Insights</button></Link>
+        <Link to="/knowledge-graph"><button className={isActive("/knowledge-graph") ? "active" : ""} style={{ '--animation-order': 7 }}>Knowledge Graph</button></Link>
+        <Link to="/weakAreaAnalysis"><button className={isActive("/weakAreaAnalysis") ? "active" : ""} style={{ '--animation-order': 8 }}>Weak Area Analysis</button></Link>
+        <Link to="/logout"><button className={isActive("/logout") ? "active" : ""} style={{ '--animation-order': 9 }}>Log out</button></Link>
+      </div>
+    );
+  } else {
+    return null;
+  }
 }
 
 export default App;

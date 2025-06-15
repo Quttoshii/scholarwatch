@@ -31,7 +31,7 @@ function CreateQuiz({ userID, makeQuiz, setMakeQuiz, numQuestions, setNumQuestio
 
     useEffect(() => {
         if (lectures.length > 0) {
-            setSelectedLecture(lectures[0].DirectoryPath);
+            setSelectedLecture({ name: lectures[0].lectureName, path: lectures[0].DirectoryPath });
         }
     }, [lectures, setSelectedLecture]);
 
@@ -85,40 +85,33 @@ function CreateQuiz({ userID, makeQuiz, setMakeQuiz, numQuestions, setNumQuestio
                             id="lecture-select"
                             value={selectLecture}
                             onChange={(e) => {
+                                const selected = lectures.find(l => l.DirectoryPath === e.target.value);
                                 setSelectLecture(e.target.value); 
-                                setSelectedLecture(e.target.value);
+                                setSelectedLecture(selected ? { name: selected.lectureName, path: selected.DirectoryPath } : null);
                                 setSuccessMessage(null);
                             }}
                             required
                         >
                             <option value="">-- Select a lecture --</option>
                             {lectures.map((lecture) => (
-                                <option key={lecture.lectureID} value={lecture.DirectoryPath}>
-                                    {lecture.lectureName}
+                                <option key={lecture.lectureID || lecture.LectureID} value={lecture.DirectoryPath || lecture.directoryPath}>
+                                    {lecture.lectureName || lecture.LectureName}
                                 </option>
                             ))}
                         </select>
                     </div>
-
                     <div className="form-group">
                         <label htmlFor="num-questions">Number of Questions:</label>
                         <input
-                            id="num-questions"
                             type="number"
-                            min="1"
-                            max="20"
+                            id="num-questions"
                             value={numQuestions}
-                            onChange={(e) => {
-                                setNumQuestions(parseInt(e.target.value) || 1);
-                                setSuccessMessage(null);
-                            }}
+                            onChange={(e) => setNumQuestions(parseInt(e.target.value))}
+                            min="1"
                             required
                         />
                     </div>
-
-                    <button type="submit" className="create-quiz-btn">
-                        Set Quiz
-                    </button>
+                    <button type="submit" className="create-quiz-btn">Create Quiz</button>
                 </form>
             )}
         </div>

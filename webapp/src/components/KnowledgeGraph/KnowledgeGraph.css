@@ -1,0 +1,152 @@
+.knowledge-graph-editor {
+  width: 100%;
+  height: 80vh;
+  position: relative;
+}
+
+.editor-panel {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 300px;
+}
+
+.node-editor,
+.edge-editor {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.save-button,
+.cancel-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.save-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
+
+.cancel-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #da190b;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 18px;
+  color: #666;
+}
+
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #f44336;
+  font-size: 18px;
+}
+
+/* ReactFlow custom styles */
+.react-flow__node {
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  border-width: 2px;
+}
+
+.react-flow__node-lecture {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.react-flow__node-topic {
+  background-color: #f3e5f5;
+  border-color: #9c27b0;
+}
+
+.react-flow__node-concept {
+  background-color: #e8f5e9;
+  border-color: #4caf50;
+}
+
+.react-flow__edge {
+  stroke-width: 2;
+}
+
+.react-flow__edge-prerequisite {
+  stroke: #f44336;
+}
+
+.react-flow__edge-related_to {
+  stroke: #2196f3;
+}
+
+.react-flow__edge-part_of {
+  stroke: #4caf50;
+}
+
+.react-flow__controls {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__minimap {
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+} 

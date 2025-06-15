@@ -35,13 +35,14 @@ function setup() {
 
     cocossd = ml5.objectDetector('cocossd', modelLoaded);
 
-    let startButton = createButton('Start Lecture');
-    startButton.position(10, 550);
-    startButton.mousePressed(startTiming);
-
-    let stopButton = createButton('End Lecture');
-    stopButton.position(100, 550);
-    stopButton.mousePressed(stopTiming);
+    // Listen for messages from parent window to start/end lecture
+    window.addEventListener('message', (event) => {
+        if (event.data === 'startLecture') {
+            startTiming();
+        } else if (event.data === 'endLecture') {
+            stopTiming();
+        }
+    });
 }
 
 function modelLoaded() {
@@ -228,7 +229,7 @@ function draw() {
     drawBoundingBox();
     fill(255, 0, 0);
     textSize(24);
-    text(alertMessage, 20, height - 30);
+    text(alertMessage, 20, height - 80);
 
     if (showResults) {
         displayResults();

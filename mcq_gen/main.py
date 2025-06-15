@@ -54,8 +54,13 @@ async def generate_mcqs(request: MCQRequest):
         # Load API Key
         api_key = request.api_key or os.environ.get("GOOGLE_API_KEY", GAK)
         genai.configure(api_key=api_key)
-        # model = genai.GenerativeModel('gemini-1.5-pro')
         model = genai.GenerativeModel('gemini-2.0-flash-lite')
+
+        # --- Path fix: prepend lectures dir if not absolute ---
+        LECTURES_DIR = "/Applications/XAMPP/xamppfiles/htdocs/scholarwatch/lectures"
+        if not os.path.isabs(request.pdf_location):
+            request.pdf_location = os.path.join(LECTURES_DIR, request.pdf_location)
+
         # Check if PDF exists
         if not os.path.exists(request.pdf_location):
             raise HTTPException(status_code=404, detail=f"PDF file not found at {request.pdf_location}")
