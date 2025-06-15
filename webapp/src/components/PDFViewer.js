@@ -14,7 +14,7 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
   const [pageNumber, setPageNumber] = useState(1);
   const [focusStartTime, setFocusStartTime] = useState(Date.now());
 // console.log("Selected Lecture:", selectedLecture.split('/')[2]);
-  const lecturePath = `http://localhost/scholarwatch/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/')[2])}`;
+  const lecturePath = selectedLecture && selectedLecture.path ? `http://localhost/scholarwatch/getPDF.php?file=${encodeURIComponent(selectedLecture.path.split('/').pop())}` : null;
   // console.log("Full PDF Path:", lecturePath);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
     <div>
       <h3>Lecture Material</h3>
 
-      {selectedLecture ? (
+      {lecturePath ? (
         <Document file={lecturePath} onLoadSuccess={onDocumentLoadSuccess} onLoadError={(error) => console.error('PDF loading error:', error)}>
           <Page pageNumber={pageNumber} />
         </Document>

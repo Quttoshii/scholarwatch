@@ -19,6 +19,8 @@ const CreateLecture = ({ userID }) => {
     const [lectureName, setLectureName] = useState("");
     const [lectures, setLectures] = useState([]);
     const [fetchTrigger, setFetchTrigger] = useState(0);
+    const [courses, setCourses] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState("");
 
     useEffect(() => {
         const fetchLectures = async () => {
@@ -39,7 +41,21 @@ const CreateLecture = ({ userID }) => {
             }
         };
 
+        const fetchCourses = async () => {
+            try {
+                const response = await axios.get(`http://localhost/scholarwatch/getTeacherCourses.php?teacherId=${userID}`);
+                if (response.data.success) {
+                    setCourses(response.data.courses);
+                } else {
+                    console.error("Error fetching courses:", response.data.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
+
         fetchLectures();
+        fetchCourses();
     }, [userID, fetchTrigger]);
 
     const onFileLoad = (event) => {
@@ -63,8 +79,8 @@ const CreateLecture = ({ userID }) => {
     };
 
     const handleUpload = async () => {
-        if (!selectedFile || !numPages || !lectureName.trim()) {
-            toast.error("Please select a valid PDF file and provide a lecture name.");
+        if (!selectedFile || !numPages || !lectureName.trim() || !selectedCourse) {
+            toast.error("Please select a valid PDF file, provide a lecture name, and select a course.");
             return;
         }
 
@@ -74,6 +90,7 @@ const CreateLecture = ({ userID }) => {
             const formData = new FormData();
             formData.append("lecture_file", selectedFile, sanitizedFileName);
             formData.append("num_pages", numPages);
+            formData.append("courseID", selectedCourse);
 
             const response = await axios.post(
                 "http://localhost/scholarwatch/insertLecture.php",
@@ -88,6 +105,7 @@ const CreateLecture = ({ userID }) => {
                 setPdfData(null);
                 setNumPages(null);
                 setPageNumber(1);
+                setSelectedCourse("");
                 setFetchTrigger(prev => prev + 1);
             } else {
                 toast.error(`Error uploading lecture: ${response.data.message || "Unknown error"}`);
@@ -98,54 +116,70 @@ const CreateLecture = ({ userID }) => {
     };
 
     return (
-        <div>
-            <h2>Lectures</h2>
+        <div className="teacher-lectures-page" style={{ background: '#FFF5EE', borderRadius: '18px', padding: '32px', maxWidth: '900px', margin: '32px auto', boxShadow: '0 4px 24px rgba(246, 166, 35, 0.10)' }}>
+            <h2 style={{ color: '#2C1810', fontWeight: 800, fontSize: '2rem', marginBottom: '24px', letterSpacing: '1px' }}>Lectures</h2>
             {lectures.length > 0 ? (
-                <table border="1" style={{ width: "100%", textAlign: "left" }}>
+                <div className="lectures-table-container" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '0', marginBottom: '32px' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', background: 'none', tableLayout: 'fixed' }}>
                     <thead>
-                        <tr>
-                            <th>Lecture Name</th>
-                            <th>Number of Pages</th>
-                            <th>Uploaded At</th>
+                            <tr style={{ background: '#f6a523', color: '#fff', fontWeight: 700, borderRadius: '8px 8px 0 0' }}>
+                                <th style={{ padding: '14px 0', border: 'none', borderRight: '1px solid #f5c46a', borderRadius: '8px 0 0 8px' }}>Lecture Name</th>
+                                <th style={{ padding: '14px 0', border: 'none', borderRight: '1px solid #f5c46a' }}>Number of Pages</th>
+                                <th style={{ padding: '14px 0', border: 'none', borderRadius: '0 8px 8px 0' }}>Uploaded At</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {lectures.length > 0 ? (
-                            lectures.map((lecture) => (
-                                <tr key={lecture.lectureID}>
-                                    <td>
-                                    <a href={`http://localhost/scholarwatch${lecture.directoryPath}`} target="_blank" rel="noopener noreferrer">
-                                        {lecture.lectureName}
+                            {lectures.map((lecture, idx) => (
+                                <tr key={lecture.lectureID || lecture.LectureID || idx} style={{ background: idx % 2 === 0 ? '#fffbe9' : '#fff', color: '#2C1810' }}>
+                                    <td style={{ padding: '12px 14px', border: 'none' }}>
+                                        <a href={`http://localhost/scholarwatch${lecture.directoryPath || lecture.DirectoryPath}`} target="_blank" rel="noopener noreferrer" style={{ color: '#2C1810', fontWeight: 700, textDecoration: 'none', fontSize: '1.08rem' }}
+                                            onMouseOver={e => e.currentTarget.style.color = '#f6a523'}
+                                            onMouseOut={e => e.currentTarget.style.color = '#2C1810'}
+                                        >
+                                        {lecture.lectureName || lecture.LectureName}
                                     </a>
                                     </td>
-                                    <td>{lecture.slideCount}</td>
-                                    <td>{new Date(lecture.StartTimestamp).toLocaleString()}</td>
+                                    <td style={{ padding: '12px 14px', border: 'none' }}>{lecture.slideCount || lecture.SlideCount}</td>
+                                    <td style={{ padding: '12px 14px', border: 'none' }}>{new Date(lecture.StartTimestamp).toLocaleString()}</td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="3">No lectures available.</td>
-                            </tr>
-                        )}
+                            ))}
                     </tbody>
                 </table>
+                </div>
             ) : (
-                <p>No lectures uploaded yet.</p>
+                <p style={{ color: '#666', textAlign: 'center', fontSize: '1.1rem', marginBottom: '32px' }}>No lectures uploaded yet.</p>
             )}
 
-            <hr />
+            <hr style={{ border: 'none', borderTop: '2px solid #ffe5b4', margin: '32px 0' }} />
 
-            <h2>Upload New Lecture</h2>
-            <label htmlFor="lecture-name">Lecture Name: </label>
+            <h2 style={{ color: '#2C1810', fontWeight: 800, fontSize: '1.5rem', marginBottom: '18px' }}>Upload New Lecture</h2>
+            <div className="upload-section" style={{ background: '#fff', borderRadius: '14px', boxShadow: '0 2px 8px rgba(246, 166, 35, 0.08)', padding: '24px', marginBottom: '16px' }}>
+                <label htmlFor="lecture-name" style={{ fontWeight: 700, color: '#2C1810', fontSize: '1.12rem', marginBottom: '8px', display: 'inline-block' }}>Lecture Name: </label>
             <input
                 type="text"
                 id="lecture-name"
                 value={lectureName}
                 onChange={(e) => setLectureName(e.target.value)}
                 placeholder="Lecture name (used as filename)"
+                    style={{ padding: '10px 16px', borderRadius: '8px', border: '2px solid #ffe5b4', margin: '0 0 18px 12px', fontSize: '1rem', outline: 'none', width: '60%', marginBottom: '18px' }}
             />
-            <br /><br />
-            <label htmlFor="file-upload" className="smaller-button take-quiz-btn">
+                <br />
+                <label htmlFor="course-select" style={{ fontWeight: 700, color: '#2C1810', fontSize: '1.12rem', marginBottom: '8px', display: 'inline-block' }}>Select Course: </label>
+                <select
+                    id="course-select"
+                    value={selectedCourse}
+                    onChange={(e) => setSelectedCourse(e.target.value)}
+                    style={{ padding: '10px 16px', borderRadius: '8px', border: '2px solid #ffe5b4', margin: '0 0 18px 12px', fontSize: '1rem', outline: 'none', width: '60%', marginBottom: '18px' }}
+                >
+                    <option value="">-- Select a course --</option>
+                    {courses.map((course) => (
+                        <option key={course.CourseID} value={course.CourseID}>
+                            {course.CourseName}
+                        </option>
+                    ))}
+                </select>
+                <br />
+                <label htmlFor="file-upload" className="smaller-button take-quiz-btn" style={{ background: '#f6a523', color: '#fff', borderRadius: '8px', fontWeight: 700, fontSize: '1.05rem', padding: '10px 24px', cursor: 'pointer', marginRight: '18px' }}>
                 Choose File
                 <input
                     type="file"
@@ -157,20 +191,23 @@ const CreateLecture = ({ userID }) => {
             </label>
 
             {pdfData && (
+                    <div style={{ margin: '18px 0' }}>
                 <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess}>
                     <Page pageNumber={pageNumber} />
                 </Document>
+                    </div>
             )}
 
             {pdfData && numPages && (
-                <div>
-                    <p>Page {pageNumber} of {numPages}</p>
-                    <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)}>Previous</button>
-                    <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)}>Next</button>
+                    <div style={{ margin: '12px 0' }}>
+                        <p style={{ color: '#2C1810', fontWeight: 600 }}>Page {pageNumber} of {numPages}</p>
+                        <button disabled={pageNumber <= 1} onClick={() => setPageNumber(pageNumber - 1)} style={{ background: '#f6a523', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '1.05rem', padding: '8px 18px', marginRight: '8px', cursor: 'pointer' }}>Previous</button>
+                        <button disabled={pageNumber >= numPages} onClick={() => setPageNumber(pageNumber + 1)} style={{ background: '#f6a523', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '1.05rem', padding: '8px 18px', marginRight: '8px', cursor: 'pointer' }}>Next</button>
                     <br />
-                    <button onClick={handleUpload} className="take-quiz-btn">Upload Lecture</button>
+                        <button onClick={handleUpload} className="take-quiz-btn" style={{ background: '#f6a523', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '1.05rem', padding: '10px 24px', marginTop: '12px', cursor: 'pointer' }}>Upload Lecture</button>
                 </div>
             )}
+            </div>
         </div>
     );
 };

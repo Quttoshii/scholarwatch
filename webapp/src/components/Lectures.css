@@ -1,41 +1,79 @@
 .lectures-page {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background-color: #FFF5EE;
+    align-items: center;
+    min-height: 80vh;
+    background: #FFF5EE;
+    padding-top: 18px;
 }
 
 .tabs {
     display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    justify-content: center;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem 0 0.5rem 0;
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 2px 8px rgba(246, 166, 35, 0.08);
+    margin-bottom: 0.5rem;
 }
 
 .tab-button {
-    padding: 0.75rem 1.5rem;
+    position: relative;
+    padding: 0.7rem 2.2rem;
     border: none;
-    border-radius: 8px;
-    background-color: #f6a623;
-    color: white;
-    font-size: 1rem;
-    font-weight: 500;
+    border-radius: 999px;
+    background: none;
+    color: #2C1810;
+    font-size: 1.08rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.18s, background 0.18s;
+    outline: none;
+    box-shadow: none;
+    margin: 0 2px;
 }
 
-.tab-button:hover {
-    background-color: #d48f20;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.tab-button::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 30%;
+    right: 30%;
+    bottom: 8px;
+    height: 3px;
+    border-radius: 2px;
+    background: #f6a523;
+    opacity: 0;
+    transform: scaleX(0.5);
+    transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+.tab-button:hover,
+.tab-button:focus {
+    color: #f6a523;
+    background: #fffbe9;
+}
+
+.tab-button:hover::after,
+.tab-button:focus::after {
+    opacity: 1;
+    transform: scaleX(1);
 }
 
 .tab-button.active {
-    background-color: #d48f20;
-    color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    background: #f6a523;
+    box-shadow: 0 2px 8px rgba(246, 166, 35, 0.10);
+}
+
+.tab-button.active::after {
+    opacity: 1;
+    background: #fff;
+    left: 20%;
+    right: 20%;
+    transform: scaleX(1.1);
 }
 
 .content {
@@ -45,11 +83,14 @@
 }
 
 .lectures-content {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.2rem 2.5rem;
+    box-shadow: 0 4px 24px rgba(246, 166, 35, 0.10);
+    border: 1.5px solid #ffe5b4;
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 1200px;
 }
 
 .no-lectures {
@@ -110,23 +151,39 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .tabs {
-        padding: 0.75rem;
+        padding: 0.75rem 0 0.3rem 0;
+        gap: 0.5rem;
     }
 
     .tab-button {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .content {
-        padding: 1rem;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.97rem;
     }
 
     .lectures-content {
-        padding: 1rem;
+        padding: 1rem 0.5rem;
+        max-width: 98vw;
     }
 
     .pdf-container {
         height: calc(100vh - 150px);
     }
+}
+
+.current-lecture-banner {
+    background: #FFF5EE;
+    border: 1.5px solid #f6a623;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: #2C1810;
+    font-weight: 500;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
 } 

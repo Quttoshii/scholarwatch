@@ -21,6 +21,14 @@ const KnowledgeGraphEditor = ({ courseId, isInstructor }) => {
   const [selectedEdge, setSelectedEdge] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  // New state for add mode
+  const [isAddMode, setIsAddMode] = useState(false);
+  // New state for delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // New state for legend visibility
+  const [showLegend, setShowLegend] = useState(true);
+  // New state for node status
+  const [nodeStatus, setNodeStatus] = useState('LOCKED');
 
   // Load graph data
   useEffect(() => {
@@ -54,11 +62,14 @@ const KnowledgeGraphEditor = ({ courseId, isInstructor }) => {
   const onNodeClick = useCallback((event, node) => {
     setSelectedNode(node);
     setSelectedEdge(null);
+    setIsAddMode(false);
+    setNodeStatus(node.data.status || 'LOCKED');
   }, []);
 
   const onEdgeClick = useCallback((_, edge) => {
     setSelectedEdge(edge);
     setSelectedNode(null);
+    setIsAddMode(false);
   }, []);
 
   const onNodeDragStop = useCallback(async (event, node) => {
@@ -142,6 +153,51 @@ const KnowledgeGraphEditor = ({ courseId, isInstructor }) => {
     }
   };
 
+  // New function to handle adding a new topic
+  const handleAddTopic = () => {
+    setIsAddMode(true);
+    setSelectedNode(null);
+    setSelectedEdge(null);
+  };
+
+  // New function to handle saving a new topic
+  const handleSaveNewTopic = (newNodeData) => {
+    const newNode = {
+      id: 'new-' + Date.now(),
+      type: 'default',
+      position: { x: 100, y: 100 },
+      data: { ...newNodeData, status: 'LOCKED' },
+    };
+    setNodes((nds) => [...nds, newNode]);
+    setIsAddMode(false);
+  };
+
+  // New function to handle deleting a topic
+  const handleDeleteTopic = () => {
+    if (selectedNode) {
+      setShowDeleteConfirm(true);
+    }
+  };
+
+  // New function to confirm deletion
+  const confirmDelete = () => {
+    setNodes((nds) => nds.filter((node) => node.id !== selectedNode.id));
+    setEdges((eds) => eds.filter((edge) => edge.source !== selectedNode.id && edge.target !== selectedNode.id));
+    setSelectedNode(null);
+    setShowDeleteConfirm(false);
+  };
+
+  const handleStatusChange = (e) => {
+    const newStatus = e.target.value;
+    setNodeStatus(newStatus);
+    if (selectedNode) {
+      onNodeUpdate({
+        id: selectedNode.id,
+        data: { ...selectedNode.data, status: newStatus },
+      });
+    }
+  };
+
   if (isLoading) {
     return <div className="loading">Loading knowledge graph...</div>;
   }
@@ -152,6 +208,17 @@ const KnowledgeGraphEditor = ({ courseId, isInstructor }) => {
 
   return (
     <div className="knowledge-graph-editor">
+      <div className="toolbar">
+        {isInstructor && (
+          <button onClick={handleAddTopic} className="toolbar-button">
+            Add Topic
+          </button>
+        )}
+        <button onClick={() => setShowLegend(!showLegend)} className="toolbar-button">
+          {showLegend ? 'Hide Legend' : 'Show Legend'}
+        </button>
+      </div>
+
       <div className="graph-container">
         <ReactFlow
           nodes={nodes}
@@ -185,13 +252,21 @@ const KnowledgeGraphEditor = ({ courseId, isInstructor }) => {
           {selectedNode.data.description && (
             <p>Description: {selectedNode.data.description}</p>
           )}
+          <div className="node-status">
+            <label htmlFor="status">Status:</label>
+            <select id="status" value={nodeStatus} onChange={handleStatusChange}>
+              <option value="LOCKED">Locked</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
           {isInstructor && (
             <div className="node-actions">
-              <button onClick={() => {/* Add edit functionality */}}>
+              <button onClick={() => {/* Edit functionality */}}>
                 Edit Node
               </button>
-              <button onClick={() => {/* Add delete functionality */}}>
-                Delete Node
+              <button onClick={handleDeleteTopic}>
+                Delete Topic
               </button>
             </div>
           )}
@@ -214,6 +289,26 @@ const KnowledgeGraphEditor = ({ courseId, isInstructor }) => {
               onClose={() => setSelectedEdge(null)}
             />
           )}
+          {isAddMode && (
+            <NodeEditor
+              node={{ id: 'new', data: { label: '', type: 'TOPIC', description: '' } }}
+              onUpdate={handleSaveNewTopic}
+              onClose={() => setIsAddMode(false)}
+            />
+          )}
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="delete-confirm-modal">
+          <div className="delete-confirm-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this topic?</p>
+            <div className="delete-confirm-actions">
+              <button onClick={confirmDelete} className="confirm-button">Yes, Delete</button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="cancel-button">Cancel</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

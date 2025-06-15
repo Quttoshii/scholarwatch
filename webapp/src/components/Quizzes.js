@@ -74,7 +74,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
 
     // console.log(selectedPages);
     const requestBody = {
-      pdf_location: `${lecturesDir}${selectedLecture}`,
+      pdf_location: selectedLecture && selectedLecture.path ? selectedLecture.path.split('/').pop() : '',
       page_numbers: selectedPages,
       num_questions: numQuestions,
     };
@@ -111,7 +111,7 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
         const correctAnswer = question.correct_answer;
         const topic = question.topic;
         const page = question.page_number;
-        const lectureName = selectedLecture.split('/').pop().split('.')[0];
+        const lectureName = selectedLecture && selectedLecture.name ? selectedLecture.name : (selectedLecture && selectedLecture.path ? selectedLecture.path.split('/').pop().split('.')[0] : '');
 
         if (userAnswer === correctAnswer) {
           correctCount++;
@@ -203,17 +203,34 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
               Back
             </button>
 
-            <button
-              className="next-btn"
-              onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
-              disabled={questions.length === 0 || currentQuestionIndex >= questions.length - 1}
-            >
-              Next
-            </button>
-
-            {questions.length > 0 && currentQuestionIndex === questions.length - 1 && (
-              <button onClick={submitQuiz} className="submit-quiz-btn">
+            {questions.length > 0 && currentQuestionIndex === questions.length - 1 ? (
+              <button
+                onClick={submitQuiz}
+                className="submit-quiz-btn"
+                style={{
+                  background: 'linear-gradient(135deg, #f6a623, #e6951a)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 18px',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  minWidth: 110,
+                  marginLeft: 12,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s, box-shadow 0.2s',
+                  boxShadow: '0 4px 12px rgba(246, 166, 35, 0.2)'
+                }}
+              >
                 Submit Quiz
+              </button>
+            ) : (
+              <button
+                className="next-btn"
+                onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                disabled={questions.length === 0 || currentQuestionIndex >= questions.length - 1}
+              >
+                Next
               </button>
             )}
           </div>
