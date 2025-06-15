@@ -133,20 +133,20 @@ function App() {
                     userID={userID}
                     userType={userType}
                   />
-                } />
-                <Route path="/liveFeed" element={<LiveFeed setEmotionResults={setEmotionResults} />} />
-                <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} makeQuiz={makeQuiz} takeQuiz={takeQuiz} setTakeQuiz={setTakeQuiz} selectedLecture={selectedLecture} pageNumbers={pageNumbers} numQuestions={numQuestions} setWeakAreas={setWeakAreas} />} />
-                <Route path="/postureDetection" element={<PostureDetection setPostureResults={setPostureResults} />} />
-                <Route path="/StudentInsights" element={<StudentInsights results={emotionResults} gazeResults={gazeResults} />} />
-                <Route path="/results" element={<Results emotionResults={emotionResults}/>} />
-                <Route path="/WeakAreaAnalysis" element={ <WeakAreaAnalysis weakAreas={weakAreas} /> } />
-                <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
-                <Route path="/knowledge-graph" element={<KnowledgeGraph courseId={1} isTeacher={false} studentId={userID} />} />
-                <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </div>
-          </div>
-        )}
+                  } />
+                  <Route path="/liveFeed" element={<LiveFeed setEmotionResults={setEmotionResults} />} />
+                  <Route path="/quizzes" element={<Quizzes incrementInvalidationCount={incrementInvalidationCount} makeQuiz={makeQuiz} takeQuiz={takeQuiz} setTakeQuiz={setTakeQuiz} selectedLecture={selectedLecture} pageNumbers={pageNumbers} numQuestions={numQuestions} setWeakAreas={setWeakAreas} />} />
+                  <Route path="/postureDetection" element={<PostureDetection setPostureResults={setPostureResults} />} />
+                  <Route path="/StudentInsights" element={<StudentInsights results={emotionResults} gazeResults={gazeResults} />} />
+                  <Route path="/results" element={<Results emotionResults={emotionResults}/>} />
+                  <Route path="/WeakAreaAnalysis" element={ <WeakAreaAnalysis weakAreas={weakAreas} /> } />
+                  <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
+                  <Route path="/knowledge-graph" element={<KnowledgeGraph courseId={1} isTeacher={false} studentId={userID} />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </>
+            )}
+          </Routes>
+        </div>
       </div>
     </Router>
   );

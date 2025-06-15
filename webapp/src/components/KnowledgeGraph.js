@@ -9,10 +9,10 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import axios from 'axios';
-import './KnowledgeGraph.css';
 import { FaPlus } from 'react-icons/fa';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import ForceGraph2D from "react-force-graph-2d";
+import './KnowledgeGraph.css';
 
 
 const levelColors = [
