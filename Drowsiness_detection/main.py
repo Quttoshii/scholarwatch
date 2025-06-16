@@ -64,16 +64,14 @@ async def run_detection():
         while is_detecting and cap is not None and cap.isOpened():
             ret, frame = cap.read()
             if not ret:
+                print("Failed to read frame from camera")
                 break
             detect_emotions(frame)
             await asyncio.sleep(0.1)
     except Exception as e:
         print(f"Error in detection loop: {e}")
-        is_detecting = False
     finally:
-        if cap is not None:
-            cap.release()
-            cap = None
+        print("Detection loop ended")
 
 @app.get("/detection_status")
 async def get_detection_status():
@@ -111,40 +109,71 @@ async def start_detection():
 
 @app.post("/stop_detection")
 async def stop_detection():
-    global is_detecting, awake_time, drowsy_time, cap, detection_task
+    global is_detecting, awake_time, drowsy_time, cap, detection_task, start_time
 
-    if not is_detecting:
-        return {"message": "No detection is running"}
-
+    # Always return results structure, even if detection wasn't running
     try:
         # Stop detection
+        was_detecting = is_detecting
         is_detecting = False
         
-        # Wait for detection task to complete
+        # Wait for detection task to complete with timeout
         if detection_task is not None:
-            await detection_task
-            detection_task = None
+            try:
+                await asyncio.wait_for(detection_task, timeout=5.0)
+            except asyncio.TimeoutError:
+                print("Detection task timeout")
+            except Exception as e:
+                print(f"Error waiting for detection task: {e}")
+            finally:
+                detection_task = None
 
         # Clean up camera
         if cap is not None:
             cap.release()
             cap = None
 
-        # Calculate results
+        # Calculate results - ensure we always return results
         total_time = time.time() - start_time if start_time else 0
+        awake_seconds = awake_time / frame_rate if awake_time > 0 else 0
+        drowsy_seconds = drowsy_time / frame_rate if drowsy_time > 0 else 0
+        
+        # Reset counters
+        awake_time = 0
+        drowsy_time = 0
+        start_time = None
+        
         return {
-            "message": "Detection stopped",
+            "message": "Detection stopped successfully" if was_detecting else "No detection was running",
             "results": {
-                "awake_time": awake_time / frame_rate,
-                "drowsy_time": drowsy_time / frame_rate
+                "awake_time": awake_seconds,
+                "drowsy_time": drowsy_seconds,
+                "total_time": total_time
             }
         }
     except Exception as e:
+        # Even on error, return results structure
+        print(f"Error in stop_detection: {e}")
+        
+        # Force cleanup
         is_detecting = False
         if cap is not None:
             cap.release()
             cap = None
-        raise HTTPException(status_code=500, detail=str(e))
+        
+        # Reset state
+        awake_time = 0
+        drowsy_time = 0
+        start_time = None
+        
+        return {
+            "message": f"Detection stopped with error: {str(e)}",
+            "results": {
+                "awake_time": 0,
+                "drowsy_time": 0,
+                "total_time": 0
+            }
+        }
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):

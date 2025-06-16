@@ -29,14 +29,14 @@ const LiveFeed = ({ setEmotionResults }) => {
       setError(null);
 
       // Check if detection is already running
-      const statusResponse = await axios.get('http://localhost:8000/detection_status');
+      const statusResponse = await axios.get('http://localhost:8003/detection_status');
       if (statusResponse.data.is_detecting) {
         setError("Detection is already running");
         return;
       }
 
       // Start the detection process
-      const response = await axios.post('http://localhost:8000/start_detection', {}, {
+      const response = await axios.post('http://localhost:8003/start_detection', {}, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -49,7 +49,7 @@ const LiveFeed = ({ setEmotionResults }) => {
         // Set up interval to check detection status
         detectionInterval.current = setInterval(async () => {
           try {
-            const statusResponse = await axios.get('http://localhost:8000/detection_status');
+            const statusResponse = await axios.get('http://localhost:8003/detection_status');
             if (!statusResponse.data.is_detecting) {
               if (!stopRequested.current) {
                 stopEmotionDetection();
@@ -87,13 +87,17 @@ const LiveFeed = ({ setEmotionResults }) => {
       }
 
       // Stop the detection
-      const stopResponse = await axios.post('http://localhost:8000/stop_detection', {}, {
+      const stopResponse = await axios.post('http://localhost:8003/stop_detection', {}, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 10000 // 10 second timeout
       });
       
-      if (stopResponse.data && stopResponse.data.results) {
+      console.log('Stop response:', stopResponse.data); // Debug log
+      
+      // Check if response has the expected structure
+      if (stopResponse.data && stopResponse.data.results !== undefined) {
         // Update the results
         setEmotionResults(stopResponse.data.results);
         
@@ -103,11 +107,26 @@ const LiveFeed = ({ setEmotionResults }) => {
         // Navigate to results page
         navigate('/results');
       } else {
-        throw new Error("Invalid response from server");
+        console.error("Invalid response structure:", stopResponse.data);
+        throw new Error(`Invalid response from server: ${JSON.stringify(stopResponse.data)}`);
       }
     } catch (error) {
       console.error("Error stopping detection:", error);
-      setError(error.response?.data?.detail || "Failed to stop emotion detection. Please try again.");
+      
+      // More specific error messages
+      let errorMessage = "Failed to stop emotion detection. Please try again.";
+      
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = "Request timed out. The server may be busy.";
+      } else if (error.response) {
+        errorMessage = error.response.data?.detail || `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        errorMessage = "No response from server. Please check if the server is running.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
       
       // Force reset detection state if stop fails
       setIsDetecting(false);
@@ -121,7 +140,9 @@ const LiveFeed = ({ setEmotionResults }) => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (isDetecting) {
-        stopEmotionDetection();
+        // For beforeunload, we can't wait for async operations
+        // Just make a quick synchronous request attempt
+        navigator.sendBeacon('http://localhost:8003/stop_detection', '{}');
       }
     };
 
@@ -167,7 +188,12 @@ const LiveFeed = ({ setEmotionResults }) => {
           {isLoading && isDetecting ? 'Stopping...' : 'Stop Detection'}
         </button>
       </div>
-      {error && <p className="error-message">{error}</p>}
+      {error && (
+        <div className="error-message">
+          <p>{error}</p>
+          <button onClick={() => setError(null)}>Dismiss</button>
+        </div>
+      )}
       {isDetecting && <p className="detection-status">Detecting emotions...</p>}
     </div>
   );
