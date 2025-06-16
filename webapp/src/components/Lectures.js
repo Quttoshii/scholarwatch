@@ -20,6 +20,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                 const response = await axios.post(
                     "http://localhost/local/scholarwatch/api/fetchLecture.php",
                     { userID },
+                    {withCredentials: "include"},
                     { headers: { "Content-Type": "application/json" } }
                 );
 
@@ -37,11 +38,11 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
         fetchLectures();
     }, [userID]);
 
-    useEffect(() => {;
+    useEffect(() => {
         const checkCameraSupport = () => {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            setCameraPermission(false);
-        }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setCameraPermission(false);
+            }
         };
 
         checkCameraSupport();
@@ -77,10 +78,28 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
     };
 
     const handleLectureSelect = (lectureId) => {
+        console.log('Selected lecture ID:', lectureId, typeof lectureId);
         setSelectedLectureId(lectureId);
-        const lecture = lectures.find(l => l.lectureID === lectureId || l.LectureID === lectureId);
+        
+        // Find the lecture - compare as strings since API returns lectureID as string
+        const lecture = lectures.find(l => 
+            (l.lectureID && l.lectureID.toString() === lectureId.toString()) || 
+            (l.LectureID && l.LectureID.toString() === lectureId.toString())
+        );
+        
+        console.log('Found lecture:', lecture);
+        
         if (lecture) {
-            setSelectedLecture({ name: lecture.lectureName || lecture.LectureName, path: lecture.directoryPath || lecture.DirectoryPath });
+            const lectureData = {
+                name: lecture.lectureName || lecture.LectureName || '',
+                path: lecture.directoryPath || lecture.DirectoryPath || ''
+            };
+            console.log('Setting selectedLecture to:', lectureData);
+            setSelectedLecture(lectureData);
+        } else {
+            console.log('No lecture found for ID:', lectureId);
+            // Reset if no lecture found
+            setSelectedLecture({ name: '', path: '' });
         }
     };
 
@@ -95,7 +114,16 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                                 <select
                                     id="lecture-select"
                                     value={selectedLectureId || ""}
-                                    onChange={(e) => handleLectureSelect(parseInt(e.target.value))}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value) {
+                                            // Don't parse to int since API returns string IDs
+                                            handleLectureSelect(value);
+                                        } else {
+                                            setSelectedLectureId(null);
+                                            setSelectedLecture({ name: '', path: '' });
+                                        }
+                                    }}
                                     style={{ padding: '10px 16px', borderRadius: '8px', border: '2px solid #ffe5b4', margin: '0 0 18px 12px', fontSize: '1rem', outline: 'none', width: '60%', marginBottom: '18px' }}
                                 >
                                     <option value="">-- Select a lecture --</option>
@@ -106,7 +134,9 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                                     ))}
                                 </select>
                             </div>
-                        ) : null}
+                        ) : (
+                            <p>Loading lectures...</p>
+                        )}
 
                         {lectures.length > 0 && selectedLecture && selectedLecture.path ? (
                             <>
@@ -130,7 +160,7 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                                 {isCalibrated ? (
                                     <PDFViewer 
                                         setTakeQuiz={setTakeQuiz} 
-                                        selectedLecture={selectedLecture} 
+                                        selectedLecture={selectedLecture.path} 
                                         onLectureFinish={handleLectureFinish}
                                         onPageGazeData={handleGazeData}
                                     />
@@ -138,7 +168,9 @@ function Lectures({ isCalibrated, setIsCalibrated, setGazeResults, makeQuiz, set
                                     <p className="calibration-warning">Please complete calibration before starting the lecture.</p>
                                 )}
                             </>
-                        ) : lectures.length > 0 && !selectedLecture?.path ? (
+                        ) : lectures.length > 0 && selectedLectureId ? (
+                            <p className="no-lectures">Selected lecture not found or has no valid path.</p>
+                        ) : lectures.length > 0 ? (
                             <p className="no-lectures">No lecture selected.</p>
                         ) : null}
                     </div>

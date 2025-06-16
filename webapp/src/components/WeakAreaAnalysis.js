@@ -15,8 +15,19 @@ import {
 import "./WeakAreasAnalysis.css";
 
 const generateColors = (length) => {
-  // const baseColors = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#a4de6c", "#d0ed57", "#8dd1e1", "#ffb6b9", "#c6b9cd", "#ffcc99"];
-  const baseColors = ['#FF6700', '#FDD1A6','#FF7F0E', '#993333','#FF7F0E', '#FDBF6F', "#F3C44D", "#FF4500", "#FFD700"]
+  // Updated color palette to match the orange theme
+  const baseColors = [
+    '#FF6700', // Main orange
+    '#FF8533', // Light orange
+    '#FF4500', // Orange red
+    '#FFB366', // Peach
+    '#FF7F0E', // Dark orange
+    '#FFA500', // Orange
+    '#FF9933', // Medium orange
+    '#FFD700', // Gold
+    '#F3C44D', // Yellow gold
+    '#FF8C00'  // Dark orange
+  ];
   const colors = [];
   for (let i = 0; i < length; i++) {
     colors.push(baseColors[i % baseColors.length]);
@@ -63,18 +74,32 @@ const WeakAreasAnalysis = ({ weakAreas }) => {
   const selectedSlideTopics = selectedSlide && topicPerSlide[selectedSlide] ? Object.entries(topicPerSlide[selectedSlide]).map(([name, value]) => ({ name, value })) : [];
 
   const topicColors = generateColors(topicData.length);
+  const slideTopicColors = generateColors(selectedSlideTopics.length);
   const hasData = lectureData.length > 0;
+
+  const chartContainerStyle = {
+    backgroundColor: 'white',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #e0e0e0',
+    marginBottom: '20px'
+  };
 
   return (
     <div className="weak-areas-container">
       <h2>Weak Area Analysis</h2>
 
       {!hasData ? (
-        <p style={{ color: "gray", fontStyle: "italic" }}>No weaknesses recorded so far. Keep up the good work!</p>
+        <div style={chartContainerStyle}>
+          <p style={{ color: "#666", fontStyle: "italic", textAlign: "center", margin: 0 }}>
+            No weaknesses recorded so far. Keep up the good work!
+          </p>
+        </div>
       ) : (
         <>
-          <div className="chart-section">
-            <h3>Lecture-wise Weakness</h3>
+          <div className="chart-section" style={chartContainerStyle}>
+            <h3 style={{ color: '#FF6700', marginBottom: '20px' }}>Lecture-wise Weakness</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
                 data={lectureData}
@@ -86,19 +111,41 @@ const WeakAreasAnalysis = ({ weakAreas }) => {
                   }
                 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#8884d8" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fill: '#666' }}
+                  axisLine={{ stroke: '#ddd' }}
+                />
+                <YAxis 
+                  allowDecimals={false} 
+                  tick={{ fill: '#666' }}
+                  axisLine={{ stroke: '#ddd' }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #FF6700',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Bar 
+                  dataKey="value" 
+                  fill="#FF6700"
+                  radius={[4, 4, 0, 0]}
+                  cursor="pointer"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {selectedLecture && (
             <>
-              <div className="chart-section">
-                <h3>Slide-wise Weakness for "{selectedLecture}"</h3>
+              <div className="chart-section" style={chartContainerStyle}>
+                <h3 style={{ color: '#FF6700', marginBottom: '20px' }}>
+                  Slide-wise Weakness for "{selectedLecture}"
+                </h3>
                 {slideData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart
@@ -109,21 +156,45 @@ const WeakAreasAnalysis = ({ weakAreas }) => {
                         if (clicked) setSelectedSlide(clicked.rawName);
                       }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis allowDecimals={false} />
-                      <Tooltip />
-                      <Bar dataKey="value" fill="#82ca9d" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fill: '#666' }}
+                        axisLine={{ stroke: '#ddd' }}
+                      />
+                      <YAxis 
+                        allowDecimals={false} 
+                        tick={{ fill: '#666' }}
+                        axisLine={{ stroke: '#ddd' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #FF8533',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                        }}
+                      />
+                      <Bar 
+                        dataKey="value" 
+                        fill="#FF8533"
+                        radius={[4, 4, 0, 0]}
+                        cursor="pointer"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p style={{ color: "gray", fontStyle: "italic" }}>No slide data available for this lecture.</p>
+                  <p style={{ color: "#666", fontStyle: "italic", textAlign: "center", margin: 0 }}>
+                    No slide data available for this lecture.
+                  </p>
                 )}
               </div>
 
               <div className="chart-section" style={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
-                <div style={{ flex: 1 }}>
-                  <h3>Topic-wise Weakness in "{selectedLecture}"</h3>
+                <div style={{ flex: 1, ...chartContainerStyle }}>
+                  <h3 style={{ color: '#FF6700', marginBottom: '20px' }}>
+                    Topic-wise Weakness in "{selectedLecture}"
+                  </h3>
                   {topicData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
@@ -134,37 +205,82 @@ const WeakAreasAnalysis = ({ weakAreas }) => {
                           cx="50%"
                           cy="50%"
                           outerRadius={100}
-                          fill="#ffc658"
-                          label
+                          innerRadius={40}
+                          paddingAngle={3}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={false}
                         >
                           {topicData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={topicColors[index]} />
                           ))}
                         </Pie>
-                        <Tooltip />
-                        <Legend verticalAlign="bottom" height={36} />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'white',
+                            border: '1px solid #FF6700',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                          }}
+                        />
+                        <Legend 
+                          verticalAlign="bottom" 
+                          height={36}
+                          wrapperStyle={{ paddingTop: '20px' }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (
-                    <p style={{ color: "gray", fontStyle: "italic" }}>No topic data available for this lecture.</p>
+                    <p style={{ color: "#666", fontStyle: "italic", textAlign: "center", margin: 0 }}>
+                      No topic data available for this lecture.
+                    </p>
                   )}
                 </div>
 
                 {selectedSlide && (
-                  <div style={{ flex: 1 }}>
-                    <h3>Topics in Slide {selectedSlide}</h3>
+                  <div style={{ flex: 1, ...chartContainerStyle }}>
+                    <h3 style={{ color: '#FF6700', marginBottom: '20px' }}>
+                      Topics in Slide {selectedSlide}
+                    </h3>
                     {selectedSlideTopics.length > 0 ? (
                       <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={selectedSlideTopics} layout="vertical" margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis type="number" allowDecimals={false} />
-                          <YAxis type="category" dataKey="name" width={200} />
-                          <Tooltip />
-                          <Bar dataKey="value" fill="#c6b9cd" />
+                        <BarChart 
+                          data={selectedSlideTopics} 
+                          layout="vertical" 
+                          margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            type="number" 
+                            allowDecimals={false} 
+                            tick={{ fill: '#666' }}
+                            axisLine={{ stroke: '#ddd' }}
+                          />
+                          <YAxis 
+                            type="category" 
+                            dataKey="name" 
+                            width={120}
+                            tick={{ fill: '#666', fontSize: 12 }}
+                            axisLine={{ stroke: '#ddd' }}
+                          />
+                          <Tooltip 
+                            contentStyle={{
+                              backgroundColor: 'white',
+                              border: '1px solid #FF4500',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                            }}
+                          />
+                          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                            {selectedSlideTopics.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={slideTopicColors[index]} />
+                            ))}
+                          </Bar>
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <p style={{ color: "gray", fontStyle: "italic" }}>No topic data for this slide.</p>
+                      <p style={{ color: "#666", fontStyle: "italic", textAlign: "center", margin: 0 }}>
+                        No topic data for this slide.
+                      </p>
                     )}
                   </div>
                 )}

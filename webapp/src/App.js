@@ -140,8 +140,8 @@ function App() {
                   <Route path="/StudentInsights" element={<StudentInsights results={emotionResults} gazeResults={gazeResults} />} />
                   <Route path="/results" element={<Results emotionResults={emotionResults}/>} />
                   <Route path="/WeakAreaAnalysis" element={ <WeakAreaAnalysis weakAreas={weakAreas} /> } />
-                  <Route path="/logout" element={<Logout setUserType={setUserType}/>} />
                   <Route path="/knowledge-graph" element={<KnowledgeGraph courseId={1} isTeacher={false} studentId={userID} />} />
+                  <Route path="/logout" element={<Logout setUserType={setUserType} returnTo={returnTo} setLoggingOut={setLoggingOut}/>} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </>
             )}

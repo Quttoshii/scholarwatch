@@ -57,6 +57,40 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     return windowWidth >= screenWidth - threshold && windowHeight >= screenHeight - threshold;
   };
 
+  // Helper function to extract PDF filename from selectedLecture
+  const getPdfFilename = (lecture) => {
+    // If selectedLecture is a string, use it directly
+    if (typeof lecture === 'string') {
+      return lecture;
+    }
+    
+    // If selectedLecture is an object, try to extract the filename
+    if (lecture && typeof lecture === 'object') {
+      // Try common property names that might contain the filename
+      if (lecture.name) {
+        return lecture.name;
+      }
+      if (lecture.filename) {
+        return lecture.filename;
+      }
+      if (lecture.path) {
+        // Extract filename from path if it exists
+        return lecture.path.split('/').pop().split('\\').pop();
+      }
+      if (lecture.title) {
+        return lecture.title;
+      }
+      // If it has an id or other identifier, you might need to construct the filename
+      if (lecture.id) {
+        return `lecture_${lecture.id}`;
+      }
+    }
+    
+    // Fallback - this will help you debug what the object actually contains
+    console.error('Unable to extract filename from selectedLecture:', lecture);
+    return 'unknown_lecture';
+  };
+
   const startQuiz = async () => {
     if (!isBrowserMaximized()) {
       toast.error("Please maximize your browser window to start the quiz.");
@@ -74,9 +108,15 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
     ? pageNumbers.slice(0, 5) 
     : pageNumbers.map(page => (isNaN(page) || page === null) ? pageNumbers.length : page);
 
-    // console.log(selectedPages);
+    // Extract the PDF filename properly
+    const pdfFilename = getPdfFilename(selectedLecture);
+    const pdfPath = `${lecturesDir}${pdfFilename}.pdf`;
+
+    console.log('PDF Path being sent:', pdfPath); // Debug log
+    console.log('Selected Lecture Object:', selectedLecture); // Debug log
+
     const requestBody = {
-      pdf_location: `${lecturesDir}${selectedLecture}.pdf`,
+      pdf_location: pdfPath,
       page_numbers: selectedPages,
       num_questions: numQuestions,
     };
@@ -113,7 +153,8 @@ function Quizzes({ incrementInvalidationCount, makeQuiz, takeQuiz, setTakeQuiz, 
         const correctAnswer = question.correct_answer;
         const topic = question.topic;
         const page = question.page_number;
-        const lectureName = selectedLecture && selectedLecture.name ? selectedLecture.name : (selectedLecture && selectedLecture.path ? selectedLecture.path.split('/').pop().split('.')[0] : '');
+        // Use the same helper function for consistency
+        const lectureName = getPdfFilename(selectedLecture);
 
         if (userAnswer === correctAnswer) {
           correctCount++;

@@ -13,14 +13,29 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [focusStartTime, setFocusStartTime] = useState(Date.now());
-  // console.log("Selected Lecture:", selectedLecture.split('/').pop());  
-  // const lecturePath = `http://localhost/local/scholarwatch/api/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/').pop())}.pdf`;
 
-  // console.log("Full PDF Path:", lecturePath);
-  const fileObject = useMemo(() => ({
-    url: `http://localhost/local/scholarwatch/api/getPDF.php?file=${encodeURIComponent(selectedLecture.split('/').pop())}.pdf`,
-    withCredentials: true,
-  }), [selectedLecture]);
+  const fileObject = useMemo(() => {
+    if (!selectedLecture) return null;
+    
+    // Extract filename from path
+    const filename = selectedLecture.split('/').pop();
+    
+    // Remove .pdf extension if it exists, then add it back
+    // This ensures we don't get double .pdf extensions
+    const baseFilename = filename.endsWith('.pdf') ? filename.slice(0, -4) : filename;
+    
+    console.log("Selected Lecture Path:", selectedLecture);
+    console.log("Extracted filename:", filename);
+    console.log("Base filename:", baseFilename);
+    
+    const url = `http://localhost/local/scholarwatch/api/getPDF.php?file=${encodeURIComponent(baseFilename)}.pdf`;
+    console.log("Final PDF URL:", url);
+    
+    return {
+      url: url,
+      withCredentials: true,
+    };
+  }, [selectedLecture]);
 
   useEffect(() => {
     if (numPages && pageNumber === numPages) {
@@ -49,10 +64,12 @@ const PDFViewer = ({ selectedLecture, setTakeQuiz, onLectureFinish, onPageGazeDa
     <div>
       <h3>Lecture Material</h3>
 
-      {selectedLecture ? (
-        <Document file={fileObject} 
-                      onLoadSuccess={onDocumentLoadSuccess} 
-                      onLoadError={(error) => console.error('PDF loading error:', error)}>
+      {selectedLecture && fileObject ? (
+        <Document 
+          file={fileObject} 
+          onLoadSuccess={onDocumentLoadSuccess} 
+          onLoadError={(error) => console.error('PDF loading error:', error)}
+        >
           <Page pageNumber={pageNumber} />
         </Document>
       ) : (
