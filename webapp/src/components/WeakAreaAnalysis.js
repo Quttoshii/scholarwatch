@@ -16,7 +16,18 @@ import "./WeakAreasAnalysis.css";
 
 const generateColors = (length) => {
   // const baseColors = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#a4de6c", "#d0ed57", "#8dd1e1", "#ffb6b9", "#c6b9cd", "#ffcc99"];
-  const baseColors = ['#FF6700', '#FDD1A6','#FF7F0E', '#993333','#FF7F0E', '#FDBF6F', "#F3C44D", "#FF4500", "#FFD700"]
+  const baseColors = [
+    '#FF6700', // Main orange
+    '#FF8533', // Light orange
+    '#FF4500', // Orange red
+    '#FFB366', // Peach
+    '#FF7F0E', // Dark orange
+    '#FFA500', // Orange
+    '#FF9933', // Medium orange
+    '#FFD700', // Gold
+    '#F3C44D', // Yellow gold
+    '#FF8C00'  // Dark orange
+  ];
   const colors = [];
   for (let i = 0; i < length; i++) {
     colors.push(baseColors[i % baseColors.length]);
