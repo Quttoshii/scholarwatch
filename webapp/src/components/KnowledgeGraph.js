@@ -47,7 +47,7 @@ const Toast = ({ message, type, onClose }) => (
   </div>
 );
 
-const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherId = 1, studentId = null }) => {
+const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher, teacherId = 1, studentId = null }) => {
   // All hooks must be called at the top level
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -101,16 +101,31 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
       try {
         let response;
         if (isTeacher) {
-          response = await axios.get(`http://localhost/scholarwatch/getTeacherCourses.php?teacherId=${teacherId}`);
-        } else {
-          response = await axios.get(`http://localhost/scholarwatch/getAllCourses.php`);
+          response = await axios.get(`http://localhost/local/scholarwatch/api/getTeacherCourses.php?teacherId=${teacherId}`, {
+            method: "GET",
+            withCredentials: "include", // important for Moodle session auth
+            headers: {
+                "Content-Type": "application/json",
+            },
+            });
+        } 
+        else {
+          response = await axios.get(`http://localhost/local/scholarwatch/api/getAllCourses.php`, 
+            {
+            method: "GET",
+            withCredentials: "include", // important for Moodle session auth
+            headers: {
+                "Content-Type": "application/json",
+            },
+            });
         }
         if (response.data.success) {
           setCourses(response.data.courses);
           if (!selectedCourseId && response.data.courses.length > 0) {
             setSelectedCourseId(response.data.courses[0].CourseID);
           }
-        } else {
+        } 
+        else {
           setCoursesError('Failed to fetch courses.');
         }
       } catch (err) {
@@ -131,11 +146,11 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
     }
 
     try {
-      let url = `http://localhost/scholarwatch/knowledge-graph.php?action=get&courseId=${selectedCourseId}`;
+      let url = `http://localhost/local/scholarwatch/api/knowledge-graph.php?action=get&courseId=${selectedCourseId}`;
       if (!isTeacher && studentId) {
         url += `&studentId=${studentId}`;
       }
-      const response = await axios.get(url);
+      const response = await axios.get(url, {withCredentials: true});
       if (response.data.success) {
         setNodes(response.data.nodes);
         setEdges(response.data.edges);
@@ -155,10 +170,16 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
   // Handle node position updates
   const onNodeDragStop = useCallback(async (event, node) => {
     try {
-      await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=updateNodePosition', {
+      await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=updateNodePosition', {
         nodeId: node.id,
         x: node.position.x,
         y: node.position.y
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true  // Required for Moodle session auth
       });
     } catch (error) {
       console.error('Error updating node position:', error);
@@ -174,24 +195,30 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
   // Handle adding new node
   const handleAddNode = async () => {
     try {
-      const response = await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=addNode', {
+      const response = await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=addNode', {
         graphId,
         name: newNode.label,
         type: 'TOPIC',
         description: newNode.description,
         x: 0,
         y: 0
-      });
+      }, {
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true
+});
 
       if (response.data.success) {
         // Add edges for prerequisites
         for (const prereqId of newNodePrereqs) {
-          await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=addEdge', {
+          await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=addEdge', {
             graphId,
             sourceId: prereqId,
             targetId: response.data.nodeId,
             type: 'PREREQUISITE'
-          });
+          }, {
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true
+});
         }
 
         // Refresh graph data
@@ -208,12 +235,15 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
   // Handle updating node
   const handleUpdateNode = async () => {
     try {
-      await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=updateNode', {
+      await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=updateNode', {
         nodeId: selectedNode.id,
         name: selectedNode.data.label,
         description: selectedNode.data.description,
         type: selectedNode.type,
         lectureId: selectedNode.data.lectureId
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true
       });
 
       fetchGraphData();
@@ -226,8 +256,11 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
   // Handle deleting node
   const handleDeleteNode = async () => {
     try {
-      await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=deleteNode', {
+      await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=deleteNode', {
         nodeId: selectedNode.id
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true
       });
 
       fetchGraphData();
@@ -240,11 +273,14 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
   // Handle adding edge
   const onConnect = useCallback(async (params) => {
     try {
-      const response = await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=addEdge', {
+      const response = await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=addEdge', {
         graphId,
         sourceId: params.source,
         targetId: params.target,
         type: 'PREREQUISITE'
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true
       });
 
       if (response.data.success) {
@@ -260,8 +296,11 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
     if (isTeacher) {
       if (window.confirm('Delete this connection?')) {
         try {
-          await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=deleteEdge', {
+          await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=deleteEdge', {
             edgeId: edge.id
+          }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
           });
           fetchGraphData();
         } catch (error) {
@@ -423,7 +462,10 @@ const KnowledgeGraph = ({ courseId: initialCourseId, isTeacher = false, teacherI
       if (!isTeacher && studentId) {
         payload.studentId = studentId;
       }
-      const response = await axios.post('http://localhost/scholarwatch/knowledge-graph.php?action=updateNodeStatus', payload);
+      const response = await axios.post('http://localhost/local/scholarwatch/api/knowledge-graph.php?action=updateNodeStatus', payload, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true
+      });
 
       if (response.data.success) {
         // Update local state immediately for better UX

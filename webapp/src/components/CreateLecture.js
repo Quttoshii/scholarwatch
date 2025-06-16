@@ -42,16 +42,25 @@ const CreateLecture = ({ userID }) => {
         };
 
         const fetchCourses = async () => {
-            try {
-                const response = await axios.get(`http://localhost/scholarwatch/getTeacherCourses.php?teacherId=${userID}`);
-                if (response.data.success) {
-                    setCourses(response.data.courses);
-                } else {
-                    console.error("Error fetching courses:", response.data.message);
-                }
-            } catch (error) {
-                console.error("Error:", error);
+        try {
+            const response = await fetch(`http://localhost/local/scholarwatch/api/getTeacherCourses.php?teacherId=${userID}`, {
+            method: "GET",
+            credentials: "include", // important for Moodle session auth
+            headers: {
+                "Content-Type": "application/json",
+            },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+            setCourses(data.courses);
+            } else {
+            console.error("Error fetching courses:", data.message);
             }
+        } catch (error) {
+            console.error("Error:", error);
+        }
         };
 
         fetchLectures();
